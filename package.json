@@ -1,0 +1,27 @@
+{
+  "name": "inversify-express-openapi",
+  "version": "0.0.1",
+  "description": "Generate OpenAPI specification from inversify-express-utils controllers",
+  "main": "src/main.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sedlatschek/inversify-express-openapi.git"
+  },
+  "keywords": [
+    "OpenAPI",
+    "OA2",
+    "OA3",
+    "Inversify",
+    "Express",
+    "Inversify-Express-Utils"
+  ],
+  "author": "Simon Sedlatschek <code@sedlatschek.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sedlatschek/inversify-express-openapi/issues"
+  },
+  "homepage": "https://github.com/sedlatschek/inversify-express-openapi#readme"
+}

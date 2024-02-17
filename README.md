@@ -1,0 +1,1 @@
+# Inversify Express OpenAPI
