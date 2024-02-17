@@ -1,10 +1,11 @@
 {
-  "name": "inversify-express-openapi",
+  "name": "inversify-express-typebox-openapi",
   "version": "0.0.1",
   "description": "Generate OpenAPI specification from inversify-express-utils controllers",
   "main": "src/main.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
     "lint": "eslint --ignore-path .gitignore --ext .js,.ts",
     "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\""
   },
@@ -16,9 +17,11 @@
     "OpenAPI",
     "OA2",
     "OA3",
+    "Swagger",
     "Inversify",
     "Express",
-    "Inversify-Express-Utils"
+    "Inversify-Express-Utils",
+    "Typebox"
   ],
   "author": "Simon Sedlatschek <code@sedlatschek.com>",
   "license": "ISC",
@@ -27,15 +30,24 @@
   },
   "homepage": "https://github.com/sedlatschek/inversify-express-openapi#readme",
   "dependencies": {
+    "openapi3-ts": "^4.2.1",
     "reflect-metadata": "^0.2.1"
   },
+  "peerDependencies": {
+    "@sinclair/typebox": "^0.32.0",
+    "inversify": "^6.0.0",
+    "inversify-express-utils": "^6.0.0"
+  },
   "devDependencies": {
+    "@types/express": "^4.17.21",
     "@types/node": "^20.11.19",
     "@typescript-eslint/eslint-plugin": "^7.0.1",
     "@typescript-eslint/parser": "^7.0.1",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
+    "express": "^4.18.2",
     "prettier": "^3.2.5",
+    "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   }
 }

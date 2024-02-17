@@ -1,12 +1,15 @@
-const test = {
-  a: 1,
-  b: 2,
-};
+import 'reflect-metadata';
+import { Container } from 'inversify';
+import { InversifyExpressServer } from 'inversify-express-utils';
 
-const test2 = { a: 1, b: 2 };
+import './ExampleController';
+import { parseContainer } from './parse';
 
-const array = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+// set up container
+let container = new Container();
 
-console.log(test);
-console.log(test2);
-console.log(array);
+// create server
+let server = new InversifyExpressServer(container);
+let app = server.build();
+
+console.log(JSON.stringify(parseContainer(container), null, 2));
