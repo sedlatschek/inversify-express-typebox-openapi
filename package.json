@@ -23,5 +23,12 @@
   "bugs": {
     "url": "https://github.com/sedlatschek/inversify-express-openapi/issues"
   },
-  "homepage": "https://github.com/sedlatschek/inversify-express-openapi#readme"
+  "homepage": "https://github.com/sedlatschek/inversify-express-openapi#readme",
+  "dependencies": {
+    "reflect-metadata": "^0.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.19",
+    "typescript": "^5.3.3"
+  }
 }
