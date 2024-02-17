@@ -1,13 +1,13 @@
 {
   "compilerOptions": {
     "target": "ES6",
-    "lib": ["ES6"],
+    "lib": ["ES6", "DOM"],
     "types": ["reflect-metadata"],
     "module": "CommonJS",
     "moduleResolution": "node",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "noImplicitAny": true,
+    "noImplicitAny": true
   },
   "include": ["src/**/*"]
 }
