@@ -6,17 +6,17 @@ import { Operation, Parameter } from './type';
 export const OPERATION_METADATA_KEY =
   'inversify-express-typebox-openapi:operation';
 
-export function getOperationMetadata(
+export const getOperationMetadata = (
   target: object,
   methodName: string | symbol,
-): Operation | undefined {
+): Operation | undefined => {
   return Reflect.getMetadata(OPERATION_METADATA_KEY, target, methodName);
-}
+};
 
-export function getOrCreateOperationMetadata(
+const getOrCreateOperationMetadata = (
   target: object,
   methodName: string | symbol,
-): Operation {
+): Operation => {
   let metadata = getOperationMetadata(target, methodName);
 
   if (!metadata) {
@@ -24,13 +24,13 @@ export function getOrCreateOperationMetadata(
   }
 
   return metadata;
-}
+};
 
-export function addOperationMetadata(
+export const addOperationMetadata = (
   target: object,
   methodName: string | symbol,
   props?: Pick<Operation, 'method' | 'deprecated'>,
-): Operation {
+): Operation => {
   let metadata = getOperationMetadata(target, methodName);
 
   if (!metadata) {
@@ -57,20 +57,23 @@ export function addOperationMetadata(
   }
 
   return metadata;
-}
+};
 
-export function getParameterMetadata(
+const getParameterMetadata = (
   target: object,
   methodName: string | symbol,
   index: number,
-): Parameter | undefined {
+): Parameter | undefined => {
   const metadata = getOperationMetadata(target, methodName);
   return (metadata?.parameters ?? []).find(
     (parameter) => parameter.index === index,
   );
-}
+};
 
-export function addParametersMetadata(
+/**
+ * Existing metadata will be updated with the new props.
+ */
+export const addParametersMetadata = (
   target: object,
   methodName: string | symbol,
   index: number,
@@ -78,7 +81,7 @@ export function addParametersMetadata(
   name?: string,
   type?: ParameterLocation,
   schema?: TSchema,
-): void {
+): void => {
   const metadata = getOrCreateOperationMetadata(target, methodName);
 
   if (!metadata.parameters) {
@@ -121,13 +124,13 @@ export function addParametersMetadata(
     ...nameProp,
     ...typeProp,
   };
-}
+};
 
-export function addBodyMetadata(
+export const addBodyMetadata = (
   target: object,
   methodName: string | symbol,
   _schema: TSchema,
-): void {
+): void => {
   const metadata = getOrCreateOperationMetadata(target, methodName);
 
   metadata.requestBody = {
@@ -135,15 +138,15 @@ export function addBodyMetadata(
     content: {}, // TODO: map schema to ContentObject
     // TODO: add required to operation requestBody metadata
   };
-}
+};
 
-export function addResponsesMetadata(
+export const addResponsesMetadata = (
   target: object,
   methodName: string | symbol,
   statusCode: string,
   description: string,
   schema?: TSchema,
-): void {
+): void => {
   const metadata = getOrCreateOperationMetadata(target, methodName);
 
   if (!metadata.responses) {
@@ -170,4 +173,4 @@ export function addResponsesMetadata(
   // TODO: add default response to operation responses metadata
 
   metadata.responses[statusCode] = response;
-}
+};
