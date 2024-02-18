@@ -19,5 +19,4 @@ const openApi = OpenApiBuilder.create();
 const controllers = parseContainer(container);
 injectControllers(openApi, controllers);
 
-console.log(JSON.stringify(parseContainer(container), null, 2));
-console.log(openApi.getSpecAsYaml());
+console.log('\n' + openApi.getSpecAsYaml());

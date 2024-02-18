@@ -16,7 +16,7 @@ export function createOperationMetadata(
   if (!metadata) {
     metadata = {
       method,
-      operationId: methodName.toString(),
+      operationId: `${target.constructor.name}::${methodName.toString()}`,
       responses: {},
     };
 
