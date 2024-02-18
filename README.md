@@ -1,5 +1,10 @@
 # Inversify Express OpenAPI
 
+## Features
+
+- OpenAPI spec generation at runtime (no precompilation)
+- Integrated with `inversify-express-utils`
+
 ## ToDo
 
 - [ ] improve `mapTypeBoxSchemaToOpenAPISchema`

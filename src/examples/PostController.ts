@@ -18,7 +18,8 @@ import { Static, Type } from '@sinclair/typebox';
 
 export const PostSchema = Type.Object(
   {
-    id: Type.String(),
+    id: Type.Number(),
+    parentId: Type.Optional(Type.Number()),
     text: Type.String(),
     visible: Type.Boolean(),
     createdAt: Type.String({ format: 'date-time' }),
@@ -56,10 +57,10 @@ export class PostController extends BaseHttpController {
   @Post('')
   @Response(201, 'A freshly created Post', PostSchema)
   public async postPost(
-    @Header('X-Something', Type.String()) _something: string,
     @Query('date', Type.String()) _date: string,
     @Body(PostSchema) body: Post,
     @response() res: ExpressResponse,
+    @Header('X-Something', Type.Optional(Type.String())) _something?: string,
   ): Promise<void> {
     res.status(201).send(body);
   }

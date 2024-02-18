@@ -1,4 +1,4 @@
-import { TSchema } from '@sinclair/typebox';
+import { OptionalKind, TSchema } from '@sinclair/typebox';
 import { ParameterLocation, ResponseObject } from 'openapi3-ts/oas31';
 import { mapTypeBoxSchemaToOpenAPISchema } from './map';
 import { Operation, OperationMethod } from './type';
@@ -70,7 +70,7 @@ export function addParametersMetadata(
     name,
     in: type,
     // TODO: add description to operation parameter metadata
-    // TODO: add required to operation parameter metadata
+    required: !(OptionalKind in schema),
     // TODO: add deprecated to operation parameter metadata
     // TODO: add allowEmptyValue to operation parameter metadata
     // TODO: add style to operation parameter metadata

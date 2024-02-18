@@ -5,22 +5,25 @@ export function mapTypeBoxSchemaToOpenAPISchema(
   typeBoxSchema: TSchema,
 ): SchemaObject {
   const schema: SchemaObject = {};
-
   switch (typeBoxSchema.type) {
     case 'string':
     case 'number':
     case 'boolean':
       schema.type = typeBoxSchema.type;
       break;
+    case 'null':
+    case 'undefined':
+      schema.type = 'null';
+      break;
     case 'object':
       schema.type = 'object';
       schema.properties = {};
       if (typeBoxSchema.properties) {
-        Object.keys(typeBoxSchema.properties).forEach((key) => {
+        for (const key of Object.keys(typeBoxSchema.properties)) {
           schema.properties![key] = mapTypeBoxSchemaToOpenAPISchema(
             typeBoxSchema.properties[key],
           );
-        });
+        }
       }
       if (typeBoxSchema.required) {
         schema.required = typeBoxSchema.required;
