@@ -26,7 +26,7 @@ export {
 
 export function Path(name: string, schema: TSchema): ParameterDecorator {
   return (
-    target: Object,
+    target: object,
     methodName: string | symbol | undefined,
     parameterIndex: number,
   ) => {
@@ -39,7 +39,7 @@ export function Path(name: string, schema: TSchema): ParameterDecorator {
 
 export function Query(name: string, schema: TSchema): ParameterDecorator {
   return (
-    target: Object,
+    target: object,
     methodName: string | symbol | undefined,
     parameterIndex: number,
   ) => {
@@ -52,7 +52,7 @@ export function Query(name: string, schema: TSchema): ParameterDecorator {
 
 export function Cookie(name: string, schema: TSchema): ParameterDecorator {
   return (
-    target: Object,
+    target: object,
     methodName: string | symbol | undefined,
     parameterIndex: number,
   ) => {
@@ -65,7 +65,7 @@ export function Cookie(name: string, schema: TSchema): ParameterDecorator {
 
 export function Header(name: string, schema: TSchema): ParameterDecorator {
   return (
-    target: Object,
+    target: object,
     methodName: string | symbol | undefined,
     parameterIndex: number,
   ) => {
@@ -78,7 +78,7 @@ export function Header(name: string, schema: TSchema): ParameterDecorator {
 
 export function Body(schema: TSchema): ParameterDecorator {
   return (
-    target: Object,
+    target: object,
     methodName: string | symbol | undefined,
     parameterIndex: number,
   ) => {

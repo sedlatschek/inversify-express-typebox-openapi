@@ -8,7 +8,7 @@ export enum METADATA_KEY {
 }
 
 export function getParametersMetadata(
-  target: Object,
+  target: object,
   methodName: string | symbol,
 ): Parameter[] | undefined {
   return (
@@ -18,12 +18,12 @@ export function getParametersMetadata(
 }
 
 export function addParametersMetadata(
-  target: Object,
+  target: object,
   methodName: string | symbol,
   type: ParameterLocation,
   schema: TSchema,
   name: string,
-) {
+): void {
   let metadata = getParametersMetadata(target, methodName);
 
   if (!metadata) {
@@ -43,16 +43,16 @@ export function addParametersMetadata(
 }
 
 export function getBodyMetadata(
-  target: Object,
+  target: object,
   methodName: string | symbol,
 ): Body | undefined {
   return Reflect.getMetadata(METADATA_KEY.body, target, methodName);
 }
 
 export function addBodyMetadata(
-  target: Object,
+  target: object,
   methodName: string | symbol,
   schema: TSchema,
-) {
+): void {
   Reflect.defineMetadata(METADATA_KEY.body, { schema }, target, methodName);
 }

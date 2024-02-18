@@ -4,7 +4,7 @@ import {
   PathItemObject,
   RequestBodyObject,
 } from 'openapi3-ts/oas31';
-import { Controller, Parameter, Route } from './type';
+import { Controller, Route } from './type';
 import { TSchema } from '@sinclair/typebox';
 import { mapTypeBoxSchemaToOpenAPISchema } from './map';
 
@@ -27,7 +27,7 @@ export const injectControllers = (
   return builder;
 };
 
-const pathParamReplaceRegex = /:([^\/]+)/g;
+const pathParamReplaceRegex = /:([^/]+)/g;
 
 const getRoutePath = (controllerPath: string, routePath: string): string => {
   return `${controllerPath}${routePath}`.replace(pathParamReplaceRegex, '{$1}');

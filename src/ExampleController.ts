@@ -38,7 +38,7 @@ const user = {
 @Controller('/api')
 export class ExampleController {
   @Get('/')
-  public async get(@response() res: Response) {
+  public async get(@response() res: Response): Promise<void> {
     res.status(200).send('Hello, world!');
   }
 
@@ -47,7 +47,7 @@ export class ExampleController {
     @Cookie('session', Type.String()) _session: string,
     @Path('userId', Type.String({ format: 'numeric' })) _userId: string,
     @response() res: Response,
-  ) {
+  ): Promise<void> {
     res.status(200).send(user);
   }
 
@@ -57,24 +57,20 @@ export class ExampleController {
     @Query('date', Type.String()) _date: string,
     @Body(UserSchema) body: User,
     @response() res: Response,
-  ) {
+  ): Promise<void> {
     res.status(201).send(body);
   }
 
   @Put('/users/:userId')
-  public async putUser(
-    @Body(UserSchema) body: User,
-    @response() res: Response,
-  ): Promise<UserType | undefined> {
-    res.status(200).send(body);
-    return undefined;
+  public async putUser(@Body(UserSchema) body: User): Promise<UserType> {
+    return body;
   }
 
   @Delete('/users/:userId')
   public async deleteUser(
     @Path('userId', Type.String({ format: 'numeric' })) _userId: string,
     @response() res: Response,
-  ) {
+  ): Promise<void> {
     res.status(204).send();
   }
 }
