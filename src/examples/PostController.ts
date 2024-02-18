@@ -66,7 +66,10 @@ export class PostController extends BaseHttpController {
 
   @Put('/:postId')
   @Response(200, 'Updated Post', PostSchema)
-  public async putPost(@Body(PostSchema) body: Post): Promise<Post> {
+  public async putPost(
+    @Path('postId', Type.String({ format: 'numeric' })) _postId: string,
+    @Body(PostSchema) body: Post,
+  ): Promise<Post> {
     return body;
   }
 

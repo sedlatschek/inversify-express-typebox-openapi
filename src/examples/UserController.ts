@@ -67,7 +67,10 @@ export class UserController {
 
   @Put('/users/:userId')
   @Response(200, 'The updated user', UserSchema)
-  public async putUser(@Body(UserSchema) body: User): Promise<UserType> {
+  public async putUser(
+    @Path('userId', Type.String({ format: 'numeric' })) _userId: string,
+    @Body(UserSchema) body: User,
+  ): Promise<UserType> {
     return body;
   }
 
