@@ -1,5 +1,4 @@
-import { TSchema } from '@sinclair/typebox';
-import { ParameterLocation } from 'openapi3-ts/oas31';
+import { OperationObject, PathItemObject } from 'openapi3-ts/oas31';
 
 export type Controller = {
   name: string;
@@ -8,18 +7,15 @@ export type Controller = {
 };
 
 export type Route = {
-  method: string;
   path: string;
-  parameters?: Parameter[];
-  body?: Body;
+  operations: Operation[];
 };
 
-export type Parameter = {
-  name: string;
-  type: ParameterLocation;
-  schema: TSchema;
-};
+export type OperationMethod = keyof Pick<
+  PathItemObject,
+  'get' | 'put' | 'post' | 'delete' | 'options' | 'head' | 'patch' | 'trace'
+>;
 
-export type Body = {
-  schema: TSchema;
+export type Operation = OperationObject & {
+  method?: OperationMethod;
 };

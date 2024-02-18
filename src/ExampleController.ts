@@ -37,7 +37,7 @@ const user = {
 
 @Controller('/api')
 export class ExampleController {
-  @Get('/')
+  @Get('/users')
   public async get(@response() res: Response): Promise<void> {
     res.status(200).send('Hello, world!');
   }

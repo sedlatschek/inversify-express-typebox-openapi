@@ -1,12 +1,5 @@
-import {
-  OpenApiBuilder,
-  ParameterObject,
-  PathItemObject,
-  RequestBodyObject,
-} from 'openapi3-ts/oas31';
-import { Controller, Route } from './type';
-import { TSchema } from '@sinclair/typebox';
-import { mapTypeBoxSchemaToOpenAPISchema } from './map';
+import { OpenApiBuilder, PathItemObject } from 'openapi3-ts/oas31';
+import { Controller } from './type';
 
 export const injectControllers = (
   builder: OpenApiBuilder,
@@ -14,12 +7,17 @@ export const injectControllers = (
 ): OpenApiBuilder => {
   for (const controller of controllers) {
     for (const route of controller.routes) {
-      const pathItem: PathItemObject = {
-        [route.method]: {
-          requestBody: getBody(route),
-          parameters: getParameters(route),
-        },
-      };
+      const pathItem: PathItemObject = {};
+      for (const operation of route.operations) {
+        if (!operation.method) {
+          throw new Error('Operation method is required');
+        }
+
+        const operationObject = { ...operation };
+        delete operationObject.method;
+
+        pathItem[operation.method] = operationObject;
+      }
       builder.addPath(getRoutePath(controller.path, route.path), pathItem);
     }
   }
@@ -31,28 +29,4 @@ const pathParamReplaceRegex = /:([^/]+)/g;
 
 const getRoutePath = (controllerPath: string, routePath: string): string => {
   return `${controllerPath}${routePath}`.replace(pathParamReplaceRegex, '{$1}');
-};
-
-const getBody = (route: Route): RequestBodyObject | undefined => {
-  const bodySchema: TSchema | undefined = route.body?.schema;
-
-  if (!bodySchema) {
-    return undefined;
-  }
-
-  return {
-    content: {
-      body: {
-        schema: mapTypeBoxSchemaToOpenAPISchema(bodySchema),
-      },
-    },
-  };
-};
-
-const getParameters = (route: Route): ParameterObject[] => {
-  return (route.parameters ?? []).map((parameter) => ({
-    name: parameter.name,
-    in: parameter.type,
-    schema: mapTypeBoxSchemaToOpenAPISchema(parameter.schema),
-  }));
 };

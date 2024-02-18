@@ -1,20 +1,56 @@
 import { TSchema } from '@sinclair/typebox';
-import { Body, Parameter } from './type';
 import { ParameterLocation } from 'openapi3-ts/oas31';
+import { mapTypeBoxSchemaToOpenAPISchema } from './map';
+import { Operation, OperationMethod } from './type';
 
-export enum METADATA_KEY {
-  body = 'inversify-express-typebox-openapi:body',
-  parameters = 'inversify-express-typebox-openapi:parameters',
-}
+export const OPERATION_METADATA_KEY =
+  'inversify-express-typebox-openapi:operation';
 
-export function getParametersMetadata(
+export function createOperationMetadata(
   target: object,
   methodName: string | symbol,
-): Parameter[] | undefined {
-  return (
-    Reflect.getMetadata(METADATA_KEY.parameters, target, methodName) ??
-    undefined
-  );
+  method?: OperationMethod,
+): Operation {
+  let metadata = getOperationMetadata(target, methodName);
+
+  if (!metadata) {
+    metadata = {
+      method,
+      operationId: methodName.toString(),
+      responses: {},
+    };
+
+    Reflect.defineMetadata(
+      OPERATION_METADATA_KEY,
+      metadata,
+      target,
+      methodName,
+    );
+  } else if (method) {
+    metadata.method = method;
+  }
+
+  return metadata;
+}
+
+export function getOperationMetadata(
+  target: object,
+  methodName: string | symbol,
+): Operation | undefined {
+  return Reflect.getMetadata(OPERATION_METADATA_KEY, target, methodName);
+}
+
+export function getOrCreateOperationMetadata(
+  target: object,
+  methodName: string | symbol,
+): Operation {
+  let metadata = getOperationMetadata(target, methodName);
+
+  if (!metadata) {
+    metadata = createOperationMetadata(target, methodName);
+  }
+
+  return metadata;
 }
 
 export function addParametersMetadata(
@@ -24,35 +60,39 @@ export function addParametersMetadata(
   schema: TSchema,
   name: string,
 ): void {
-  let metadata = getParametersMetadata(target, methodName);
+  const metadata = getOrCreateOperationMetadata(target, methodName);
 
-  if (!metadata) {
-    const parametersMetadata: Parameter[] = [];
-
-    Reflect.defineMetadata(
-      METADATA_KEY.parameters,
-      parametersMetadata,
-      target,
-      methodName,
-    );
-
-    metadata = parametersMetadata;
+  if (!metadata.parameters) {
+    metadata.parameters = [];
   }
 
-  metadata.push({ name, type, schema });
-}
-
-export function getBodyMetadata(
-  target: object,
-  methodName: string | symbol,
-): Body | undefined {
-  return Reflect.getMetadata(METADATA_KEY.body, target, methodName);
+  metadata.parameters.push({
+    name,
+    in: type,
+    // TODO: add description to operation parameter metadata
+    // TODO: add required to operation parameter metadata
+    // TODO: add deprecated to operation parameter metadata
+    // TODO: add allowEmptyValue to operation parameter metadata
+    // TODO: add style to operation parameter metadata
+    // TODO: add explode to operation parameter metadata
+    // TODO: add allowReserved to operation parameter metadata
+    schema: mapTypeBoxSchemaToOpenAPISchema(schema),
+    // TODO: add examples to operation parameter metadata
+    // TODO: add example to operation parameter metadata
+    // TODO: add content to operation parameter metadata
+  });
 }
 
 export function addBodyMetadata(
   target: object,
   methodName: string | symbol,
-  schema: TSchema,
+  _schema: TSchema,
 ): void {
-  Reflect.defineMetadata(METADATA_KEY.body, { schema }, target, methodName);
+  const metadata = getOrCreateOperationMetadata(target, methodName);
+
+  metadata.requestBody = {
+    // TODO: add description to operation requestBody metadata
+    content: {}, // TODO: map schema to ContentObject
+    // TODO: add required to operation requestBody metadata
+  };
 }

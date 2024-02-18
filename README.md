@@ -13,6 +13,10 @@
 - [ ] descriptions
 - [ ] examples
 - [ ] tags
+- [ ] deprecated
+- [ ] operationId
+- [ ] externalDocs
 - [ ] Readme
 - [ ] make a package out of it
 - [ ] check for the lowest compatibile version of each peerDependency
+- [ ] inversify all?

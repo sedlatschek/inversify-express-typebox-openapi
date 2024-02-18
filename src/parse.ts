@@ -7,7 +7,7 @@ import {
   getControllersFromContainer,
 } from 'inversify-express-utils';
 import { Controller, Route } from './type';
-import { getBodyMetadata, getParametersMetadata } from './reflect';
+import { getOperationMetadata } from './reflect';
 
 export const parseContainer = (container: Container): Controller[] => {
   const inversifyControllers = getControllersFromContainer(container, true);
@@ -39,14 +39,13 @@ export const parseRoutes = (
   inversifyControllerMethod: ControllerMethodMetadata[],
 ): Route[] => {
   return inversifyControllerMethod.map((method): Route => {
-    const body = getBodyMetadata(method.target, method.key);
-    const parameters = getParametersMetadata(method.target, method.key);
+    const operation = getOperationMetadata(method.target, method.key);
+
+    const operations = operation ? [operation] : [];
 
     return {
-      method: method.method,
       path: method.path,
-      parameters,
-      body,
+      operations,
     };
   });
 };
