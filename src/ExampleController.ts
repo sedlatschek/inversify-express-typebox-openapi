@@ -1,14 +1,18 @@
 import 'reflect-metadata';
-import {
-  controller,
-  httpDelete,
-  httpGet,
-  httpPost,
-  httpPut,
-  response,
-} from 'inversify-express-utils';
+import { response } from 'inversify-express-utils';
 import { type Response } from 'express';
-import { Body, Header, Path, Query } from './decorators';
+import {
+  Body,
+  Controller,
+  Cookie,
+  Delete,
+  Get,
+  Header,
+  Path,
+  Post,
+  Put,
+  Query,
+} from './decorate';
 import { Type } from '@sinclair/typebox';
 
 export interface User {
@@ -16,7 +20,10 @@ export interface User {
   name: string;
 }
 
-const UserSchema = Type.Object({ id: Type.String(), name: Type.String() });
+const UserSchema = Type.Object(
+  { id: Type.String(), name: Type.String() },
+  { $id: 'User' },
+);
 
 export type UserType = {
   id: number;
@@ -28,24 +35,25 @@ const user = {
   name: 'John Doe',
 };
 
-@controller('/api')
+@Controller('/api')
 export class ExampleController {
-  @httpGet('/')
+  @Get('/')
   public async get(@response() res: Response) {
     res.status(200).send('Hello, world!');
   }
 
-  @httpGet('/users/:userId')
+  @Get('/users/:userId')
   public async getUser(
+    @Cookie('session', Type.String()) _session: string,
     @Path('userId', Type.String({ format: 'numeric' })) _userId: string,
     @response() res: Response,
   ) {
     res.status(200).send(user);
   }
 
-  @httpPost('/users')
+  @Post('/users')
   public async postUser(
-    @Header('Authorization', Type.String()) _auth: string,
+    @Header('X-Something', Type.String()) _something: string,
     @Query('date', Type.String()) _date: string,
     @Body(UserSchema) body: User,
     @response() res: Response,
@@ -53,7 +61,7 @@ export class ExampleController {
     res.status(201).send(body);
   }
 
-  @httpPut('/users/:userId')
+  @Put('/users/:userId')
   public async putUser(
     @Body(UserSchema) body: User,
     @response() res: Response,
@@ -62,7 +70,7 @@ export class ExampleController {
     return undefined;
   }
 
-  @httpDelete('/users/:userId')
+  @Delete('/users/:userId')
   public async deleteUser(
     @Path('userId', Type.String({ format: 'numeric' })) _userId: string,
     @response() res: Response,
