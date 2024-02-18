@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sedlatschek/inversify-express-openapi.git"
+    "url": "git+https://github.com/sedlatschek/inversify-express-typebox-openapi.git"
   },
   "keywords": [
     "OpenAPI",
@@ -26,9 +26,9 @@
   "author": "Simon Sedlatschek <code@sedlatschek.com>",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/sedlatschek/inversify-express-openapi/issues"
+    "url": "https://github.com/sedlatschek/inversify-express-typebox-openapi/issues"
   },
-  "homepage": "https://github.com/sedlatschek/inversify-express-openapi#readme",
+  "homepage": "https://github.com/sedlatschek/inversify-express-typebox-openapi#readme",
   "dependencies": {
     "openapi3-ts": "^4.2.1",
     "reflect-metadata": "^0.2.1"
