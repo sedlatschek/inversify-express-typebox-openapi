@@ -1,4 +1,6 @@
-# Inversify Express OpenAPI
+# Inversify Express Typebox OpenAPI
+
+Generate OpenAPI specification during runtime from inversify-express-utils controllers and typebox schemas.
 
 ## Features
 
