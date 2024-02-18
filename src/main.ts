@@ -2,7 +2,8 @@ import 'reflect-metadata';
 import { Container } from 'inversify';
 import { InversifyExpressServer } from 'inversify-express-utils';
 
-import './ExampleController';
+import './examples/UserController';
+import './examples/PostController';
 import { parseContainer } from './parse';
 import { injectControllers } from './generate';
 import { OpenApiBuilder } from 'openapi3-ts/oas31';

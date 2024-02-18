@@ -12,7 +12,7 @@ import {
   Post,
   Put,
   Query,
-} from './decorate';
+} from '../decorate';
 import { Type } from '@sinclair/typebox';
 
 export interface User {
@@ -36,7 +36,7 @@ const user = {
 };
 
 @Controller('/api')
-export class ExampleController {
+export class UserController {
   @Get('/users')
   public async get(@response() res: Response): Promise<void> {
     res.status(200).send('Hello, world!');
