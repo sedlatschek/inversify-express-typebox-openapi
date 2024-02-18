@@ -11,7 +11,6 @@
 - [ ] provide clearMetadata for testing
 - [ ] tests
 - [ ] schema reference by id (`const UserSchema = Type.Object( { id: Type.String(), name: Type.String() }, { $id: 'User' });`)
-- [ ] refactor decorate.ts to be more DRY
 - [ ] required parameters
 - [ ] security
 - [ ] descriptions

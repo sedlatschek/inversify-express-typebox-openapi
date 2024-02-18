@@ -20,92 +20,42 @@ import {
   addResponsesMetadata,
   createOperationMetadata,
 } from './reflect';
+import { OperationMethod } from './type';
+import { ParameterLocation } from 'openapi3-ts/oas31';
 
 export { controller as Controller };
 
-export function Get(
+export type InversifyMethodDecorator = (
   path: string,
   ...middleware: Array<Middleware>
-): HandlerDecorator {
-  return (
-    target: object,
-    methodName: string,
-    descriptor: PropertyDescriptor,
-  ) => {
-    createOperationMetadata(target, methodName, 'get');
-    httpGet(path, ...middleware)(target, methodName, descriptor);
-  };
-}
+) => HandlerDecorator;
 
-export function Post(
-  path: string,
-  ...middleware: Array<Middleware>
-): HandlerDecorator {
-  return (
-    target: object,
-    methodName: string,
-    descriptor: PropertyDescriptor,
-  ) => {
-    createOperationMetadata(target, methodName, 'post');
-    httpPost(path, ...middleware)(target, methodName, descriptor);
+const operationDecoratorFactory = (
+  inversifyMethodDecorator: InversifyMethodDecorator,
+  method: OperationMethod,
+): ((path: string, ...middleware: Array<Middleware>) => HandlerDecorator) => {
+  return (path: string, ...middleware: Array<Middleware>) => {
+    return (
+      target: object,
+      methodName: string,
+      descriptor: PropertyDescriptor,
+    ) => {
+      createOperationMetadata(target, methodName, method);
+      inversifyMethodDecorator(path, ...middleware)(
+        target,
+        methodName,
+        descriptor,
+      );
+    };
   };
-}
+};
 
-export function Patch(
-  path: string,
-  ...middleware: Array<Middleware>
-): HandlerDecorator {
-  return (
-    target: object,
-    methodName: string,
-    descriptor: PropertyDescriptor,
-  ) => {
-    createOperationMetadata(target, methodName, 'patch');
-    httpPatch(path, ...middleware)(target, methodName, descriptor);
-  };
-}
-
-export function Put(
-  path: string,
-  ...middleware: Array<Middleware>
-): HandlerDecorator {
-  return (
-    target: object,
-    methodName: string,
-    descriptor: PropertyDescriptor,
-  ) => {
-    createOperationMetadata(target, methodName, 'put');
-    httpPut(path, ...middleware)(target, methodName, descriptor);
-  };
-}
-
-export function Head(
-  path: string,
-  ...middleware: Array<Middleware>
-): HandlerDecorator {
-  return (
-    target: object,
-    methodName: string,
-    descriptor: PropertyDescriptor,
-  ) => {
-    createOperationMetadata(target, methodName, 'head');
-    httpHead(path, ...middleware)(target, methodName, descriptor);
-  };
-}
-
-export function Delete(
-  path: string,
-  ...middleware: Array<Middleware>
-): HandlerDecorator {
-  return (
-    target: object,
-    methodName: string,
-    descriptor: PropertyDescriptor,
-  ) => {
-    createOperationMetadata(target, methodName, 'delete');
-    httpDelete(path, ...middleware)(target, methodName, descriptor);
-  };
-}
+export const Get = operationDecoratorFactory(httpGet, 'get');
+export const Post = operationDecoratorFactory(httpPost, 'post');
+export const Patch = operationDecoratorFactory(httpPatch, 'patch');
+export const Put = operationDecoratorFactory(httpPut, 'put');
+export const Head = operationDecoratorFactory(httpHead, 'head');
+export const Delete = operationDecoratorFactory(httpDelete, 'delete');
 
 export function Response(
   statusCode: string | number,
@@ -123,57 +73,33 @@ export function Response(
   };
 }
 
-export function Path(name: string, schema: TSchema): ParameterDecorator {
-  return (
-    target: object,
-    methodName: string | symbol | undefined,
-    parameterIndex: number,
-  ) => {
-    if (methodName) {
-      addParametersMetadata(target, methodName, 'path', schema, name);
-    }
-    requestParam(name)(target, methodName, parameterIndex);
-  };
-}
+export type InversifyParameterDecorator = (
+  paramName?: string,
+) => ParameterDecorator;
 
-export function Query(name: string, schema: TSchema): ParameterDecorator {
-  return (
-    target: object,
-    methodName: string | symbol | undefined,
-    parameterIndex: number,
-  ) => {
-    if (methodName) {
-      addParametersMetadata(target, methodName, 'query', schema, name);
-    }
-    queryParam(name)(target, methodName, parameterIndex);
+const parameterDecoratorFactory = (
+  inversifyParameterDecorator: InversifyParameterDecorator,
+  type: ParameterLocation,
+): ((name: string, schema: TSchema) => ParameterDecorator) => {
+  return (name: string, schema: TSchema): ParameterDecorator => {
+    return (
+      target: object,
+      methodName: string | symbol | undefined,
+      parameterIndex: number,
+    ) => {
+      if (!methodName) {
+        throw new Error('Parameter decorators must have a method name');
+      }
+      addParametersMetadata(target, methodName, type, schema, name);
+      inversifyParameterDecorator(name)(target, methodName, parameterIndex);
+    };
   };
-}
+};
 
-export function Cookie(name: string, schema: TSchema): ParameterDecorator {
-  return (
-    target: object,
-    methodName: string | symbol | undefined,
-    parameterIndex: number,
-  ) => {
-    if (methodName) {
-      addParametersMetadata(target, methodName, 'cookie', schema, name);
-    }
-    queryParam(name)(target, methodName, parameterIndex);
-  };
-}
-
-export function Header(name: string, schema: TSchema): ParameterDecorator {
-  return (
-    target: object,
-    methodName: string | symbol | undefined,
-    parameterIndex: number,
-  ) => {
-    if (methodName) {
-      addParametersMetadata(target, methodName, 'header', schema, name);
-    }
-    queryParam(name)(target, methodName, parameterIndex);
-  };
-}
+export const Path = parameterDecoratorFactory(requestParam, 'path');
+export const Query = parameterDecoratorFactory(queryParam, 'query');
+export const Cookie = parameterDecoratorFactory(queryParam, 'cookie');
+export const Header = parameterDecoratorFactory(queryParam, 'header');
 
 export function Body(schema: TSchema): ParameterDecorator {
   return (
@@ -181,9 +107,10 @@ export function Body(schema: TSchema): ParameterDecorator {
     methodName: string | symbol | undefined,
     parameterIndex: number,
   ) => {
-    if (methodName) {
-      addBodyMetadata(target, methodName, schema);
+    if (!methodName) {
+      throw new Error('Body decorators must have a method name');
     }
+    addBodyMetadata(target, methodName, schema);
     requestBody()(target, methodName, parameterIndex);
   };
 }
