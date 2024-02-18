@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import { BaseHttpController, response } from 'inversify-express-utils';
-import { type Response } from 'express';
+import { type Response as ExpressResponse } from 'express';
 import {
   Body,
   Controller,
@@ -12,6 +12,7 @@ import {
   Post,
   Put,
   Query,
+  Response,
 } from '../decorate';
 import { Static, Type } from '@sinclair/typebox';
 
@@ -37,38 +38,43 @@ const post = {
 @Controller('/api/posts')
 export class PostController extends BaseHttpController {
   @Get('/')
-  public async get(@response() res: Response): Promise<void> {
+  @Response(200, 'All posts', Type.Array(PostSchema))
+  public async get(@response() res: ExpressResponse): Promise<void> {
     res.status(200).send('Hello, world!');
   }
 
   @Get('/:postId')
+  @Response(200, 'Post with the given postId', PostSchema)
   public async getPost(
     @Cookie('session', Type.String()) _session: string,
     @Path('postId', Type.String({ format: 'numeric' })) _postId: string,
-    @response() res: Response,
+    @response() res: ExpressResponse,
   ): Promise<void> {
     res.status(200).send(post);
   }
 
   @Post('')
+  @Response(201, 'A freshly created Post', PostSchema)
   public async postPost(
     @Header('X-Something', Type.String()) _something: string,
     @Query('date', Type.String()) _date: string,
     @Body(PostSchema) body: Post,
-    @response() res: Response,
+    @response() res: ExpressResponse,
   ): Promise<void> {
     res.status(201).send(body);
   }
 
   @Put('/:postId')
+  @Response(200, 'Updated Post', PostSchema)
   public async putPost(@Body(PostSchema) body: Post): Promise<Post> {
     return body;
   }
 
   @Delete('/:postId')
+  @Response(204, 'No content')
   public async deletePost(
     @Path('postId', Type.String({ format: 'numeric' })) _postId: string,
-    @response() res: Response,
+    @response() res: ExpressResponse,
   ): Promise<void> {
     res.status(204).send();
   }

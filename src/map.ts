@@ -8,13 +8,9 @@ export function mapTypeBoxSchemaToOpenAPISchema(
 
   switch (typeBoxSchema.type) {
     case 'string':
-      schema.type = 'string';
-      break;
     case 'number':
-      schema.type = 'number';
-      break;
     case 'boolean':
-      schema.type = 'boolean';
+      schema.type = typeBoxSchema.type;
       break;
     case 'object':
       schema.type = 'object';
@@ -29,6 +25,14 @@ export function mapTypeBoxSchemaToOpenAPISchema(
       if (typeBoxSchema.required) {
         schema.required = typeBoxSchema.required;
       }
+      break;
+    case 'array':
+      schema.type = 'array';
+      if (!typeBoxSchema.items) {
+        throw new Error('Array schema must have an "items" property');
+      }
+      // Map the item schema of the array
+      schema.items = mapTypeBoxSchemaToOpenAPISchema(typeBoxSchema.items);
       break;
     // Add more cases here to handle other types like 'array', 'enum', etc.
     default:

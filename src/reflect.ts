@@ -1,5 +1,5 @@
 import { TSchema } from '@sinclair/typebox';
-import { ParameterLocation } from 'openapi3-ts/oas31';
+import { ParameterLocation, ResponseObject } from 'openapi3-ts/oas31';
 import { mapTypeBoxSchemaToOpenAPISchema } from './map';
 import { Operation, OperationMethod } from './type';
 
@@ -95,4 +95,39 @@ export function addBodyMetadata(
     content: {}, // TODO: map schema to ContentObject
     // TODO: add required to operation requestBody metadata
   };
+}
+
+export function addResponsesMetadata(
+  target: object,
+  methodName: string | symbol,
+  statusCode: string,
+  description: string,
+  schema?: TSchema,
+): void {
+  const metadata = getOrCreateOperationMetadata(target, methodName);
+
+  if (!metadata.responses) {
+    metadata.responses = {};
+  }
+
+  const response: ResponseObject = {
+    description,
+    // TODO: add headers to operation response metadata
+    // TODO: add links to operation response metadata
+  };
+
+  if (schema) {
+    response.content = {
+      'application/json': {
+        schema: mapTypeBoxSchemaToOpenAPISchema(schema),
+        // TODO: add examples to operation response metadata
+        // TODO: add example to operation response metadata
+        // TODO: add encoding to operation response metadata
+      },
+    };
+  }
+
+  // TODO: add default response to operation responses metadata
+
+  metadata.responses[statusCode] = response;
 }

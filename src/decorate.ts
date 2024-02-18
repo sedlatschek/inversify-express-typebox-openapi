@@ -17,8 +17,10 @@ import {
 import {
   addBodyMetadata,
   addParametersMetadata,
+  addResponsesMetadata,
   createOperationMetadata,
 } from './reflect';
+import { TcpSocketConnectOpts } from 'net';
 
 export { controller as Controller };
 
@@ -26,7 +28,11 @@ export function Get(
   path: string,
   ...middleware: Array<Middleware>
 ): HandlerDecorator {
-  return (target: object, methodName: string, descriptor) => {
+  return (
+    target: object,
+    methodName: string,
+    descriptor: PropertyDescriptor,
+  ) => {
     console.log('Get', methodName);
     createOperationMetadata(target, methodName, 'get');
     httpGet(path, ...middleware)(target, methodName, descriptor);
@@ -37,7 +43,11 @@ export function Post(
   path: string,
   ...middleware: Array<Middleware>
 ): HandlerDecorator {
-  return (target: object, methodName: string, descriptor) => {
+  return (
+    target: object,
+    methodName: string,
+    descriptor: PropertyDescriptor,
+  ) => {
     console.log('Post', methodName);
     createOperationMetadata(target, methodName, 'post');
     httpPost(path, ...middleware)(target, methodName, descriptor);
@@ -48,7 +58,11 @@ export function Patch(
   path: string,
   ...middleware: Array<Middleware>
 ): HandlerDecorator {
-  return (target: object, methodName: string, descriptor) => {
+  return (
+    target: object,
+    methodName: string,
+    descriptor: PropertyDescriptor,
+  ) => {
     console.log('Patch', methodName);
     createOperationMetadata(target, methodName, 'patch');
     httpPatch(path, ...middleware)(target, methodName, descriptor);
@@ -59,7 +73,11 @@ export function Put(
   path: string,
   ...middleware: Array<Middleware>
 ): HandlerDecorator {
-  return (target: object, methodName: string, descriptor) => {
+  return (
+    target: object,
+    methodName: string,
+    descriptor: PropertyDescriptor,
+  ) => {
     console.log('Put', methodName);
     createOperationMetadata(target, methodName, 'put');
     httpPut(path, ...middleware)(target, methodName, descriptor);
@@ -70,7 +88,11 @@ export function Head(
   path: string,
   ...middleware: Array<Middleware>
 ): HandlerDecorator {
-  return (target: object, methodName: string, descriptor) => {
+  return (
+    target: object,
+    methodName: string,
+    descriptor: PropertyDescriptor,
+  ) => {
     console.log('Head', methodName);
     createOperationMetadata(target, methodName, 'head');
     httpHead(path, ...middleware)(target, methodName, descriptor);
@@ -81,10 +103,31 @@ export function Delete(
   path: string,
   ...middleware: Array<Middleware>
 ): HandlerDecorator {
-  return (target: object, methodName: string, descriptor) => {
+  return (
+    target: object,
+    methodName: string,
+    descriptor: PropertyDescriptor,
+  ) => {
     console.log('Delete', methodName);
     createOperationMetadata(target, methodName, 'delete');
     httpDelete(path, ...middleware)(target, methodName, descriptor);
+  };
+}
+
+export function Response(
+  statusCode: string | number,
+  description: string,
+  schema?: TSchema,
+): HandlerDecorator {
+  return (target: object, methodName: string) => {
+    console.log('Response', methodName);
+    addResponsesMetadata(
+      target,
+      methodName,
+      statusCode.toString(),
+      description,
+      schema,
+    );
   };
 }
 
