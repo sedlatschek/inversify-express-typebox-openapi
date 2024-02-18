@@ -6,6 +6,7 @@ import {
   Controller,
   Cookie,
   Delete,
+  Deprecated,
   Get,
   Header,
   Path,
@@ -39,6 +40,7 @@ const user = {
 @Controller('/api')
 export class UserController {
   @Get('/users')
+  @Deprecated()
   @Response(200, 'All users', Type.Array(UserSchema))
   public async get(@response() res: ExpressResponse): Promise<void> {
     res.status(200).send('Hello, world!');
@@ -49,6 +51,9 @@ export class UserController {
   public async getUser(
     @Cookie('session', Type.String()) _session: string,
     @Path('userId', Type.String({ format: 'numeric' })) _userId: string,
+    @Cookie('deprecated_session', Type.String())
+    @Deprecated()
+    _deprecatedSession: string,
     @response() res: ExpressResponse,
   ): Promise<void> {
     res.status(200).send(user);

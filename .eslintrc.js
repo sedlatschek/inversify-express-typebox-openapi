@@ -31,6 +31,7 @@ module.exports = {
       'warn',
       {
         argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
       },
     ],
     '@typescript-eslint/explicit-function-return-type': 'error',

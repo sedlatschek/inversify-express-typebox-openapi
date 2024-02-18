@@ -1,5 +1,10 @@
-import { OpenApiBuilder, PathItemObject } from 'openapi3-ts/oas31';
-import { Controller } from './type';
+import {
+  OpenApiBuilder,
+  OperationObject,
+  ParameterObject,
+  PathItemObject,
+} from 'openapi3-ts/oas31';
+import { Controller, Operation, Parameter } from './type';
 
 export const injectControllers = (
   builder: OpenApiBuilder,
@@ -12,11 +17,8 @@ export const injectControllers = (
         if (!operation.method) {
           throw new Error('Operation method is required');
         }
-
-        const operationObject = { ...operation };
-        delete operationObject.method;
-
-        pathItem[operation.method] = operationObject;
+        pathItem[operation.method] =
+          convertOperationToOperationObject(operation);
       }
       builder.addPath(getRoutePath(controller.path, route.path), pathItem);
     }
@@ -29,4 +31,19 @@ const pathParamReplaceRegex = /:([^/]+)/g;
 
 const getRoutePath = (controllerPath: string, routePath: string): string => {
   return `${controllerPath}${routePath}`.replace(pathParamReplaceRegex, '{$1}');
+};
+
+const convertOperationToOperationObject = (
+  operation: Operation,
+): OperationObject => {
+  const operationObject = { ...operation };
+  delete operationObject.method;
+
+  (operationObject as OperationObject).parameters =
+    operationObject.parameters?.map((parameter: Parameter): ParameterObject => {
+      const { index: _, ...parameterObject } = parameter;
+      return parameterObject;
+    }) as ParameterObject[] | undefined;
+
+  return operationObject;
 };

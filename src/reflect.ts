@@ -1,37 +1,10 @@
 import { OptionalKind, TSchema } from '@sinclair/typebox';
 import { ParameterLocation, ResponseObject } from 'openapi3-ts/oas31';
 import { mapTypeBoxSchemaToOpenAPISchema } from './map';
-import { Operation, OperationMethod } from './type';
+import { Operation, Parameter } from './type';
 
 export const OPERATION_METADATA_KEY =
   'inversify-express-typebox-openapi:operation';
-
-export function createOperationMetadata(
-  target: object,
-  methodName: string | symbol,
-  method?: OperationMethod,
-): Operation {
-  let metadata = getOperationMetadata(target, methodName);
-
-  if (!metadata) {
-    metadata = {
-      method,
-      operationId: `${target.constructor.name}::${methodName.toString()}`,
-      responses: {},
-    };
-
-    Reflect.defineMetadata(
-      OPERATION_METADATA_KEY,
-      metadata,
-      target,
-      methodName,
-    );
-  } else if (method) {
-    metadata.method = method;
-  }
-
-  return metadata;
-}
 
 export function getOperationMetadata(
   target: object,
@@ -47,18 +20,64 @@ export function getOrCreateOperationMetadata(
   let metadata = getOperationMetadata(target, methodName);
 
   if (!metadata) {
-    metadata = createOperationMetadata(target, methodName);
+    metadata = addOperationMetadata(target, methodName);
   }
 
   return metadata;
 }
 
+export function addOperationMetadata(
+  target: object,
+  methodName: string | symbol,
+  props?: Pick<Operation, 'method' | 'deprecated'>,
+): Operation {
+  let metadata = getOperationMetadata(target, methodName);
+
+  if (!metadata) {
+    metadata = {
+      method: props?.method,
+      operationId: `${target.constructor.name}::${methodName.toString()}`,
+      responses: {},
+      deprecated: props?.deprecated,
+    };
+
+    Reflect.defineMetadata(
+      OPERATION_METADATA_KEY,
+      metadata,
+      target,
+      methodName,
+    );
+  } else {
+    if (props?.method) {
+      metadata.method = props?.method;
+    }
+    if (props?.deprecated) {
+      metadata.deprecated = props?.deprecated;
+    }
+  }
+
+  return metadata;
+}
+
+export function getParameterMetadata(
+  target: object,
+  methodName: string | symbol,
+  index: number,
+): Parameter | undefined {
+  const metadata = getOperationMetadata(target, methodName);
+  return (metadata?.parameters ?? []).find(
+    (parameter) => parameter.index === index,
+  );
+}
+
 export function addParametersMetadata(
   target: object,
   methodName: string | symbol,
-  type: ParameterLocation,
-  schema: TSchema,
-  name: string,
+  index: number,
+  props: Pick<Parameter, 'deprecated'>,
+  name?: string,
+  type?: ParameterLocation,
+  schema?: TSchema,
 ): void {
   const metadata = getOrCreateOperationMetadata(target, methodName);
 
@@ -66,21 +85,42 @@ export function addParametersMetadata(
     metadata.parameters = [];
   }
 
-  metadata.parameters.push({
-    name,
-    in: type,
-    // TODO: add description to operation parameter metadata
-    required: !(OptionalKind in schema),
-    // TODO: add deprecated to operation parameter metadata
-    // TODO: add allowEmptyValue to operation parameter metadata
-    // TODO: add style to operation parameter metadata
-    // TODO: add explode to operation parameter metadata
-    // TODO: add allowReserved to operation parameter metadata
-    schema: mapTypeBoxSchemaToOpenAPISchema(schema),
-    // TODO: add examples to operation parameter metadata
-    // TODO: add example to operation parameter metadata
-    // TODO: add content to operation parameter metadata
-  });
+  let parameter = getParameterMetadata(target, methodName, index);
+  if (!parameter) {
+    parameter = {
+      index,
+      name: name ?? 'unknown name', // TODO: refactor this ugly peace of code so we don't need to set a default value
+      in: type ?? 'query', // TODO: refactor this ugly peace of code so we don't need to set a default value
+      // TODO: add description to operation parameter metadata
+      // TODO: add allowEmptyValue to operation parameter metadata
+      // TODO: add style to operation parameter metadata
+      // TODO: add explode to operation parameter metadata
+      // TODO: add allowReserved to operation parameter metadata
+      // TODO: add examples to operation parameter metadata
+      // TODO: add example to operation parameter metadata
+      // TODO: add content to operation parameter metadata
+    };
+    metadata.parameters.push(parameter);
+  }
+
+  const nameProp = name ? { name } : {};
+  const typeProp = type ? { in: type } : {};
+
+  const calculatedProps = schema
+    ? {
+        required: !(OptionalKind in schema),
+        schema: mapTypeBoxSchemaToOpenAPISchema(schema),
+      }
+    : {};
+
+  const arrayIndex = metadata.parameters.findIndex((p) => p.index === index);
+  metadata.parameters[arrayIndex] = {
+    ...parameter,
+    ...props,
+    ...calculatedProps,
+    ...nameProp,
+    ...typeProp,
+  };
 }
 
 export function addBodyMetadata(
