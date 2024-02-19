@@ -130,13 +130,17 @@ export const addParametersMetadata = (
 export const addBodyMetadata = (
   target: object,
   methodName: string | symbol,
-  _schema: TSchema,
+  schema: TSchema,
 ): void => {
   const metadata = getOrCreateOperationMetadata(target, methodName);
 
   metadata.requestBody = {
     // TODO: add description to operation requestBody metadata
-    content: {}, // TODO: map schema to ContentObject
+    content: {
+      'application/json': {
+        schema,
+      },
+    },
     // TODO: add required to operation requestBody metadata
   };
 };
