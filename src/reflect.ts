@@ -1,6 +1,5 @@
 import { OptionalKind, TSchema } from '@sinclair/typebox';
 import { ParameterLocation, ResponseObject } from 'openapi3-ts/oas31';
-import { mapTypeBoxSchemaToOpenAPISchema } from './map';
 import { Operation, Parameter } from './type';
 
 export const OPERATION_METADATA_KEY =
@@ -13,7 +12,7 @@ export const getOperationMetadata = (
   return Reflect.getMetadata(OPERATION_METADATA_KEY, target, methodName);
 };
 
-const getOrCreateOperationMetadata = (
+export const getOrCreateOperationMetadata = (
   target: object,
   methodName: string | symbol,
 ): Operation => {
@@ -59,7 +58,7 @@ export const addOperationMetadata = (
   return metadata;
 };
 
-const getParameterMetadata = (
+export const getParameterMetadata = (
   target: object,
   methodName: string | symbol,
   index: number,
@@ -106,13 +105,14 @@ export const addParametersMetadata = (
     metadata.parameters.push(parameter);
   }
 
+  // Optionally passed props will override existing props
   const nameProp = name ? { name } : {};
   const typeProp = type ? { in: type } : {};
+  const schemaProp = schema ? { schema: schema } : {};
 
   const calculatedProps = schema
     ? {
         required: !(OptionalKind in schema),
-        schema: mapTypeBoxSchemaToOpenAPISchema(schema),
       }
     : {};
 
@@ -123,19 +123,24 @@ export const addParametersMetadata = (
     ...calculatedProps,
     ...nameProp,
     ...typeProp,
+    ...schemaProp,
   };
 };
 
 export const addBodyMetadata = (
   target: object,
   methodName: string | symbol,
-  _schema: TSchema,
+  schema: TSchema,
 ): void => {
   const metadata = getOrCreateOperationMetadata(target, methodName);
 
   metadata.requestBody = {
     // TODO: add description to operation requestBody metadata
-    content: {}, // TODO: map schema to ContentObject
+    content: {
+      'application/json': {
+        schema,
+      },
+    },
     // TODO: add required to operation requestBody metadata
   };
 };
@@ -162,7 +167,7 @@ export const addResponsesMetadata = (
   if (schema) {
     response.content = {
       'application/json': {
-        schema: mapTypeBoxSchemaToOpenAPISchema(schema),
+        schema,
         // TODO: add examples to operation response metadata
         // TODO: add example to operation response metadata
         // TODO: add encoding to operation response metadata
