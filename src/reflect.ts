@@ -12,7 +12,7 @@ export const getOperationMetadata = (
   return Reflect.getMetadata(OPERATION_METADATA_KEY, target, methodName);
 };
 
-const getOrCreateOperationMetadata = (
+export const getOrCreateOperationMetadata = (
   target: object,
   methodName: string | symbol,
 ): Operation => {
@@ -58,7 +58,7 @@ export const addOperationMetadata = (
   return metadata;
 };
 
-const getParameterMetadata = (
+export const getParameterMetadata = (
   target: object,
   methodName: string | symbol,
   index: number,
