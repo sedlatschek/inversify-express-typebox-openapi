@@ -1,6 +1,5 @@
 import { OptionalKind, TSchema } from '@sinclair/typebox';
 import { ParameterLocation, ResponseObject } from 'openapi3-ts/oas31';
-import { mapTypeBoxSchemaToOpenAPISchema } from './map';
 import { Operation, Parameter } from './type';
 
 export const OPERATION_METADATA_KEY =
@@ -106,13 +105,14 @@ export const addParametersMetadata = (
     metadata.parameters.push(parameter);
   }
 
+  // Optionally passed props will override existing props
   const nameProp = name ? { name } : {};
   const typeProp = type ? { in: type } : {};
+  const schemaProp = schema ? { schema: schema } : {};
 
   const calculatedProps = schema
     ? {
         required: !(OptionalKind in schema),
-        schema: mapTypeBoxSchemaToOpenAPISchema(schema),
       }
     : {};
 
@@ -123,6 +123,7 @@ export const addParametersMetadata = (
     ...calculatedProps,
     ...nameProp,
     ...typeProp,
+    ...schemaProp,
   };
 };
 
@@ -162,7 +163,7 @@ export const addResponsesMetadata = (
   if (schema) {
     response.content = {
       'application/json': {
-        schema: mapTypeBoxSchemaToOpenAPISchema(schema),
+        schema,
         // TODO: add examples to operation response metadata
         // TODO: add example to operation response metadata
         // TODO: add encoding to operation response metadata
