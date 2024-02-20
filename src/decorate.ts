@@ -66,15 +66,11 @@ const parameterDecoratorFactory = (
       if (!methodName) {
         throw new Error('Parameter decorators must have a method name');
       }
-      addParametersMetadata(
-        target,
-        methodName,
-        parameterIndex,
-        {},
+      addParametersMetadata(target, methodName, parameterIndex, {
         name,
-        type,
+        in: type,
         schema,
-      );
+      });
       inversifyParameterDecorator(name)(target, methodName, parameterIndex);
     };
   };

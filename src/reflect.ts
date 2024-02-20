@@ -1,6 +1,7 @@
 import { OptionalKind, TSchema } from '@sinclair/typebox';
 import { ParameterLocation, ResponseObject } from 'openapi3-ts/oas31';
 import { Operation, Parameter } from './type';
+import { updateDefinedProperties } from './utilize';
 
 export const OPERATION_METADATA_KEY =
   'inversify-express-typebox-openapi:operation';
@@ -25,19 +26,21 @@ export const getOrCreateOperationMetadata = (
   return metadata;
 };
 
+export type OperationMetadataProperties = Partial<Operation>;
+
 export const addOperationMetadata = (
   target: object,
   methodName: string | symbol,
-  props?: Pick<Operation, 'method' | 'deprecated'>,
+  properties?: OperationMetadataProperties,
 ): Operation => {
   let metadata = getOperationMetadata(target, methodName);
 
   if (!metadata) {
     metadata = {
-      method: props?.method,
+      method: properties?.method,
       operationId: `${target.constructor.name}::${methodName.toString()}`,
       responses: {},
-      deprecated: props?.deprecated,
+      deprecated: properties?.deprecated,
     };
 
     Reflect.defineMetadata(
@@ -47,11 +50,8 @@ export const addOperationMetadata = (
       methodName,
     );
   } else {
-    if (props?.method) {
-      metadata.method = props?.method;
-    }
-    if (props?.deprecated) {
-      metadata.deprecated = props?.deprecated;
+    if (properties) {
+      updateDefinedProperties(metadata, properties);
     }
   }
 
@@ -69,6 +69,14 @@ export const getParameterMetadata = (
   );
 };
 
+export type ParameterMetadataProperties = Omit<
+  Parameter,
+  'index' | 'name' | 'in'
+> & {
+  name?: string;
+  in?: ParameterLocation;
+};
+
 /**
  * Existing metadata will be updated with the new props.
  */
@@ -76,10 +84,7 @@ export const addParametersMetadata = (
   target: object,
   methodName: string | symbol,
   index: number,
-  props: Pick<Parameter, 'deprecated'>,
-  name?: string,
-  type?: ParameterLocation,
-  schema?: TSchema,
+  properties: ParameterMetadataProperties,
 ): void => {
   const metadata = getOrCreateOperationMetadata(target, methodName);
 
@@ -91,8 +96,8 @@ export const addParametersMetadata = (
   if (!parameter) {
     parameter = {
       index,
-      name: name ?? 'unknown name', // TODO: refactor this ugly peace of code so we don't need to set a default value
-      in: type ?? 'query', // TODO: refactor this ugly peace of code so we don't need to set a default value
+      name: properties.name ?? 'unknown name', // TODO: refactor this ugly peace of code so we don't need to set a default value
+      in: properties.in ?? 'query', // TODO: refactor this ugly peace of code so we don't need to set a default value
       // TODO: add description to operation parameter metadata
       // TODO: add allowEmptyValue to operation parameter metadata
       // TODO: add style to operation parameter metadata
@@ -105,26 +110,16 @@ export const addParametersMetadata = (
     metadata.parameters.push(parameter);
   }
 
-  // Optionally passed props will override existing props
-  const nameProp = name ? { name } : {};
-  const typeProp = type ? { in: type } : {};
-  const schemaProp = schema ? { schema: schema } : {};
-
-  const calculatedProps = schema
+  const calculatedProps = properties.schema
     ? {
-        required: !(OptionalKind in schema),
+        required: !(OptionalKind in properties.schema),
       }
     : {};
 
   const arrayIndex = metadata.parameters.findIndex((p) => p.index === index);
-  metadata.parameters[arrayIndex] = {
-    ...parameter,
-    ...props,
-    ...calculatedProps,
-    ...nameProp,
-    ...typeProp,
-    ...schemaProp,
-  };
+
+  updateDefinedProperties(parameter, { ...properties, ...calculatedProps });
+  metadata.parameters[arrayIndex] = parameter;
 };
 
 export const addBodyMetadata = (

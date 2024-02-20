@@ -104,7 +104,10 @@ describe('reflect', () => {
     it('should add new metadata', () => {
       const target = {};
 
-      addParametersMetadata(target, 'test', 0, {}, 'method', 'header');
+      addParametersMetadata(target, 'test', 0, {
+        name: 'method',
+        in: 'header',
+      });
 
       expect(getParameterMetadata(target, 'test', 0)).toMatchObject({
         index: 0,
@@ -116,7 +119,10 @@ describe('reflect', () => {
     it('should update existing metadata', () => {
       const target = {};
 
-      addParametersMetadata(target, 'test', 0, {}, 'method', 'header');
+      addParametersMetadata(target, 'test', 0, {
+        name: 'method',
+        in: 'header',
+      });
 
       const metadata = getParameterMetadata(target, 'test', 0);
 
