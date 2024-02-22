@@ -1,3 +1,28 @@
-export * from './decorate';
-export * from './parse';
-export * from './generate';
+import { type Container } from 'inversify';
+import { OpenApiBuilder } from 'openapi3-ts/oas31';
+import { parseContainer } from './parse';
+import { injectControllers } from './generate';
+
+export const generateSpec = (
+  container: Container,
+  builder?: OpenApiBuilder,
+): OpenApiBuilder => {
+  const openApi = builder || OpenApiBuilder.create();
+  const controllers = parseContainer(container);
+  injectControllers(openApi, controllers);
+  return openApi;
+};
+
+export const generateSpecAsJson = (
+  container: Container,
+  builder?: OpenApiBuilder,
+): string => {
+  return JSON.stringify(generateSpec(container, builder).getSpec());
+};
+
+export const generateSpecAsYaml = (
+  container: Container,
+  builder?: OpenApiBuilder,
+): string => {
+  return generateSpec(container, builder).getSpecAsYaml();
+};
