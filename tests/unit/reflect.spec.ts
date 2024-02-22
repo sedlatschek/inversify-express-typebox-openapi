@@ -6,11 +6,13 @@ import {
   addOperationMetadata,
   addParametersMetadata,
   addResponsesMetadata,
+  getIndexByParameterIndex,
   getOperationMetadata,
   getOrCreateOperationMetadata,
   getParameterMetadata,
 } from '../../src/reflect';
 import { Type } from '@sinclair/typebox';
+import { Operation } from '../../src/type';
 
 describe('reflect', () => {
   describe('getOperationMetadata', () => {
@@ -30,7 +32,11 @@ describe('reflect', () => {
   describe('getOrCreateOperationMetadata', () => {
     it('should return metadata if found', () => {
       const target = {};
-      const metadata = { method: 'get' };
+      const metadata: Operation = {
+        method: 'get',
+        operationObject: { responses: {} },
+        parameterIndices: [],
+      };
       Reflect.defineMetadata(OPERATION_METADATA_KEY, metadata, target, 'test');
 
       expect(getOrCreateOperationMetadata(target, 'test')).toEqual(metadata);
@@ -41,8 +47,9 @@ describe('reflect', () => {
       const metadata = getOrCreateOperationMetadata(target, 'test');
 
       expect(metadata).toEqual({
-        operationId: 'Object::test',
-        responses: {},
+        method: undefined,
+        operationObject: { operationId: 'Object::test', responses: {} },
+        parameterIndices: [],
       });
     });
   });
@@ -56,8 +63,11 @@ describe('reflect', () => {
 
       expect(metadata).toEqual({
         method: 'get',
-        operationId: 'Object::test',
-        responses: {},
+        operationObject: {
+          operationId: 'Object::test',
+          responses: {},
+        },
+        parameterIndices: [],
       });
     });
 
@@ -69,20 +79,52 @@ describe('reflect', () => {
 
       expect(metadata).toEqual({
         method: 'get',
-        operationId: 'Object::test',
-        responses: {},
+        operationObject: {
+          operationId: 'Object::test',
+          responses: {},
+        },
+        parameterIndices: [],
       });
 
       const updatedMetadata = addOperationMetadata(target, 'test', {
-        deprecated: true,
+        operationObject: {
+          deprecated: true,
+        },
       });
 
       expect(updatedMetadata).toEqual({
         method: 'get',
-        operationId: 'Object::test',
-        responses: {},
-        deprecated: true,
+        operationObject: {
+          operationId: 'Object::test',
+          responses: {},
+          deprecated: true,
+        },
+        parameterIndices: [],
       });
+    });
+  });
+
+  describe('getIndexByParameterIndex', () => {
+    it('should return undefined if no metadata is found', () => {
+      expect(getIndexByParameterIndex({}, 'test', 0)).toBeUndefined();
+    });
+
+    it('should return array index if parameter index was found', () => {
+      const target = {};
+      const metadata: Operation = {
+        method: 'get',
+        operationObject: {
+          parameters: [
+            { name: 'test', in: 'query' },
+            { name: 'test2', in: 'query' },
+          ],
+          responses: {},
+        },
+        parameterIndices: [3, 4],
+      };
+      Reflect.defineMetadata(OPERATION_METADATA_KEY, metadata, target, 'test');
+
+      expect(getIndexByParameterIndex(target, 'test', 4)).toEqual(1);
     });
   });
 
@@ -93,10 +135,20 @@ describe('reflect', () => {
 
     it('should return metadata if found', () => {
       const target = {};
-      const metadata = { method: 'get', parameters: [{ index: 0 }] };
+      const metadata: Operation = {
+        method: 'get',
+        operationObject: {
+          parameters: [{ name: 'test', in: 'query' }],
+          responses: {},
+        },
+        parameterIndices: [0],
+      };
       Reflect.defineMetadata(OPERATION_METADATA_KEY, metadata, target, 'test');
 
-      expect(getParameterMetadata(target, 'test', 0)).toEqual({ index: 0 });
+      expect(getParameterMetadata(target, 'test', 0)).toEqual({
+        name: 'test',
+        in: 'query',
+      });
     });
   });
 
@@ -110,7 +162,6 @@ describe('reflect', () => {
       });
 
       expect(getParameterMetadata(target, 'test', 0)).toMatchObject({
-        index: 0,
         name: 'method',
         in: 'header',
       });
@@ -127,7 +178,6 @@ describe('reflect', () => {
       const metadata = getParameterMetadata(target, 'test', 0);
 
       expect(metadata).toMatchObject({
-        index: 0,
         name: 'method',
         in: 'header',
       });
@@ -136,7 +186,6 @@ describe('reflect', () => {
       addParametersMetadata(target, 'test', 0, { deprecated: true });
 
       expect(getParameterMetadata(target, 'test', 0)).toMatchObject({
-        index: 0,
         name: 'method',
         in: 'header',
         deprecated: true,
@@ -155,13 +204,19 @@ describe('reflect', () => {
       const metadata = getOperationMetadata(target, 'test');
 
       expect(metadata).toMatchObject({
-        requestBody: {
-          content: {
-            'application/json': {
-              schema,
+        method: undefined,
+        operationObject: {
+          operationId: 'Object::test',
+          requestBody: {
+            content: {
+              'application/json': {
+                schema,
+              },
             },
           },
+          responses: {},
         },
+        parameterIndices: [],
       });
     });
 
@@ -175,13 +230,19 @@ describe('reflect', () => {
       const metadata = getOperationMetadata(target, 'test');
 
       expect(metadata).toMatchObject({
-        requestBody: {
-          content: {
-            'application/json': {
-              schema,
+        method: undefined,
+        operationObject: {
+          operationId: 'Object::test',
+          requestBody: {
+            content: {
+              'application/json': {
+                schema,
+              },
             },
           },
+          responses: {},
         },
+        parameterIndices: [],
       });
 
       const newSchema = Type.Object({ id: Type.Number(), name: Type.String() });
@@ -189,13 +250,19 @@ describe('reflect', () => {
       addBodyMetadata(target, 'test', newSchema);
 
       expect(metadata).toMatchObject({
-        requestBody: {
-          content: {
-            'application/json': {
-              schema: newSchema,
+        method: undefined,
+        operationObject: {
+          operationId: 'Object::test',
+          requestBody: {
+            content: {
+              'application/json': {
+                schema: newSchema,
+              },
             },
           },
+          responses: {},
         },
+        parameterIndices: [],
       });
     });
   });
@@ -209,11 +276,16 @@ describe('reflect', () => {
       const metadata = getOperationMetadata(target, 'test');
 
       expect(metadata).toMatchObject({
-        responses: {
-          '200': {
-            description: 'OK',
+        method: undefined,
+        operationObject: {
+          operationId: 'Object::test',
+          responses: {
+            '200': {
+              description: 'OK',
+            },
           },
         },
+        parameterIndices: [],
       });
     });
 
@@ -225,26 +297,36 @@ describe('reflect', () => {
       const metadata = getOperationMetadata(target, 'test');
 
       expect(metadata).toMatchObject({
-        responses: {
-          '200': {
-            description: 'OK',
+        method: undefined,
+        operationObject: {
+          operationId: 'Object::test',
+          responses: {
+            '200': {
+              description: 'OK',
+            },
           },
         },
+        parameterIndices: [],
       });
 
       addResponsesMetadata(target, 'test', '200', 'OK', Type.Object({}));
 
       expect(metadata).toMatchObject({
-        responses: {
-          '200': {
-            description: 'OK',
-            content: {
-              'application/json': {
-                schema: {},
+        method: undefined,
+        operationObject: {
+          operationId: 'Object::test',
+          responses: {
+            '200': {
+              description: 'OK',
+              content: {
+                'application/json': {
+                  schema: {},
+                },
               },
             },
           },
         },
+        parameterIndices: [],
       });
     });
   });

@@ -20,11 +20,15 @@ export type OperationMethod = keyof Pick<
   'get' | 'put' | 'post' | 'delete' | 'options' | 'head' | 'patch' | 'trace'
 >;
 
-export type Operation = Omit<OperationObject, 'parameters'> & {
-  method?: OperationMethod;
-  parameters?: Parameter[];
+export type OperationObjectWithoutReferences = Omit<
+  OperationObject,
+  'parameters'
+> & {
+  parameters?: ParameterObject[];
 };
 
-export type Parameter = ParameterObject & {
-  index: number;
+export type Operation = {
+  method?: OperationMethod;
+  operationObject: OperationObjectWithoutReferences;
+  parameterIndices: number[];
 };

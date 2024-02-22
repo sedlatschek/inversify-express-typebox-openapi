@@ -127,7 +127,9 @@ export const Deprecated = (): ParameterDecorator | HandlerDecorator => {
       });
     } else {
       // Method decorator
-      addOperationMetadata(target, propertyKey, { deprecated: true });
+      addOperationMetadata(target, propertyKey, {
+        operationObject: { deprecated: true },
+      });
     }
   };
 };

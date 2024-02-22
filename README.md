@@ -15,7 +15,6 @@ We use [vitest](https://vitest.dev/) for testing. To ensure support for decorato
 
 ## ToDo
 
-- [ ] improve `mapTypeBoxSchemaToOpenAPISchema`
 - [ ] provide clearMetadata for testing
 - [ ] tests
 - [ ] schema reference by id (`const UserSchema = Type.Object( { id: Type.String(), name: Type.String() }, { $id: 'User' });`)

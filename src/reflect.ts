@@ -1,6 +1,10 @@
 import { OptionalKind, TSchema } from '@sinclair/typebox';
-import { ParameterLocation, ResponseObject } from 'openapi3-ts/oas31';
-import { Operation, Parameter } from './type';
+import {
+  ParameterLocation,
+  ParameterObject,
+  ResponseObject,
+} from 'openapi3-ts/oas31';
+import { Operation } from './type';
 import { updateDefinedProperties } from './utilize';
 
 export const OPERATION_METADATA_KEY =
@@ -26,7 +30,11 @@ export const getOrCreateOperationMetadata = (
   return metadata;
 };
 
-export type OperationMetadataProperties = Partial<Operation>;
+export type OperationMetadataProperties = Partial<
+  Omit<Operation, 'operationObject'> & {
+    operationObject?: Partial<Operation['operationObject']>;
+  }
+>;
 
 export const addOperationMetadata = (
   target: object,
@@ -38,9 +46,11 @@ export const addOperationMetadata = (
   if (!metadata) {
     metadata = {
       method: properties?.method,
-      operationId: `${target.constructor.name}::${methodName.toString()}`,
-      responses: {},
-      deprecated: properties?.deprecated,
+      operationObject: {
+        operationId: `${target.constructor.name}::${methodName.toString()}`,
+        responses: {},
+      },
+      parameterIndices: [],
     };
 
     Reflect.defineMetadata(
@@ -49,29 +59,57 @@ export const addOperationMetadata = (
       target,
       methodName,
     );
-  } else {
-    if (properties) {
-      updateDefinedProperties(metadata, properties);
-    }
+  }
+
+  if (properties?.method !== undefined) {
+    metadata.method = properties.method;
+  }
+
+  if (properties?.operationObject) {
+    updateDefinedProperties(
+      metadata.operationObject,
+      properties.operationObject,
+    );
   }
 
   return metadata;
 };
 
-export const getParameterMetadata = (
+export const getIndexByParameterIndex = (
   target: object,
   methodName: string | symbol,
-  index: number,
-): Parameter | undefined => {
+  parameterIndex: number,
+): number | undefined => {
   const metadata = getOperationMetadata(target, methodName);
-  return (metadata?.parameters ?? []).find(
-    (parameter) => parameter.index === index,
+  return (
+    metadata?.parameterIndices?.findIndex(
+      (index) => index === parameterIndex,
+    ) ?? undefined
   );
 };
 
+export const getParameterMetadata = (
+  target: object,
+  methodName: string | symbol,
+  parameterIndex: number,
+): ParameterObject | undefined => {
+  const actualIndex = getIndexByParameterIndex(
+    target,
+    methodName,
+    parameterIndex,
+  );
+
+  if (actualIndex !== undefined) {
+    const metadata = getOperationMetadata(target, methodName);
+    return metadata?.operationObject.parameters?.[actualIndex] ?? undefined;
+  }
+
+  return undefined;
+};
+
 export type ParameterMetadataProperties = Omit<
-  Parameter,
-  'index' | 'name' | 'in'
+  ParameterObject,
+  'name' | 'in'
 > & {
   name?: string;
   in?: ParameterLocation;
@@ -83,19 +121,18 @@ export type ParameterMetadataProperties = Omit<
 export const addParametersMetadata = (
   target: object,
   methodName: string | symbol,
-  index: number,
+  parameterIndex: number,
   properties: ParameterMetadataProperties,
 ): void => {
   const metadata = getOrCreateOperationMetadata(target, methodName);
 
-  if (!metadata.parameters) {
-    metadata.parameters = [];
+  if (!metadata.operationObject.parameters) {
+    metadata.operationObject.parameters = [];
   }
 
-  let parameter = getParameterMetadata(target, methodName, index);
+  let parameter = getParameterMetadata(target, methodName, parameterIndex);
   if (!parameter) {
     parameter = {
-      index,
       name: properties.name ?? 'unknown name', // TODO: refactor this ugly peace of code so we don't need to set a default value
       in: properties.in ?? 'query', // TODO: refactor this ugly peace of code so we don't need to set a default value
       // TODO: add description to operation parameter metadata
@@ -107,7 +144,8 @@ export const addParametersMetadata = (
       // TODO: add example to operation parameter metadata
       // TODO: add content to operation parameter metadata
     };
-    metadata.parameters.push(parameter);
+    metadata.operationObject.parameters.push(parameter);
+    metadata.parameterIndices.push(parameterIndex);
   }
 
   const calculatedProps = properties.schema
@@ -116,10 +154,19 @@ export const addParametersMetadata = (
       }
     : {};
 
-  const arrayIndex = metadata.parameters.findIndex((p) => p.index === index);
+  const arrayIndex = getIndexByParameterIndex(
+    target,
+    methodName,
+    parameterIndex,
+  );
+  if (arrayIndex === undefined) {
+    throw new Error(
+      `Could not find array index of parameter index ${parameterIndex} in operation metadata`,
+    );
+  }
 
   updateDefinedProperties(parameter, { ...properties, ...calculatedProps });
-  metadata.parameters[arrayIndex] = parameter;
+  metadata.operationObject.parameters[arrayIndex] = parameter;
 };
 
 export const addBodyMetadata = (
@@ -129,7 +176,7 @@ export const addBodyMetadata = (
 ): void => {
   const metadata = getOrCreateOperationMetadata(target, methodName);
 
-  metadata.requestBody = {
+  metadata.operationObject.requestBody = {
     // TODO: add description to operation requestBody metadata
     content: {
       'application/json': {
@@ -149,8 +196,8 @@ export const addResponsesMetadata = (
 ): void => {
   const metadata = getOrCreateOperationMetadata(target, methodName);
 
-  if (!metadata.responses) {
-    metadata.responses = {};
+  if (!metadata.operationObject.responses) {
+    metadata.operationObject.responses = {};
   }
 
   const response: ResponseObject = {
@@ -172,5 +219,5 @@ export const addResponsesMetadata = (
 
   // TODO: add default response to operation responses metadata
 
-  metadata.responses[statusCode] = response;
+  metadata.operationObject.responses[statusCode] = response;
 };
