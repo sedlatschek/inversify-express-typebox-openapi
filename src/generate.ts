@@ -27,10 +27,13 @@ export const injectControllers = (
   return builder;
 };
 
+const pathSlashReplaceRegex = /\/\/+/g;
 const pathParamReplaceRegex = /:([^/]+)/g;
 
 const getRoutePath = (controllerPath: string, routePath: string): string => {
-  return `${controllerPath}${routePath}`.replace(pathParamReplaceRegex, '{$1}');
+  return `${controllerPath}/${routePath}`
+    .replace(pathSlashReplaceRegex, '/')
+    .replace(pathParamReplaceRegex, '{$1}');
 };
 
 const convertOperationToOperationObject = (
