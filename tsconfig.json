@@ -1,16 +1,17 @@
 {
   "compilerOptions": {
     "outDir": "./dist",
-    "target": "ES2021",
+    "target": "es2021",
     "lib": ["ES6", "DOM"],
     "types": ["reflect-metadata"],
     "module": "CommonJS",
     "moduleResolution": "node",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "esModuleInterop": true,
     "noImplicitAny": true,
     "sourceMap": true,
     "strict": true
   },
-  "exclude": ["tests", "dist", "node_modules"]
+  "include": ["./src/**/*.ts", "./tests/**/*.ts"]
 }

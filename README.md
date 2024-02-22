@@ -7,6 +7,12 @@ Generate OpenAPI specification during runtime from inversify-express-utils contr
 - OpenAPI spec generation at runtime (no precompilation)
 - Integrated with `inversify-express-utils`
 
+## Development
+
+### Testing
+
+We use [vitest](https://vitest.dev/) for testing. To ensure support for decorators and reflection, we run it with [swc](https://swc.rs).
+
 ## ToDo
 
 - [ ] improve `mapTypeBoxSchemaToOpenAPISchema`
@@ -24,3 +30,4 @@ Generate OpenAPI specification during runtime from inversify-express-utils contr
 - [ ] check for the lowest compatibile version of each peerDependency
 - [ ] inversify all?
 - [ ] fix array type
+- [ ] controller wide decorators: cookie, header
