@@ -2,7 +2,7 @@ import { OpenApiBuilder, PathItemObject } from 'openapi3-ts/oas31';
 import { Controller } from './type';
 import { collectSchemasAndReplaceWithReferences } from './reference';
 
-export const injectControllers = (
+export const injectControllersIntoBuilder = (
   builder: OpenApiBuilder,
   controllers: Controller[],
 ): OpenApiBuilder => {
