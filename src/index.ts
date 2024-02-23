@@ -1,7 +1,7 @@
 import { type Container } from 'inversify';
 import { OpenApiBuilder } from 'openapi3-ts/oas31';
 import { parseContainer } from './parse';
-import { injectControllers } from './generate';
+import { injectControllersIntoBuilder } from './generate';
 
 export const generateSpec = (
   container: Container,
@@ -9,7 +9,7 @@ export const generateSpec = (
 ): OpenApiBuilder => {
   const openApi = builder || OpenApiBuilder.create();
   const controllers = parseContainer(container);
-  injectControllers(openApi, controllers);
+  injectControllersIntoBuilder(openApi, controllers);
   return openApi;
 };
 
