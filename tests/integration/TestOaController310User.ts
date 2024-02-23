@@ -24,15 +24,18 @@ export enum UserState {
   Pending = 'pending',
 }
 
-export const userStateSchema = Type.Enum(UserState);
+export const userStateSchema = Type.Enum(UserState, { $id: 'UserState' });
 
-export const userSchema = Type.Object({
-  id: Type.Number(),
-  name: Type.String(),
-  email: Type.String({}),
-  createdAt: Type.String({ format: 'date-time' }),
-  state: userStateSchema,
-});
+export const userSchema = Type.Object(
+  {
+    id: Type.Number(),
+    name: Type.String(),
+    email: Type.String({}),
+    createdAt: Type.String({ format: 'date-time' }),
+    state: userStateSchema,
+  },
+  { $id: 'User' },
+);
 
 export type User = Static<typeof userSchema>;
 

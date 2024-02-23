@@ -19,13 +19,16 @@ export type Post = {
   createdAt: string;
 };
 
-export const postSchema = Type.Object({
-  id: Type.Number(),
-  userId: Type.Number(),
-  title: Type.String(),
-  content: Type.String(),
-  createdAt: Type.String({ format: 'date-time' }),
-});
+export const postSchema = Type.Object(
+  {
+    id: Type.Number(),
+    userId: Type.Number(),
+    title: Type.String(),
+    content: Type.String(),
+    createdAt: Type.String({ format: 'date-time' }),
+  },
+  { $id: 'Post' },
+);
 
 export const posts: Post[] = [];
 

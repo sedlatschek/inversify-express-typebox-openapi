@@ -4,7 +4,7 @@ import {
   ParameterObject,
   ResponseObject,
 } from 'openapi3-ts/oas31';
-import { Operation } from './type';
+import { Operation, isParameterObject } from './type';
 import { updateDefinedProperties } from './utilize';
 
 export const OPERATION_METADATA_KEY =
@@ -101,7 +101,11 @@ export const getParameterMetadata = (
 
   if (actualIndex !== undefined) {
     const metadata = getOperationMetadata(target, methodName);
-    return metadata?.operationObject.parameters?.[actualIndex] ?? undefined;
+    const parameterMetadata =
+      metadata?.operationObject.parameters?.[actualIndex];
+    if (isParameterObject(parameterMetadata)) {
+      return parameterMetadata;
+    }
   }
 
   return undefined;
