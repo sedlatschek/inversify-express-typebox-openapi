@@ -2,35 +2,45 @@ import { Container } from 'inversify';
 import {
   Controller as InversifyController,
   ControllerMethodMetadata,
-  getControllerMetadata,
-  getControllerMethodMetadata,
-  getControllersFromContainer,
+  getControllerMetadata as getInversifyControllerMetadata,
+  getControllerMethodMetadata as getInversifyControllerMethodMetadata,
+  getControllersFromContainer as getInversifyControllersFromContainer,
 } from 'inversify-express-utils';
 import { Controller, Route } from './type';
-import { getOperationMetadata } from './reflect';
+import { getControllerMetadata, getOperationMetadata } from './reflect';
+import { OperationObject } from 'openapi3-ts/oas31';
 
-export const parseContainer = (container: Container): Controller[] => {
-  const inversifyControllers = getControllersFromContainer(container, true);
+export type ParsedController = Controller & {
+  baseOperationObject: OperationObject;
+};
+
+export const parseContainer = (container: Container): ParsedController[] => {
+  const inversifyControllers = getInversifyControllersFromContainer(
+    container,
+    true,
+  );
   return parseControllers(inversifyControllers);
 };
 
 export const parseControllers = (
   inversifyControllers: InversifyController[],
-): Controller[] => {
-  return inversifyControllers.map((controller): Controller => {
-    const inversifyControllerMetadata = getControllerMetadata(
+): ParsedController[] => {
+  return inversifyControllers.map((controller): ParsedController => {
+    const inversifyControllerMetadata = getInversifyControllerMetadata(
       controller.constructor,
     );
-    const inversifyMethodMetadata = getControllerMethodMetadata(
+    const inversifyMethodMetadata = getInversifyControllerMethodMetadata(
       controller.constructor,
     );
 
+    const controllerMetadata = getControllerMetadata(controller.constructor);
     const routes = parseRoutes(inversifyMethodMetadata);
 
     return {
       name: inversifyControllerMetadata.target.name,
       path: inversifyControllerMetadata.path,
       routes,
+      baseOperationObject: controllerMetadata?.baseOperationObject ?? {},
     };
   });
 };
@@ -39,13 +49,11 @@ export const parseRoutes = (
   inversifyControllerMethod: ControllerMethodMetadata[],
 ): Route[] => {
   return inversifyControllerMethod.map((method): Route => {
-    const operation = getOperationMetadata(method.target, method.key);
-
-    const operations = operation ? [operation] : [];
-
+    const operationMetadata = getOperationMetadata(method.target, method.key);
+    const operationMetadatas = operationMetadata ? [operationMetadata] : [];
     return {
       path: method.path,
-      operations,
+      operationMetadatas,
     };
   });
 };

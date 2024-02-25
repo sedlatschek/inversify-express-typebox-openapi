@@ -1,53 +1,117 @@
 import { OptionalKind, TSchema } from '@sinclair/typebox';
 import {
+  OperationObject,
   ParameterLocation,
   ParameterObject,
   ResponseObject,
 } from 'openapi3-ts/oas31';
-import { Operation, isParameterObject } from './type';
+import { OperationMethod, isParameterObject } from './type';
 import { updateDefinedProperties } from './utilize';
+import { Controller } from 'inversify-express-utils';
 
+export const CONTROLLER_METADATA_KEY =
+  'inversify-express-typebox-openapi:controller';
 export const OPERATION_METADATA_KEY =
   'inversify-express-typebox-openapi:operation';
+
+export type ControllerConfig = {
+  name?: string;
+};
+
+export type ControllerMetadata = {
+  config?: ControllerConfig;
+  baseOperationObject: OperationObject;
+};
+
+export const getControllerMetadata = (
+  target: Controller,
+): ControllerMetadata | undefined => {
+  return Reflect.getMetadata(CONTROLLER_METADATA_KEY, target);
+};
+
+export const addControllerMetadata = (
+  target: Controller,
+  {
+    metadataProperties,
+    config,
+  }: {
+    metadataProperties?: Partial<OperationObject>;
+    config?: Partial<ControllerConfig>;
+  },
+): ControllerMetadata => {
+  let metadata = getControllerMetadata(target);
+
+  if (!metadata) {
+    metadata = {
+      baseOperationObject: {
+        ...metadataProperties,
+      },
+    };
+
+    Reflect.defineMetadata(CONTROLLER_METADATA_KEY, metadata, target);
+  }
+
+  if (metadataProperties) {
+    updateDefinedProperties(metadata.baseOperationObject, metadataProperties);
+  }
+
+  if (config) {
+    if (!metadata.config) {
+      metadata.config = {};
+    }
+    updateDefinedProperties(metadata.config, config);
+  }
+
+  return metadata;
+};
 
 export const getOperationMetadata = (
   target: object,
   methodName: string | symbol,
-): Operation | undefined => {
+): OperationMetadata | undefined => {
   return Reflect.getMetadata(OPERATION_METADATA_KEY, target, methodName);
 };
 
 export const getOrCreateOperationMetadata = (
   target: object,
   methodName: string | symbol,
-): Operation => {
+): OperationMetadata => {
   let metadata = getOperationMetadata(target, methodName);
 
   if (!metadata) {
-    metadata = addOperationMetadata(target, methodName);
+    metadata = addOperationMetadata(target, methodName, {});
   }
 
   return metadata;
 };
 
-export type OperationMetadataProperties = Partial<
-  Omit<Operation, 'operationObject'> & {
-    operationObject?: Partial<Operation['operationObject']>;
-  }
->;
+export type OperationConfig = {
+  name?: string;
+  method?: OperationMethod;
+};
+
+export type OperationMetadata = {
+  parameterIndices: number[];
+  config?: OperationConfig;
+  operationObject: OperationObject;
+};
 
 export const addOperationMetadata = (
   target: object,
   methodName: string | symbol,
-  properties?: OperationMetadataProperties,
-): Operation => {
+  {
+    metadataProperties,
+    config,
+  }: {
+    metadataProperties?: Partial<OperationObject>;
+    config?: Partial<OperationConfig>;
+  },
+): OperationMetadata => {
   let metadata = getOperationMetadata(target, methodName);
 
   if (!metadata) {
     metadata = {
-      method: properties?.method,
       operationObject: {
-        operationId: `${target.constructor.name}::${methodName.toString()}`,
         responses: {},
       },
       parameterIndices: [],
@@ -61,15 +125,15 @@ export const addOperationMetadata = (
     );
   }
 
-  if (properties?.method !== undefined) {
-    metadata.method = properties.method;
+  if (config) {
+    if (!metadata.config) {
+      metadata.config = {};
+    }
+    updateDefinedProperties(metadata.config, config);
   }
 
-  if (properties?.operationObject) {
-    updateDefinedProperties(
-      metadata.operationObject,
-      properties.operationObject,
-    );
+  if (metadataProperties) {
+    updateDefinedProperties(metadata.operationObject, metadataProperties);
   }
 
   return metadata;
@@ -82,9 +146,8 @@ export const getIndexByParameterIndex = (
 ): number | undefined => {
   const metadata = getOperationMetadata(target, methodName);
   return (
-    metadata?.parameterIndices?.findIndex(
-      (index) => index === parameterIndex,
-    ) ?? undefined
+    metadata?.parameterIndices.findIndex((index) => index === parameterIndex) ??
+    undefined
   );
 };
 

@@ -8,7 +8,6 @@ import {
   isSchemaObject,
 } from 'openapi3-ts/oas31';
 import {
-  Operation,
   SchemasObject,
   isParameterObject,
   isRequestBodyObject,
@@ -16,23 +15,24 @@ import {
 } from './type';
 import { TSchema } from '@sinclair/typebox';
 import { equalsRegardlessOfItemOrPropertyOrder } from './utilize';
+import { OperationMetadata } from './reflect';
 
 export const collectSchemasAndReplaceWithReferences = (
   schemas: SchemasObject,
-  operations: Operation[],
+  operationMetadatas: OperationMetadata[],
 ): void => {
-  for (const operation of operations) {
+  for (const operationMetadata of operationMetadatas) {
     const parameterObjects = (
-      operation.operationObject?.parameters ?? []
+      operationMetadata.operationObject?.parameters ?? []
     ).filter(isParameterObject);
     replaceParameterSchemasWithReferences(schemas, parameterObjects);
     replaceBodySchemasWithReferences(
       schemas,
-      operation.operationObject.requestBody,
+      operationMetadata.operationObject.requestBody,
     );
     replaceResponseSchemasWithReferences(
       schemas,
-      operation.operationObject.responses,
+      operationMetadata.operationObject.responses,
     );
   }
 };

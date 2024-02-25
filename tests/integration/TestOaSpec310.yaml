@@ -8,7 +8,6 @@ info:
 paths:
   /api/users/me:
     get:
-      operationId: TestOaController310User::getUserFromSession
       responses:
         "200":
           description: The user from the session
@@ -24,9 +23,11 @@ paths:
           schema:
             type: string
           required: true
+      operationId: UserController_getUserFromSession
+      tags:
+        - Users
   /api/users/:
     get:
-      operationId: TestOaController310User::getAllUsers
       responses:
         "200":
           description: List of all users
@@ -73,8 +74,10 @@ paths:
           schema:
             $ref: "#/components/schemas/UserState"
           required: false
+      operationId: UserController_getAllUsers
+      tags:
+        - Users
     post:
-      operationId: TestOaController310User::createUser
       responses:
         "201":
           description: The created user
@@ -87,9 +90,11 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/User"
+      operationId: UserController_createUser
+      tags:
+        - Users
   /api/users/active:
     get:
-      operationId: TestOaController310User::getAllActiveUsers
       responses:
         "200":
           description: List of all active users
@@ -126,9 +131,11 @@ paths:
                     - createdAt
                     - state
       deprecated: true
+      operationId: UserController_getAllActiveUsers
+      tags:
+        - Users
   /api/users/{userId}:
     get:
-      operationId: TestOaController310User::getUserById
       responses:
         "200":
           description: The requested user
@@ -149,8 +156,10 @@ paths:
           schema:
             type: number
           required: true
+      operationId: UserController_getUserById
+      tags:
+        - Users
     put:
-      operationId: TestOaController310User::updateUser
       responses:
         "200":
           description: The updated user
@@ -167,8 +176,10 @@ paths:
           schema:
             type: number
           required: true
+      operationId: UserController_updateUser
+      tags:
+        - Users
     delete:
-      operationId: TestOaController310User::deleteUser
       responses:
         "204":
           description: User deleted
@@ -180,9 +191,11 @@ paths:
           schema:
             type: number
           required: true
+      operationId: UserController_deleteUser
+      tags:
+        - Users
   /api/users/{userId}/state:
     patch:
-      operationId: TestOaController310User::patchUserState
       responses:
         "200":
           description: The updated user
@@ -203,9 +216,11 @@ paths:
           schema:
             type: number
           required: true
+      operationId: UserController_patchUserState
+      tags:
+        - Users
   /api/users/{userId}/posts:
     get:
-      operationId: TestOaController310User::getUserPosts
       responses:
         "200":
           description: List of the users posts
@@ -245,9 +260,12 @@ paths:
           schema:
             type: number
           required: true
+      tags:
+        - Posts
+        - Users
+      operationId: UserController_getUserPosts
   /api/posts/:
     post:
-      operationId: TestOaController310Post::createPost
       responses:
         "201":
           description: Post created
@@ -260,9 +278,11 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/Post"
+      operationId: TestOaController310Post_createPost
+      tags:
+        - Posts
   /api/posts/{postId}:
     put:
-      operationId: TestOaController310Post::updatePost
       responses:
         "200":
           description: Post updated
@@ -283,8 +303,10 @@ paths:
           schema:
             type: number
           required: true
+      operationId: TestOaController310Post_updatePost
+      tags:
+        - Posts
     delete:
-      operationId: TestOaController310Post::deletePost
       responses:
         "200":
           description: Post deleted
@@ -296,6 +318,9 @@ paths:
           schema:
             type: number
           required: true
+      operationId: TestOaController310Post_deletePost
+      tags:
+        - Posts
 components:
   schemas:
     User:

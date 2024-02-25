@@ -15,16 +15,16 @@ We use [vitest](https://vitest.dev/) for testing. To ensure support for decorato
 
 ## ToDo
 
+- [ ] rework controller metadata (don't rely on inversify-express-utils debug functions) -> use new config object
 - [ ] provide clearMetadata for testing
 - [ ] security
 - [ ] descriptions
 - [ ] examples
-- [ ] tags
-- [ ] operationId
+- [ ] controller operationId as prefix
 - [ ] externalDocs
 - [ ] Readme
 - [ ] make a package out of it
 - [ ] check for the lowest compatibile version of each peerDependency
 - [ ] inversify all?
-- [ ] fix array type
-- [ ] controller wide decorators: cookie, header
+- [ ] controller wide parameter decorators: cookie, header
+- [ ] change error text to "must decorate a class"

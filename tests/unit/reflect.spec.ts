@@ -1,20 +1,88 @@
 import 'reflect-metadata';
 import { expect, describe, it } from 'vitest';
 import {
+  CONTROLLER_METADATA_KEY,
+  ControllerMetadata,
   OPERATION_METADATA_KEY,
+  OperationMetadata,
   addBodyMetadata,
+  addControllerMetadata,
   addOperationMetadata,
   addParametersMetadata,
   addResponsesMetadata,
+  getControllerMetadata,
   getIndexByParameterIndex,
   getOperationMetadata,
   getOrCreateOperationMetadata,
   getParameterMetadata,
 } from '../../src/reflect';
 import { Type } from '@sinclair/typebox';
-import { Operation } from '../../src/type';
 
 describe('reflect', () => {
+  describe('getControllerMetadata', () => {
+    it('should return undefined if no metadata is found', () => {
+      expect(getControllerMetadata({})).toBeUndefined();
+    });
+
+    it('should return metadata if found', () => {
+      const target = {};
+      const metadata: ControllerMetadata = {
+        baseOperationObject: { operationId: 'test' },
+      };
+      Reflect.defineMetadata(CONTROLLER_METADATA_KEY, metadata, target);
+
+      expect(getControllerMetadata(target)).toEqual(metadata);
+    });
+  });
+
+  describe('addControllerMetadata', () => {
+    it('should add new metadata', () => {
+      const target = {};
+      const metadata = addControllerMetadata(target, {
+        metadataProperties: {
+          operationId: 'test',
+        },
+      });
+
+      expect(metadata).toEqual({
+        baseOperationObject: { operationId: 'test' },
+      });
+    });
+
+    it('should update existing metadata', () => {
+      const target = {};
+
+      const returnedMetadata = addControllerMetadata(target, {
+        metadataProperties: {
+          operationId: 'test',
+        },
+      });
+      const retrievedMetadata = getControllerMetadata(target);
+      const expectedMetadata = {
+        baseOperationObject: { operationId: 'test' },
+      };
+
+      expect(returnedMetadata).toEqual(expectedMetadata);
+      expect(retrievedMetadata).toEqual(expectedMetadata);
+
+      const returnedUpdatedMetadata = addControllerMetadata(target, {
+        metadataProperties: {
+          deprecated: true,
+        },
+      });
+      const retrievedUpdagtedMetadata = getControllerMetadata(target);
+      const expectedUpdatedMetadata = {
+        baseOperationObject: {
+          operationId: 'test',
+          deprecated: true,
+        },
+      };
+
+      expect(returnedUpdatedMetadata).toEqual(expectedUpdatedMetadata);
+      expect(retrievedUpdagtedMetadata).toEqual(expectedUpdatedMetadata);
+    });
+  });
+
   describe('getOperationMetadata', () => {
     it('should return undefined if no metadata is found', () => {
       expect(getOperationMetadata({}, 'test')).toBeUndefined();
@@ -32,8 +100,8 @@ describe('reflect', () => {
   describe('getOrCreateOperationMetadata', () => {
     it('should return metadata if found', () => {
       const target = {};
-      const metadata: Operation = {
-        method: 'get',
+      const metadata: OperationMetadata = {
+        config: { name: 'get' },
         operationObject: { responses: {} },
         parameterIndices: [],
       };
@@ -47,8 +115,7 @@ describe('reflect', () => {
       const metadata = getOrCreateOperationMetadata(target, 'test');
 
       expect(metadata).toEqual({
-        method: undefined,
-        operationObject: { operationId: 'Object::test', responses: {} },
+        operationObject: { responses: {} },
         parameterIndices: [],
       });
     });
@@ -58,13 +125,16 @@ describe('reflect', () => {
     it('should add new metadata', () => {
       const target = {};
       const metadata = addOperationMetadata(target, 'test', {
-        method: 'get',
+        config: {
+          name: 'get',
+        },
       });
 
       expect(metadata).toEqual({
-        method: 'get',
+        config: {
+          name: 'get',
+        },
         operationObject: {
-          operationId: 'Object::test',
           responses: {},
         },
         parameterIndices: [],
@@ -74,28 +144,30 @@ describe('reflect', () => {
     it('should update existing metadata', () => {
       const target = {};
       const metadata = addOperationMetadata(target, 'test', {
-        method: 'get',
+        config: { method: 'get' },
       });
 
       expect(metadata).toEqual({
-        method: 'get',
+        config: {
+          method: 'get',
+        },
         operationObject: {
-          operationId: 'Object::test',
           responses: {},
         },
         parameterIndices: [],
       });
 
       const updatedMetadata = addOperationMetadata(target, 'test', {
-        operationObject: {
+        metadataProperties: {
           deprecated: true,
         },
       });
 
       expect(updatedMetadata).toEqual({
-        method: 'get',
+        config: {
+          method: 'get',
+        },
         operationObject: {
-          operationId: 'Object::test',
           responses: {},
           deprecated: true,
         },
@@ -111,8 +183,8 @@ describe('reflect', () => {
 
     it('should return array index if parameter index was found', () => {
       const target = {};
-      const metadata: Operation = {
-        method: 'get',
+      const metadata: OperationMetadata = {
+        config: { name: 'get' },
         operationObject: {
           parameters: [
             { name: 'test', in: 'query' },
@@ -135,8 +207,8 @@ describe('reflect', () => {
 
     it('should return metadata if found', () => {
       const target = {};
-      const metadata: Operation = {
-        method: 'get',
+      const metadata: OperationMetadata = {
+        config: { name: 'get' },
         operationObject: {
           parameters: [{ name: 'test', in: 'query' }],
           responses: {},
@@ -204,9 +276,7 @@ describe('reflect', () => {
       const metadata = getOperationMetadata(target, 'test');
 
       expect(metadata).toMatchObject({
-        method: undefined,
         operationObject: {
-          operationId: 'Object::test',
           requestBody: {
             content: {
               'application/json': {
@@ -230,9 +300,7 @@ describe('reflect', () => {
       const metadata = getOperationMetadata(target, 'test');
 
       expect(metadata).toMatchObject({
-        method: undefined,
         operationObject: {
-          operationId: 'Object::test',
           requestBody: {
             content: {
               'application/json': {
@@ -250,9 +318,7 @@ describe('reflect', () => {
       addBodyMetadata(target, 'test', newSchema);
 
       expect(metadata).toMatchObject({
-        method: undefined,
         operationObject: {
-          operationId: 'Object::test',
           requestBody: {
             content: {
               'application/json': {
@@ -276,9 +342,7 @@ describe('reflect', () => {
       const metadata = getOperationMetadata(target, 'test');
 
       expect(metadata).toMatchObject({
-        method: undefined,
         operationObject: {
-          operationId: 'Object::test',
           responses: {
             '200': {
               description: 'OK',
@@ -297,9 +361,7 @@ describe('reflect', () => {
       const metadata = getOperationMetadata(target, 'test');
 
       expect(metadata).toMatchObject({
-        method: undefined,
         operationObject: {
-          operationId: 'Object::test',
           responses: {
             '200': {
               description: 'OK',
@@ -312,9 +374,7 @@ describe('reflect', () => {
       addResponsesMetadata(target, 'test', '200', 'OK', Type.Object({}));
 
       expect(metadata).toMatchObject({
-        method: undefined,
         operationObject: {
-          operationId: 'Object::test',
           responses: {
             '200': {
               description: 'OK',

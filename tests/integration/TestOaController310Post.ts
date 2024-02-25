@@ -9,6 +9,8 @@ import {
   Post,
   Put,
   Response,
+  OperationId,
+  Tags,
 } from '../../src/decorate';
 
 export type Post = {
@@ -33,6 +35,7 @@ export const postSchema = Type.Object(
 export const posts: Post[] = [];
 
 @Controller('/api/posts')
+@Tags('Posts')
 export class TestOaController310Post {
   @Post('/')
   @Response(201, 'Post created', postSchema)
@@ -64,6 +67,7 @@ export class TestOaController310Post {
   @Delete('/:postId')
   @Response(200, 'Post deleted')
   @Response(404, 'Post not found')
+  @OperationId('deletePost')
   public deletePost(
     @Path('postId', Type.Number()) postId: number,
     @response() res: express.Response,

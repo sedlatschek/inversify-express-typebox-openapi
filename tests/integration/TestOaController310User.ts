@@ -14,6 +14,8 @@ import {
   Response,
   Header,
   Cookie,
+  Tags,
+  OperationId,
 } from '../../src/decorate';
 import { Response as ExpressResponse } from 'express';
 import { Post as PostType, postSchema, posts } from './TestOaController310Post';
@@ -57,6 +59,8 @@ export const users: User[] = [
 ];
 
 @Controller('/api/users')
+@Tags('Users')
+@OperationId('UserController')
 export class TestOaController310User extends BaseHttpController {
   @Get('me')
   @Response(200, 'The user from the session', userSchema)
@@ -74,7 +78,8 @@ export class TestOaController310User extends BaseHttpController {
 
   @Get('/')
   @Response(200, 'List of all users', Type.Array(userSchema))
-  public getAllUsers(
+  @OperationId('getAllUsers')
+  public get(
     @Query('state', Type.Optional(userStateSchema)) userState?: UserState,
     @Header('Accept-Language', Type.Optional(Type.String()))
     _acceptLanguage?: string,
@@ -179,6 +184,7 @@ export class TestOaController310User extends BaseHttpController {
 
   @Get('/:userId/posts')
   @Response(200, 'List of the users posts', Type.Array(postSchema))
+  @Tags('Posts')
   public getUserPosts(
     @Path('userId', Type.Number()) userId: number,
     @Header('Accept-Language', Type.Optional(Type.String()))

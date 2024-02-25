@@ -1,10 +1,11 @@
 import { OpenApiBuilder, PathItemObject } from 'openapi3-ts/oas31';
-import { Controller } from './type';
 import { collectSchemasAndReplaceWithReferences } from './reference';
+import { mergeBaseOperationIntoOperations } from './merge';
+import { ParsedController } from './parse';
 
 export const injectControllersIntoBuilder = (
   builder: OpenApiBuilder,
-  controllers: Controller[],
+  controllers: ParsedController[],
 ): OpenApiBuilder => {
   if (builder.rootDoc.components === undefined) {
     builder.rootDoc.components = {};
@@ -16,18 +17,24 @@ export const injectControllersIntoBuilder = (
 
   for (const controller of controllers) {
     for (const route of controller.routes) {
+      mergeBaseOperationIntoOperations(controller, route.operationMetadatas);
+
       collectSchemasAndReplaceWithReferences(
         builder.rootDoc.components.schemas,
-        route.operations,
+        route.operationMetadatas,
       );
 
       const pathItem: PathItemObject = {};
-      for (const operation of route.operations) {
-        if (!operation.method) {
+      for (const operationMetadata of route.operationMetadatas) {
+        if (!operationMetadata.config?.method) {
           throw new Error('Operation method is required');
         }
-        pathItem[operation.method] = operation.operationObject;
+        pathItem[operationMetadata.config.method] =
+          operationMetadata.operationObject;
       }
+
+      console.log('pathItem', pathItem);
+
       builder.addPath(getRoutePath(controller.path, route.path), pathItem);
     }
   }
