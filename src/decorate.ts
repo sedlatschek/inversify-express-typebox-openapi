@@ -23,6 +23,7 @@ import {
 } from './reflect';
 import { OperationMethod } from './type';
 import { ParameterLocation } from 'openapi3-ts/oas31';
+import { ucfirst } from './utilize';
 
 export const Controller = (
   path: string,
@@ -85,7 +86,9 @@ const parameterDecoratorFactory = (
       parameterIndex: number,
     ) => {
       if (!methodName) {
-        throw new Error('Parameter decorators must have a method name');
+        throw new Error(
+          `${ucfirst(type)} decorator can only be used on parameters`,
+        );
       }
       addParametersMetadata(target, methodName, parameterIndex, {
         name,
@@ -109,7 +112,7 @@ export function Body(schema: TSchema): ParameterDecorator {
     parameterIndex: number,
   ) => {
     if (!propertyKey) {
-      throw new Error('Body decorators must have a method name');
+      throw new Error('Body decorator can only be used on parameters');
     }
     addBodyMetadata(target, propertyKey, schema);
     requestBody()(target, propertyKey, parameterIndex);
@@ -139,7 +142,9 @@ export const Deprecated = (): ParameterDecorator | HandlerDecorator => {
     parameterIndex?: number | TypedPropertyDescriptor<unknown> | undefined,
   ): void => {
     if (!propertyKey) {
-      throw new Error('Deprecated decorators must have a method name');
+      throw new Error(
+        'Deprecated decorator can only be used on methods or parameters',
+      );
     }
     if (typeof parameterIndex === 'number') {
       // Parameter decorator
