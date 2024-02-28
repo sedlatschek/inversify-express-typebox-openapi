@@ -8,6 +8,8 @@ import { readFile } from 'fs/promises';
 import { generateSpec } from '../../src';
 
 const container = new Container();
+container.bind('SomeService').toConstantValue('SomeValue');
+
 const server = new InversifyExpressServer(container);
 server.build();
 

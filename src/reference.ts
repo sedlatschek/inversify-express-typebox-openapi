@@ -15,7 +15,7 @@ import {
 } from './type';
 import { TSchema } from '@sinclair/typebox';
 import { equalsRegardlessOfItemOrPropertyOrder } from './utilize';
-import { OperationMetadata } from './reflect';
+import { OperationMetadata } from './type';
 
 export const collectSchemasAndReplaceWithReferences = (
   schemas: SchemasObject,

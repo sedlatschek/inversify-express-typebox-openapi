@@ -1,11 +1,11 @@
 import { OpenApiBuilder, PathItemObject } from 'openapi3-ts/oas31';
 import { collectSchemasAndReplaceWithReferences } from './reference';
 import { mergeBaseOperationIntoOperations } from './merge';
-import { ParsedController } from './parse';
+import { ControllerMetadata } from './type';
 
 export const injectControllersIntoBuilder = (
   builder: OpenApiBuilder,
-  controllers: ParsedController[],
+  controllers: ControllerMetadata[],
 ): OpenApiBuilder => {
   if (builder.rootDoc.components === undefined) {
     builder.rootDoc.components = {};
@@ -16,26 +16,33 @@ export const injectControllersIntoBuilder = (
   }
 
   for (const controller of controllers) {
-    for (const route of controller.routes) {
-      mergeBaseOperationIntoOperations(controller, route.operationMetadatas);
+    if (!controller.config?.path) {
+      throw new Error(`Path for controller ${controller.name} is missing`);
+    }
 
-      collectSchemasAndReplaceWithReferences(
-        builder.rootDoc.components.schemas,
-        route.operationMetadatas,
-      );
+    mergeBaseOperationIntoOperations(controller);
+    collectSchemasAndReplaceWithReferences(
+      builder.rootDoc.components.schemas,
+      controller.operationMetadatas,
+    );
 
-      const pathItem: PathItemObject = {};
-      for (const operationMetadata of route.operationMetadatas) {
-        if (!operationMetadata.config?.method) {
-          throw new Error('Operation method is required');
-        }
-        pathItem[operationMetadata.config.method] =
-          operationMetadata.operationObject;
+    for (const operationMetadata of controller.operationMetadatas) {
+      if (
+        !operationMetadata.config?.method ||
+        !operationMetadata.config?.path
+      ) {
+        throw new Error('Operation method and path are required');
       }
 
-      console.log('pathItem', pathItem);
+      const pathItem: PathItemObject = {};
 
-      builder.addPath(getRoutePath(controller.path, route.path), pathItem);
+      pathItem[operationMetadata.config.method] =
+        operationMetadata.operationObject;
+
+      builder.addPath(
+        getRoutePath(controller.config?.path, operationMetadata.config?.path),
+        pathItem,
+      );
     }
   }
 

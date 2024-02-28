@@ -5,138 +5,149 @@ import {
   ParameterObject,
   ResponseObject,
 } from 'openapi3-ts/oas31';
-import { OperationMethod, isParameterObject } from './type';
+import {
+  ControllerConfig,
+  ControllerMetadata,
+  OperationConfig,
+  OperationMetadata,
+  isParameterObject,
+} from './type';
 import { updateDefinedProperties } from './utilize';
-import { Controller } from 'inversify-express-utils';
 
 export const CONTROLLER_METADATA_KEY =
   'inversify-express-typebox-openapi:controller';
-export const OPERATION_METADATA_KEY =
-  'inversify-express-typebox-openapi:operation';
-
-export type ControllerConfig = {
-  name?: string;
-};
-
-export type ControllerMetadata = {
-  config?: ControllerConfig;
-  baseOperationObject: OperationObject;
-};
 
 export const getControllerMetadata = (
-  target: Controller,
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  target: object | Function,
 ): ControllerMetadata | undefined => {
-  return Reflect.getMetadata(CONTROLLER_METADATA_KEY, target);
+  const constructor =
+    typeof target === 'function' ? target : target.constructor;
+  return Reflect.getMetadata(CONTROLLER_METADATA_KEY, constructor);
+};
+
+export const getOrCreateControllerMetadata = (
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  target: object | Function,
+): ControllerMetadata => {
+  const constructor =
+    typeof target === 'function' ? target : target.constructor;
+
+  let controllerMetadata = getControllerMetadata(constructor);
+
+  if (!controllerMetadata) {
+    controllerMetadata = {
+      name: constructor.name,
+      baseOperationObject: {},
+      operationMetadatas: [],
+    };
+    Reflect.defineMetadata(
+      CONTROLLER_METADATA_KEY,
+      controllerMetadata,
+      constructor,
+    );
+  }
+
+  return controllerMetadata;
 };
 
 export const addControllerMetadata = (
-  target: Controller,
-  {
-    metadataProperties,
-    config,
-  }: {
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  target: object | Function,
+  metadata?: {
     metadataProperties?: Partial<OperationObject>;
     config?: Partial<ControllerConfig>;
   },
 ): ControllerMetadata => {
-  let metadata = getControllerMetadata(target);
+  const controllerMetadata = getOrCreateControllerMetadata(target);
 
-  if (!metadata) {
-    metadata = {
-      baseOperationObject: {
-        ...metadataProperties,
-      },
-    };
+  if (metadata) {
+    const { metadataProperties, config } = metadata;
 
-    Reflect.defineMetadata(CONTROLLER_METADATA_KEY, metadata, target);
-  }
-
-  if (metadataProperties) {
-    updateDefinedProperties(metadata.baseOperationObject, metadataProperties);
-  }
-
-  if (config) {
-    if (!metadata.config) {
-      metadata.config = {};
+    if (config) {
+      if (!controllerMetadata.config) {
+        controllerMetadata.config = {};
+      }
+      updateDefinedProperties(controllerMetadata.config, config);
     }
-    updateDefinedProperties(metadata.config, config);
+
+    if (metadataProperties) {
+      updateDefinedProperties(
+        controllerMetadata.baseOperationObject,
+        metadataProperties,
+      );
+    }
   }
 
-  return metadata;
+  return controllerMetadata;
 };
 
 export const getOperationMetadata = (
   target: object,
   methodName: string | symbol,
 ): OperationMetadata | undefined => {
-  return Reflect.getMetadata(OPERATION_METADATA_KEY, target, methodName);
+  const metadata = getControllerMetadata(target.constructor);
+  return (
+    metadata?.operationMetadatas.find(
+      (operationMetadata) => operationMetadata.name === methodName,
+    ) ?? undefined
+  );
 };
 
 export const getOrCreateOperationMetadata = (
   target: object,
   methodName: string | symbol,
 ): OperationMetadata => {
-  let metadata = getOperationMetadata(target, methodName);
+  let operationMetadata = getOperationMetadata(target, methodName);
 
-  if (!metadata) {
-    metadata = addOperationMetadata(target, methodName, {});
-  }
-
-  return metadata;
-};
-
-export type OperationConfig = {
-  name?: string;
-  method?: OperationMethod;
-};
-
-export type OperationMetadata = {
-  parameterIndices: number[];
-  config?: OperationConfig;
-  operationObject: OperationObject;
-};
-
-export const addOperationMetadata = (
-  target: object,
-  methodName: string | symbol,
-  {
-    metadataProperties,
-    config,
-  }: {
-    metadataProperties?: Partial<OperationObject>;
-    config?: Partial<OperationConfig>;
-  },
-): OperationMetadata => {
-  let metadata = getOperationMetadata(target, methodName);
-
-  if (!metadata) {
-    metadata = {
+  if (!operationMetadata) {
+    operationMetadata = {
+      name: methodName.toString(),
+      config: {},
       operationObject: {
         responses: {},
       },
       parameterIndices: [],
     };
 
-    Reflect.defineMetadata(
-      OPERATION_METADATA_KEY,
-      metadata,
-      target,
-      methodName,
+    const controllerMetadata = getOrCreateControllerMetadata(
+      target.constructor,
     );
+    controllerMetadata.operationMetadatas.push(operationMetadata);
   }
 
-  if (config) {
-    if (!metadata.config) {
-      metadata.config = {};
+  return operationMetadata;
+};
+
+export const addOperationMetadata = (
+  target: object,
+  methodName: string | symbol,
+  metadata?: {
+    metadataProperties?: Partial<OperationObject>;
+    config?: Partial<OperationConfig>;
+  },
+): OperationMetadata => {
+  const operationMetadata = getOrCreateOperationMetadata(target, methodName);
+
+  if (metadata) {
+    const { metadataProperties, config } = metadata;
+
+    if (config) {
+      if (!operationMetadata.config) {
+        operationMetadata.config = {};
+      }
+      updateDefinedProperties(operationMetadata.config, config);
     }
-    updateDefinedProperties(metadata.config, config);
+
+    if (metadataProperties) {
+      updateDefinedProperties(
+        operationMetadata.operationObject,
+        metadataProperties,
+      );
+    }
   }
 
-  if (metadataProperties) {
-    updateDefinedProperties(metadata.operationObject, metadataProperties);
-  }
-
-  return metadata;
+  return operationMetadata;
 };
 
 export const getIndexByParameterIndex = (
@@ -144,10 +155,11 @@ export const getIndexByParameterIndex = (
   methodName: string | symbol,
   parameterIndex: number,
 ): number | undefined => {
-  const metadata = getOperationMetadata(target, methodName);
+  const operationMetadata = getOperationMetadata(target, methodName);
   return (
-    metadata?.parameterIndices.findIndex((index) => index === parameterIndex) ??
-    undefined
+    operationMetadata?.parameterIndices.findIndex(
+      (index) => index === parameterIndex,
+    ) ?? undefined
   );
 };
 
@@ -191,10 +203,10 @@ export const addParametersMetadata = (
   parameterIndex: number,
   properties: ParameterMetadataProperties,
 ): void => {
-  const metadata = getOrCreateOperationMetadata(target, methodName);
+  const operationMetadata = getOrCreateOperationMetadata(target, methodName);
 
-  if (!metadata.operationObject.parameters) {
-    metadata.operationObject.parameters = [];
+  if (!operationMetadata.operationObject.parameters) {
+    operationMetadata.operationObject.parameters = [];
   }
 
   let parameter = getParameterMetadata(target, methodName, parameterIndex);
@@ -211,8 +223,8 @@ export const addParametersMetadata = (
       // TODO: add example to operation parameter metadata
       // TODO: add content to operation parameter metadata
     };
-    metadata.operationObject.parameters.push(parameter);
-    metadata.parameterIndices.push(parameterIndex);
+    operationMetadata.operationObject.parameters.push(parameter);
+    operationMetadata.parameterIndices.push(parameterIndex);
   }
 
   const calculatedProps = properties.schema
@@ -233,7 +245,7 @@ export const addParametersMetadata = (
   }
 
   updateDefinedProperties(parameter, { ...properties, ...calculatedProps });
-  metadata.operationObject.parameters[arrayIndex] = parameter;
+  operationMetadata.operationObject.parameters[arrayIndex] = parameter;
 };
 
 export const addBodyMetadata = (

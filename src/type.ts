@@ -1,4 +1,5 @@
 import {
+  OperationObject,
   ParameterObject,
   PathItemObject,
   ReferenceObject,
@@ -7,17 +8,28 @@ import {
   SchemaObject,
   isReferenceObject,
 } from 'openapi3-ts/oas31';
-import { OperationMetadata } from './reflect';
 
-export type Controller = {
-  name: string;
-  path: string;
-  routes: Route[];
+export type ControllerConfig = {
+  path?: string;
 };
 
-export type Route = {
-  path: string;
+export type ControllerMetadata = {
+  name: string;
+  config?: ControllerConfig;
+  baseOperationObject: OperationObject;
   operationMetadatas: OperationMetadata[];
+};
+
+export type OperationConfig = {
+  method?: OperationMethod;
+  path?: string;
+};
+
+export type OperationMetadata = {
+  name: string;
+  parameterIndices: number[];
+  config: OperationConfig;
+  operationObject: OperationObject;
 };
 
 export type OperationMethod = keyof Pick<

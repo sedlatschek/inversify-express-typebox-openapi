@@ -12,6 +12,7 @@ import {
   OperationId,
   Tags,
 } from '../../src/decorate';
+import { inject } from 'inversify';
 
 export type Post = {
   id: number;
@@ -37,6 +38,12 @@ export const posts: Post[] = [];
 @Controller('/api/posts')
 @Tags('Posts')
 export class TestOaController310Post {
+  public someRandomProperty: string;
+
+  public constructor(@inject('SomeService') someService: string) {
+    this.someRandomProperty = someService;
+  }
+
   @Post('/')
   @Response(201, 'Post created', postSchema)
   public createPost(

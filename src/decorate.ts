@@ -24,20 +24,13 @@ import {
 import { OperationMethod } from './type';
 import { ParameterLocation } from 'openapi3-ts/oas31';
 
-export type ClassDecorator = (target: object) => void;
-export type MethodDecorator = (
-  target: object,
-  propertyKey: string | symbol | undefined,
-) => void;
-export type ClassAndMethodDecorator = (
-  target: object,
-  propertyKey?: string | symbol | undefined,
-) => void;
-
-export const Controller = (path: string, ...middleware: Array<Middleware>) => {
-  return (target: typeof Object.constructor): void => {
+export const Controller = (
+  path: string,
+  ...middleware: Array<Middleware>
+): ClassDecorator => {
+  return (target: object): void => {
     addControllerMetadata(target, {
-      config: { name: target.name },
+      config: { path },
     });
     controller(path, ...middleware)(target);
   };
@@ -59,7 +52,7 @@ const operationDecoratorFactory = (
       descriptor: PropertyDescriptor,
     ) => {
       addOperationMetadata(target, propertyKey, {
-        config: { name: propertyKey, method },
+        config: { method, path },
       });
       inversifyMethodDecorator(path, ...middleware)(
         target,
@@ -162,15 +155,14 @@ export const Deprecated = (): ParameterDecorator | HandlerDecorator => {
   };
 };
 
-export const OperationId = (operationId: string): ClassAndMethodDecorator => {
+export const OperationId = (
+  operationId: string,
+): ClassDecorator & MethodDecorator => {
   return (target: object, propertyKey?: string | symbol | undefined) => {
-    if (!propertyKey) {
+    if (propertyKey === undefined) {
       addControllerMetadata(target, { metadataProperties: { operationId } });
     } else {
       addOperationMetadata(target, propertyKey, {
-        config: {
-          name: propertyKey.toString(),
-        },
         metadataProperties: {
           operationId,
         },
