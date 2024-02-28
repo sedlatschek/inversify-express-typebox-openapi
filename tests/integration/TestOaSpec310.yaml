@@ -68,6 +68,7 @@ paths:
           in: header
           schema:
             type: string
+          description: Falls back to english if not provided
           required: false
         - name: state
           in: query
@@ -263,6 +264,7 @@ paths:
       tags:
         - Posts
         - Users
+      description: Get all posts of a user
       operationId: UserController_getUserPosts
   /api/posts/:
     post:
@@ -278,6 +280,7 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/Post"
+      description: Create a new post
       operationId: TestOaController310Post_createPost
       tags:
         - Posts
@@ -293,6 +296,7 @@ paths:
         "404":
           description: Post not found
       requestBody:
+        description: The post dto
         content:
           application/json:
             schema:
@@ -303,6 +307,7 @@ paths:
           schema:
             type: number
           required: true
+      description: Update a existing post
       operationId: TestOaController310Post_updatePost
       tags:
         - Posts
@@ -317,8 +322,10 @@ paths:
           in: path
           schema:
             type: number
+          description: The post id
           required: true
       operationId: TestOaController310Post_deletePost
+      description: Delete a post
       tags:
         - Posts
 components:

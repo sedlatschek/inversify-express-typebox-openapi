@@ -81,7 +81,11 @@ export class TestOaController310User extends BaseHttpController {
   @OperationId('getAllUsers')
   public get(
     @Query('state', Type.Optional(userStateSchema)) userState?: UserState,
-    @Header('Accept-Language', Type.Optional(Type.String()))
+    @Header(
+      'Accept-Language',
+      Type.Optional(Type.String()),
+      'Falls back to english if not provided',
+    )
     _acceptLanguage?: string,
   ): User[] {
     if (userState) {
@@ -182,7 +186,7 @@ export class TestOaController310User extends BaseHttpController {
     res.status(404).send('User not found');
   }
 
-  @Get('/:userId/posts')
+  @Get('/:userId/posts', 'Get all posts of a user')
   @Response(200, 'List of the users posts', Type.Array(postSchema))
   @Tags('Posts')
   public getUserPosts(

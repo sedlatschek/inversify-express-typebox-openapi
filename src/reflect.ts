@@ -214,7 +214,6 @@ export const addParametersMetadata = (
     parameter = {
       name: properties.name ?? 'unknown name', // TODO: refactor this ugly peace of code so we don't need to set a default value
       in: properties.in ?? 'query', // TODO: refactor this ugly peace of code so we don't need to set a default value
-      // TODO: add description to operation parameter metadata
       // TODO: add allowEmptyValue to operation parameter metadata
       // TODO: add style to operation parameter metadata
       // TODO: add explode to operation parameter metadata
@@ -252,11 +251,12 @@ export const addBodyMetadata = (
   target: object,
   methodName: string | symbol,
   schema: TSchema,
+  description?: string,
 ): void => {
   const metadata = getOrCreateOperationMetadata(target, methodName);
 
   metadata.operationObject.requestBody = {
-    // TODO: add description to operation requestBody metadata
+    description,
     content: {
       'application/json': {
         schema,

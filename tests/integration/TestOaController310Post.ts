@@ -44,7 +44,7 @@ export class TestOaController310Post {
     this.someRandomProperty = someService;
   }
 
-  @Post('/')
+  @Post('/', 'Create a new post')
   @Response(201, 'Post created', postSchema)
   public createPost(
     @Body(postSchema) post: Post,
@@ -54,12 +54,12 @@ export class TestOaController310Post {
     res.status(201).send(post);
   }
 
-  @Put('/:postId')
+  @Put('/:postId', 'Update a existing post')
   @Response(200, 'Post updated', postSchema)
   @Response(404, 'Post not found')
   public updatePost(
     @Path('postId', Type.Number()) postId: number,
-    @Body(postSchema) post: Post,
+    @Body(postSchema, 'The post dto') post: Post,
     @response() res: express.Response,
   ): void {
     const index = posts.findIndex((p) => p.id === postId);
@@ -71,12 +71,12 @@ export class TestOaController310Post {
     res.status(404).send('Post not found');
   }
 
-  @Delete('/:postId')
+  @Delete('/:postId', 'Delete a post')
   @Response(200, 'Post deleted')
   @Response(404, 'Post not found')
   @OperationId('deletePost')
-  public deletePost(
-    @Path('postId', Type.Number()) postId: number,
+  public del(
+    @Path('postId', Type.Number(), 'The post id') postId: number,
     @response() res: express.Response,
   ): void {
     const index = posts.findIndex((p) => p.id === postId);

@@ -45,8 +45,16 @@ export type InversifyMethodDecorator = (
 const operationDecoratorFactory = (
   inversifyMethodDecorator: InversifyMethodDecorator,
   method: OperationMethod,
-): ((path: string, ...middleware: Array<Middleware>) => HandlerDecorator) => {
-  return (path: string, ...middleware: Array<Middleware>) => {
+): ((
+  path: string,
+  description?: string,
+  ...middleware: Array<Middleware>
+) => HandlerDecorator) => {
+  return (
+    path: string,
+    description?: string,
+    ...middleware: Array<Middleware>
+  ) => {
     return (
       target: object,
       propertyKey: string,
@@ -54,6 +62,7 @@ const operationDecoratorFactory = (
     ) => {
       addOperationMetadata(target, propertyKey, {
         config: { method, path },
+        metadataProperties: { description },
       });
       inversifyMethodDecorator(path, ...middleware)(
         target,
@@ -78,8 +87,16 @@ export type InversifyParameterDecorator = (
 const parameterDecoratorFactory = (
   inversifyParameterDecorator: InversifyParameterDecorator,
   type: ParameterLocation,
-): ((name: string, schema: TSchema) => ParameterDecorator) => {
-  return (name: string, schema: TSchema): ParameterDecorator => {
+): ((
+  name: string,
+  schema: TSchema,
+  description?: string,
+) => ParameterDecorator) => {
+  return (
+    name: string,
+    schema: TSchema,
+    description?: string,
+  ): ParameterDecorator => {
     return (
       target: object,
       methodName: string | symbol | undefined,
@@ -94,6 +111,7 @@ const parameterDecoratorFactory = (
         name,
         in: type,
         schema,
+        description,
       });
       inversifyParameterDecorator(name)(target, methodName, parameterIndex);
     };
@@ -105,7 +123,10 @@ export const Query = parameterDecoratorFactory(queryParam, 'query');
 export const Cookie = parameterDecoratorFactory(queryParam, 'cookie');
 export const Header = parameterDecoratorFactory(queryParam, 'header');
 
-export function Body(schema: TSchema): ParameterDecorator {
+export function Body(
+  schema: TSchema,
+  description?: string,
+): ParameterDecorator {
   return (
     target: object,
     propertyKey: string | symbol | undefined,
@@ -114,7 +135,7 @@ export function Body(schema: TSchema): ParameterDecorator {
     if (!propertyKey) {
       throw new Error('Body decorator can only be used on parameters');
     }
-    addBodyMetadata(target, propertyKey, schema);
+    addBodyMetadata(target, propertyKey, schema, description);
     requestBody()(target, propertyKey, parameterIndex);
   };
 }
