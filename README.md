@@ -7,6 +7,22 @@ Generate OpenAPI specification during runtime from inversify-express-utils contr
 - OpenAPI spec generation at runtime (no precompilation)
 - Integrated with `inversify-express-utils`
 
+## Usage
+
+### Installation
+
+```sh
+npm install inversify-express-typebox-openapi
+```
+
+### Example
+
+ToDo
+
+### Documentation
+
+ToDo
+
 ## Development
 
 ### Testing
@@ -15,16 +31,15 @@ We use [vitest](https://vitest.dev/) for testing. To ensure support for decorato
 
 ## ToDo
 
-- [ ] rework controller metadata (don't rely on inversify-express-utils debug functions) -> use new config object
 - [ ] provide clearMetadata for testing
 - [ ] security
 - [ ] descriptions
 - [ ] examples
-- [ ] controller operationId as prefix
 - [ ] externalDocs
-- [ ] Readme
+- [ ] Readme (docs)
 - [ ] make a package out of it
 - [ ] check for the lowest compatibile version of each peerDependency
 - [ ] inversify all?
 - [ ] controller wide parameter decorators: cookie, header
-- [ ] change error text to "must decorate a class"
+- [ ] deprecated controller
+- [ ] ignore decorator for controller, methods and paramaters
