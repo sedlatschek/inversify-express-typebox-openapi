@@ -12,10 +12,10 @@ import {
   isParameterObject,
   isRequestBodyObject,
   isResponseObject,
-} from './type';
+} from '../type';
 import { TSchema } from '@sinclair/typebox';
-import { equalsRegardlessOfItemOrPropertyOrder } from './utilize';
-import { OperationMetadata } from './type';
+import { equalsRegardlessOfItemOrPropertyOrder } from '../utilize';
+import { OperationMetadata } from '../type';
 
 export const collectSchemasAndReplaceWithReferences = (
   schemas: SchemasObject,

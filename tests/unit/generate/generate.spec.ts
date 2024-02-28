@@ -1,5 +1,5 @@
 import { expect, describe, it } from 'vitest';
-import { getRoutePath } from '../../src/generate';
+import { getRoutePath } from '../../../src/generate/generate';
 
 describe('generate', () => {
   describe('getRoutePath', () => {

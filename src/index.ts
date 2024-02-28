@@ -1,7 +1,7 @@
 import { type Container } from 'inversify';
 import { OpenApiBuilder } from 'openapi3-ts/oas31';
 import { parseContainer } from './parse';
-import { injectControllersIntoBuilder } from './generate';
+import { injectControllersIntoBuilder } from './generate/generate';
 
 export const generateSpec = (
   container: Container,

@@ -1,5 +1,5 @@
 import { OperationObject } from 'openapi3-ts/oas31';
-import { ControllerMetadata } from './type';
+import { ControllerMetadata } from '../type';
 
 export const mergeBaseOperationIntoOperations = (
   controller: ControllerMetadata,

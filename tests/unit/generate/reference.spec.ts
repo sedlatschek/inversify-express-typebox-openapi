@@ -1,6 +1,9 @@
 import 'reflect-metadata';
 import { expect, describe, it } from 'vitest';
-import { areEqualSchemas, referenceSchema } from '../../src/reference';
+import {
+  areEqualSchemas,
+  referenceSchema,
+} from '../../../src/generate/reference';
 import { Type } from '@sinclair/typebox';
 
 describe('generate', () => {

@@ -1,7 +1,7 @@
 import { OpenApiBuilder, PathItemObject } from 'openapi3-ts/oas31';
 import { collectSchemasAndReplaceWithReferences } from './reference';
 import { mergeBaseOperationIntoOperations } from './merge';
-import { ControllerMetadata } from './type';
+import { ControllerMetadata } from '../type';
 
 export const injectControllersIntoBuilder = (
   builder: OpenApiBuilder,
