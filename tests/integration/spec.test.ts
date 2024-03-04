@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import { describe, expect, it } from 'vitest';
 import { Container } from 'inversify';
 import { InversifyExpressServer } from 'inversify-express-utils';
+import './TestOaController310Other';
 import './TestOaController310User';
 import './TestOaController310Post';
 import { readFile } from 'fs/promises';

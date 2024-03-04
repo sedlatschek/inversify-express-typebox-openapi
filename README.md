@@ -38,8 +38,8 @@ We use [vitest](https://vitest.dev/) for testing. To ensure support for decorato
 - [ ] externalDocs
 - [ ] Readme (docs)
 - [ ] make a package out of it
-- [ ] check for the lowest compatibile version of each peerDependency
+- [ ] check for the lowest compatible version of each peerDependency
 - [ ] inversify all?
 - [ ] controller wide parameter decorators: cookie, header
 - [ ] deprecated controller
-- [ ] ignore decorator for controller, methods and paramaters
+- [ ] ignore decorator for controller, methods and parameters
