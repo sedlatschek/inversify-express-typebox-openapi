@@ -1,7 +1,7 @@
 import { OpenApiBuilder, PathItemObject } from 'openapi3-ts/oas31';
 import { collectSchemasAndReplaceWithReferences } from './reference';
-import { mergeBaseOperationIntoOperations } from './merge';
 import { ControllerMetadata } from '../type';
+import { mergeIntoOperation } from '../merge';
 
 export const injectControllersIntoBuilder = (
   builder: OpenApiBuilder,
@@ -59,4 +59,16 @@ export const getRoutePath = (
   return `${controllerPath}/${routePath}`
     .replace(pathSlashReplaceRegex, '/')
     .replace(pathParamReplaceRegex, '{$1}');
+};
+
+export const mergeBaseOperationIntoOperations = (
+  controller: ControllerMetadata,
+): void => {
+  for (const operationMetadata of controller.operationMetadatas) {
+    operationMetadata.operationObject.operationId = `${controller.baseOperationObject.operationId ?? controller.name}_${operationMetadata.operationObject?.operationId ?? operationMetadata.name}`;
+    mergeIntoOperation(
+      operationMetadata.operationObject,
+      controller.baseOperationObject,
+    );
+  }
 };
