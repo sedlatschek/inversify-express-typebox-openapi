@@ -22,7 +22,10 @@ import {
   addControllerMetadata,
 } from './reflect';
 import { OperationMethod } from './type';
-import { ParameterLocation } from 'openapi3-ts/oas31';
+import {
+  ParameterLocation,
+  SecurityRequirementObject,
+} from 'openapi3-ts/oas31';
 import { ucfirst } from './utilize';
 
 export const Controller = (
@@ -167,15 +170,21 @@ export const Deprecated = (): ParameterDecorator | HandlerDecorator => {
         'Deprecated decorator can only be used on methods or parameters',
       );
     }
+
+    const metadataProperties = { deprecated: true };
+
     if (typeof parameterIndex === 'number') {
       // Parameter decorator
-      addParametersMetadata(target, propertyKey, parameterIndex, {
-        deprecated: true,
-      });
+      addParametersMetadata(
+        target,
+        propertyKey,
+        parameterIndex,
+        metadataProperties,
+      );
     } else {
       // Method decorator
       addOperationMetadata(target, propertyKey, {
-        metadataProperties: { deprecated: true },
+        metadataProperties,
       });
     }
   };
@@ -185,13 +194,29 @@ export const OperationId = (
   operationId: string,
 ): ClassDecorator & MethodDecorator => {
   return (target: object, propertyKey?: string | symbol | undefined) => {
+    const metadataProperties = { operationId };
+
     if (propertyKey === undefined) {
-      addControllerMetadata(target, { metadataProperties: { operationId } });
+      addControllerMetadata(target, { metadataProperties });
     } else {
       addOperationMetadata(target, propertyKey, {
-        metadataProperties: {
-          operationId,
-        },
+        metadataProperties,
+      });
+    }
+  };
+};
+
+export const Security = (
+  securityObject: SecurityRequirementObject,
+): ((target: object, propertyKey?: string | symbol | undefined) => void) => {
+  return (target: object, propertyKey?: string | symbol | undefined): void => {
+    const metadataProperties = { security: [securityObject] };
+
+    if (!propertyKey) {
+      addControllerMetadata(target, { metadataProperties });
+    } else {
+      addOperationMetadata(target, propertyKey, {
+        metadataProperties,
       });
     }
   };
@@ -201,11 +226,13 @@ export const Tags = (
   ...tags: string[]
 ): ((target: object, propertyKey?: string | symbol | undefined) => void) => {
   return (target: object, propertyKey?: string | symbol | undefined): void => {
+    const metadataProperties = { tags };
+
     if (!propertyKey) {
-      addControllerMetadata(target, { metadataProperties: { tags } });
+      addControllerMetadata(target, { metadataProperties });
     } else {
       addOperationMetadata(target, propertyKey, {
-        metadataProperties: { tags },
+        metadataProperties,
       });
     }
   };

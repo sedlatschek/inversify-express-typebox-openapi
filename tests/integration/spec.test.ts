@@ -6,7 +6,7 @@ import './TestOaController310Other';
 import './TestOaController310User';
 import './TestOaController310Post';
 import { readFile } from 'fs/promises';
-import { generateSpec } from '../../src';
+import { generateSpec, generateSpecAsYaml } from '../../src';
 
 const container = new Container();
 container.bind('SomeService').toConstantValue('SomeValue');
@@ -17,16 +17,25 @@ server.build();
 describe('spec', async () => {
   it('is valid for OpenAPI 3.1.0', async () => {
     const openApi = generateSpec(container);
-    openApi.addInfo({
-      title: 'TestOa',
-      version: '0.2.0',
-      description: 'The expected OpenAPI 3.1.0 spec for the test controllers',
-      contact: {
-        email: 'developer@example.org',
-      },
-    });
+    openApi
+      .addInfo({
+        title: 'TestOa',
+        version: '0.2.0',
+        description: 'The expected OpenAPI 3.1.0 spec for the test controllers',
+        contact: {
+          email: 'developer@example.org',
+        },
+      })
+      .addSecurityScheme('basicAuth', { type: 'http', scheme: 'basic' })
+      .addSecurityScheme('bearerAuth', {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+      });
 
-    expect(openApi.getSpecAsYaml()).to.equal(
+    const spec = generateSpecAsYaml(openApi);
+
+    expect(spec).to.equal(
       await readFile('tests/integration/TestOaSpec310.yaml', 'utf8'),
     );
   });

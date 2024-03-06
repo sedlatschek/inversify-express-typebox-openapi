@@ -16,7 +16,8 @@ import {
   Cookie,
   Tags,
   OperationId,
-} from '../../src/decorate';
+  Security,
+} from '../../src';
 import { Response as ExpressResponse } from 'express';
 import { Post as PostType, postSchema, posts } from './TestOaController310Post';
 
@@ -61,10 +62,14 @@ export const users: User[] = [
 @Controller('/api/users')
 @Tags('Users')
 @OperationId('UserController')
+@Security({ bearerAuth: ['user', 'admin'] })
+@Security({ basicAuth: ['user', 'admin'] })
 export class TestOaController310User extends BaseHttpController {
   @Get('me')
   @Response(200, 'The user from the session', userSchema)
   @Response(401, 'Unauthorized')
+  @Security({ bearerAuth: ['user'] })
+  @Security({ basicAuth: ['user'] })
   public getUserFromSession(
     @response() res: ExpressResponse,
     @Cookie('sessionId', Type.String()) sessionId: string,

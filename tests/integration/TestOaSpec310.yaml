@@ -23,6 +23,17 @@ paths:
           schema:
             type: string
           required: true
+      security:
+        - basicAuth:
+            - user
+        - bearerAuth:
+            - user
+        - basicAuth:
+            - user
+            - admin
+        - bearerAuth:
+            - user
+            - admin
       operationId: UserController_getUserFromSession
       tags:
         - Users
@@ -78,6 +89,13 @@ paths:
       operationId: UserController_getAllUsers
       tags:
         - Users
+      security:
+        - basicAuth:
+            - user
+            - admin
+        - bearerAuth:
+            - user
+            - admin
     post:
       responses:
         "201":
@@ -94,6 +112,13 @@ paths:
       operationId: UserController_createUser
       tags:
         - Users
+      security:
+        - basicAuth:
+            - user
+            - admin
+        - bearerAuth:
+            - user
+            - admin
   /api/users/active:
     get:
       responses:
@@ -135,6 +160,13 @@ paths:
       operationId: UserController_getAllActiveUsers
       tags:
         - Users
+      security:
+        - basicAuth:
+            - user
+            - admin
+        - bearerAuth:
+            - user
+            - admin
   /api/users/{userId}:
     get:
       responses:
@@ -160,6 +192,13 @@ paths:
       operationId: UserController_getUserById
       tags:
         - Users
+      security:
+        - basicAuth:
+            - user
+            - admin
+        - bearerAuth:
+            - user
+            - admin
     put:
       responses:
         "200":
@@ -180,6 +219,13 @@ paths:
       operationId: UserController_updateUser
       tags:
         - Users
+      security:
+        - basicAuth:
+            - user
+            - admin
+        - bearerAuth:
+            - user
+            - admin
     delete:
       responses:
         "204":
@@ -195,6 +241,13 @@ paths:
       operationId: UserController_deleteUser
       tags:
         - Users
+      security:
+        - basicAuth:
+            - user
+            - admin
+        - bearerAuth:
+            - user
+            - admin
   /api/users/{userId}/state:
     patch:
       responses:
@@ -220,6 +273,13 @@ paths:
       operationId: UserController_patchUserState
       tags:
         - Users
+      security:
+        - basicAuth:
+            - user
+            - admin
+        - bearerAuth:
+            - user
+            - admin
   /api/users/{userId}/posts:
     get:
       responses:
@@ -266,6 +326,13 @@ paths:
         - Users
       description: Get all posts of a user
       operationId: UserController_getUserPosts
+      security:
+        - basicAuth:
+            - user
+            - admin
+        - bearerAuth:
+            - user
+            - admin
   /api/posts/:
     post:
       responses:
@@ -284,6 +351,10 @@ paths:
       operationId: TestOaController310Post_createPost
       tags:
         - Posts
+      security:
+        - bearerAuth:
+            - user
+            - poster
   /api/posts/{postId}:
     put:
       responses:
@@ -311,6 +382,10 @@ paths:
       operationId: TestOaController310Post_updatePost
       tags:
         - Posts
+      security:
+        - bearerAuth:
+            - user
+            - poster
     delete:
       responses:
         "200":
@@ -328,6 +403,10 @@ paths:
       description: Delete a post
       tags:
         - Posts
+      security:
+        - bearerAuth:
+            - user
+            - poster
 components:
   schemas:
     User:
@@ -393,7 +472,14 @@ components:
   examples: {}
   requestBodies: {}
   headers: {}
-  securitySchemes: {}
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   links: {}
   callbacks: {}
 tags: []

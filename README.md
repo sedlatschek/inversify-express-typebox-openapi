@@ -21,7 +21,22 @@ ToDo
 
 ### Documentation
 
-ToDo
+#### Decorators
+
+##### Security
+
+Specify the security requirements for a method.
+
+```ts
+@Security({ securityScheme: ['scopeA', 'scopeB'] })
+```
+
+| Controller | Method | Parameter |
+| :--------: | :----: | :-------: |
+|     ✅     |   ✅   |    ❌     |
+
+When used on a controller, it is applied to each of its methods.
+Multiple `@Security` decorators onto one controller/method extend the requirements.
 
 ## Development
 
@@ -32,7 +47,6 @@ We use [vitest](https://vitest.dev/) for testing. To ensure support for decorato
 ## ToDo
 
 - [ ] provide clearMetadata for testing
-- [ ] security
 - [ ] descriptions
 - [ ] examples
 - [ ] externalDocs
@@ -41,5 +55,8 @@ We use [vitest](https://vitest.dev/) for testing. To ensure support for decorato
 - [ ] check for the lowest compatible version of each peerDependency
 - [ ] inversify all?
 - [ ] controller wide parameter decorators: cookie, header
-- [ ] deprecated controller
+- [ ] controller wide responses (eg 500)
+- [ ] controller wide deprecated
 - [ ] ignore decorator for controller, methods and parameters
+- [ ] improve types of merge.ts (only allow property keys of the assumed property value that is needed for the function to work)
+- [ ] parameters decorators should reflect types

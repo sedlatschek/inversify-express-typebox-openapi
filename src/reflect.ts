@@ -13,6 +13,7 @@ import {
   isParameterObject,
 } from './type';
 import { updateDefinedProperties } from './utilize';
+import { mergeIntoOperation } from './merge';
 
 export const CONTROLLER_METADATA_KEY =
   'inversify-express-typebox-openapi:controller';
@@ -72,7 +73,7 @@ export const addControllerMetadata = (
     }
 
     if (metadataProperties) {
-      updateDefinedProperties(
+      mergeIntoOperation(
         controllerMetadata.baseOperationObject,
         metadataProperties,
       );
@@ -140,10 +141,7 @@ export const addOperationMetadata = (
     }
 
     if (metadataProperties) {
-      updateDefinedProperties(
-        operationMetadata.operationObject,
-        metadataProperties,
-      );
+      mergeIntoOperation(operationMetadata.operationObject, metadataProperties);
     }
   }
 

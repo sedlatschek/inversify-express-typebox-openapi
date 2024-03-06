@@ -11,7 +11,8 @@ import {
   Response,
   OperationId,
   Tags,
-} from '../../src/decorate';
+  Security,
+} from '../../src';
 import { inject } from 'inversify';
 
 export type Post = {
@@ -37,6 +38,7 @@ export const posts: Post[] = [];
 
 @Controller('/api/posts')
 @Tags('Posts')
+@Security({ bearerAuth: ['user', 'poster'] })
 export class TestOaController310Post {
   public someRandomProperty: string;
 

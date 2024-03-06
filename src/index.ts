@@ -1,7 +1,9 @@
-import { type Container } from 'inversify';
+import { Container } from 'inversify';
 import { OpenApiBuilder } from 'openapi3-ts/oas31';
 import { parseContainer } from './parse';
 import { injectControllersIntoBuilder } from './generate/generate';
+import { stringify } from 'yaml';
+export * from './decorate';
 
 export const generateSpec = (
   container: Container,
@@ -14,15 +16,26 @@ export const generateSpec = (
 };
 
 export const generateSpecAsJson = (
-  container: Container,
+  containerOrOpenApiBuilder: Container | OpenApiBuilder,
   builder?: OpenApiBuilder,
 ): string => {
-  return JSON.stringify(generateSpec(container, builder).getSpec());
+  const openApiBuilder =
+    containerOrOpenApiBuilder instanceof Container
+      ? generateSpec(containerOrOpenApiBuilder, builder)
+      : containerOrOpenApiBuilder;
+  return openApiBuilder.getSpecAsJson();
 };
 
 export const generateSpecAsYaml = (
-  container: Container,
+  containerOrOpenApiBuilder: Container | OpenApiBuilder,
   builder?: OpenApiBuilder,
 ): string => {
-  return generateSpec(container, builder).getSpecAsYaml();
+  const spec =
+    containerOrOpenApiBuilder instanceof Container
+      ? generateSpec(containerOrOpenApiBuilder, builder).getSpec()
+      : containerOrOpenApiBuilder.getSpec();
+  return stringify(spec, {
+    aliasDuplicateObjects: false,
+    anchorPrefix: 'oa',
+  });
 };
