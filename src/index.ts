@@ -9,6 +9,7 @@ export {
   IdentifiableObject,
   isIdentifiableObject,
   identifiable,
+  withoutId,
 } from './generate/reference';
 
 export const generateSpec = (
