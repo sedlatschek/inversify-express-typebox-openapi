@@ -414,6 +414,29 @@ paths:
         - bearerAuth:
             - user
             - poster
+  /api/postings/:
+    post:
+      responses:
+        "201":
+          description: Post created
+          content:
+            application/json:
+              schema:
+                type: string
+      requestBody:
+        description: A new post
+        content:
+          application/json:
+            schema:
+              type: string
+            examples:
+              example:
+                value: example
+      description: Create a new post
+      operationId: TestOaController310DeprecatedPost_createPost
+      deprecated: true
+      tags:
+        - Posts
 components:
   schemas:
     User:

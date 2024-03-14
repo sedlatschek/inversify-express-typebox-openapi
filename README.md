@@ -23,6 +23,20 @@ ToDo
 
 #### Decorators
 
+##### Deprecated
+
+Flag a parameter, a method or a controller as deprecated.
+
+```ts
+@Deprecated()
+```
+
+| Controller | Method | Parameter |
+| :--------: | :----: | :-------: |
+|     ✅     |   ✅   |    ✅     |
+
+When used on a controller, it is applied to each of its methods.
+
 ##### Security
 
 Specify the security requirements for a method.
@@ -48,7 +62,6 @@ We use [vitest](https://vitest.dev/) for testing. To ensure support for decorato
 
 - [ ] provide clearMetadata for testing
 - [ ] descriptions
-- [ ] examples
 - [ ] externalDocs
 - [ ] Readme (docs)
 - [ ] make a package out of it
@@ -56,7 +69,6 @@ We use [vitest](https://vitest.dev/) for testing. To ensure support for decorato
 - [ ] inversify all?
 - [ ] controller wide parameter decorators: cookie, header
 - [ ] controller wide responses (eg 500)
-- [ ] controller wide deprecated
 - [ ] ignore decorator for controller, methods and parameters
 - [ ] improve types of merge.ts (only allow property keys of the assumed property value that is needed for the function to work)
 - [ ] parameters decorators should reflect types

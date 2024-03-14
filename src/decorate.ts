@@ -191,25 +191,23 @@ export function Response(
   };
 }
 
-export const Deprecated = (): ParameterDecorator | HandlerDecorator => {
+export const Deprecated = (): ClassDecorator &
+  MethodDecorator &
+  ParameterDecorator => {
   return (
     target: object,
-    propertyKey: string | symbol | undefined,
-    parameterIndex?: number | TypedPropertyDescriptor<unknown> | undefined,
+    propertyKey?: string | symbol,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    descriptorOrParameterIndex?: TypedPropertyDescriptor<any>,
   ): void => {
-    if (!propertyKey) {
-      throw new Error(
-        'Deprecated decorator can only be used on methods or parameters',
-      );
-    }
-
     const metadataProperties = { deprecated: true };
-
-    if (typeof parameterIndex === 'number') {
+    if (propertyKey === undefined) {
+      addControllerMetadata(target, { metadataProperties });
+    } else if (typeof descriptorOrParameterIndex === 'number') {
       addParametersMetadata(
         target,
         propertyKey,
-        parameterIndex,
+        descriptorOrParameterIndex,
         metadataProperties,
       );
     } else {

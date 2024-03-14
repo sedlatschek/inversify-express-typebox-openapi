@@ -40,7 +40,7 @@ export type ExampleObjectOf<T> = Omit<ExampleObject, 'value'> & {
   value: T;
 };
 export type ExamplesObjectOf<T> = {
-  [name: string]: IdentifiableObject<ExampleObjectOf<T>>;
+  [name: string]: IdentifiableObject<ExampleObjectOf<T>> | ExampleObjectOf<T>;
 };
 
 export const isParameterObject = (
