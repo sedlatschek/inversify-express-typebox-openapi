@@ -110,6 +110,10 @@ Multiple `@Security` decorators onto one controller/method extend the requiremen
 
 We use [vitest](https://vitest.dev/) for testing. To ensure support for decorators and reflection, we run it with [swc](https://swc.rs).
 
+### Contribute
+
+ToDo
+
 ## ToDo
 
 - [ ] provide clearMetadata for testing
@@ -123,6 +127,7 @@ We use [vitest](https://vitest.dev/) for testing. To ensure support for decorato
 - [ ] parameters decorators should reflect types
 - [ ] OA v3.0
 - [ ] remove reflect-metadata import from tests that do not rely on it
+- [ ] Changelog
 
 ### Roadmap
 

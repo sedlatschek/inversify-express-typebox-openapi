@@ -5,6 +5,7 @@ import {
   ParameterLocation,
   ParameterObject,
   ResponseObject,
+  isReferenceObject,
 } from 'openapi3-ts/oas31';
 import {
   ControllerConfig,
@@ -12,7 +13,6 @@ import {
   ExamplesObjectOf,
   OperationConfig,
   OperationMetadata,
-  isParameterObject,
 } from './type';
 import { hasValues, updateDefinedProperties } from './utilize';
 import { mergeIntoOperation } from './merge';
@@ -178,7 +178,8 @@ export const getParameterMetadata = (
     const metadata = getOperationMetadata(target, methodName);
     const parameterMetadata =
       metadata?.operationObject.parameters?.[actualIndex];
-    if (isParameterObject(parameterMetadata)) {
+
+    if (!!parameterMetadata && !isReferenceObject(parameterMetadata)) {
       return parameterMetadata;
     }
   }

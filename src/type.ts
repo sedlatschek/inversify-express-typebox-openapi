@@ -1,10 +1,7 @@
 import {
   ExampleObject,
   OperationObject,
-  ParameterObject,
   PathItemObject,
-  ReferenceObject,
-  isReferenceObject,
 } from 'openapi3-ts/oas31';
 import { IdentifiableObject } from './generate/reference';
 
@@ -39,12 +36,7 @@ export type OperationMethod = keyof Pick<
 export type ExampleObjectOf<T> = Omit<ExampleObject, 'value'> & {
   value: T;
 };
+
 export type ExamplesObjectOf<T> = {
   [name: string]: IdentifiableObject<ExampleObjectOf<T>> | ExampleObjectOf<T>;
-};
-
-export const isParameterObject = (
-  parameter: ParameterObject | ReferenceObject | undefined,
-): parameter is ParameterObject => {
-  return !!parameter && !isReferenceObject(parameter);
 };
