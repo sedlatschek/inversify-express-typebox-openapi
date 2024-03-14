@@ -5,6 +5,12 @@ import { injectControllersIntoBuilder } from './generate/generate';
 import { stringify } from 'yaml';
 export * from './decorate';
 
+export {
+  IdentifiableObject,
+  isIdentifiableObject,
+  identifiable,
+} from './generate/reference';
+
 export const generateSpec = (
   container: Container,
   builder?: OpenApiBuilder,

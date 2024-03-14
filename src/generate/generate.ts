@@ -1,5 +1,5 @@
 import { OpenApiBuilder, PathItemObject } from 'openapi3-ts/oas31';
-import { collectSchemasAndReplaceWithReferences } from './reference';
+import { createReferences } from './create-references';
 import { ControllerMetadata } from '../type';
 import { mergeIntoOperation } from '../merge';
 
@@ -11,20 +11,12 @@ export const injectControllersIntoBuilder = (
     builder.rootDoc.components = {};
   }
 
-  if (builder.rootDoc.components.schemas === undefined) {
-    builder.rootDoc.components.schemas = {};
-  }
-
   for (const controller of controllers) {
     if (!controller.config?.path) {
       throw new Error(`Path for controller ${controller.name} is missing`);
     }
 
-    mergeBaseOperationIntoOperations(controller);
-    collectSchemasAndReplaceWithReferences(
-      builder.rootDoc.components.schemas,
-      controller.operationMetadatas,
-    );
+    mergeBaseOperationIntoAllOperations(controller);
 
     for (const operationMetadata of controller.operationMetadatas) {
       if (
@@ -38,6 +30,11 @@ export const injectControllersIntoBuilder = (
 
       pathItem[operationMetadata.config.method] =
         operationMetadata.operationObject;
+
+      createReferences(
+        builder.rootDoc.components,
+        operationMetadata.operationObject,
+      );
 
       builder.addPath(
         getRoutePath(controller.config?.path, operationMetadata.config?.path),
@@ -61,7 +58,7 @@ export const getRoutePath = (
     .replace(pathParamReplaceRegex, '{$1}');
 };
 
-export const mergeBaseOperationIntoOperations = (
+export const mergeBaseOperationIntoAllOperations = (
   controller: ControllerMetadata,
 ): void => {
   for (const operationMetadata of controller.operationMetadatas) {

@@ -1,58 +1,202 @@
 import 'reflect-metadata';
 import { expect, describe, it } from 'vitest';
+import { identifiable, isIdentifiableObject } from '../../../src';
 import {
-  areEqualSchemas,
-  referenceSchema,
+  reference,
+  referenceArray,
+  referenceMap,
+  withoutId,
 } from '../../../src/generate/reference';
-import { Type } from '@sinclair/typebox';
+import {
+  ComponentsObject,
+  ExamplesObject,
+  ParameterObject,
+} from 'openapi3-ts/oas31';
+import { TSchema, Type } from '@sinclair/typebox';
 
 describe('generate', () => {
-  describe('referenceSchema', () => {
-    it('should return a reference to the schema', () => {
-      const schemaPool = {};
-      const schema = Type.Object({ id: Type.Number() }, { $id: 'TestSchema' });
+  describe('isIdentifiableObject', () => {
+    it('should return true for an identifiable object', () => {
+      const object = { a: 1, b: 2, $id: 'test' };
 
-      const reference = referenceSchema(schemaPool, schema);
-
-      expect(reference).toEqual({
-        $ref: '#/components/schemas/TestSchema',
-      });
+      expect(isIdentifiableObject(object)).toBe(true);
     });
 
-    it("throws error if a schema with the same title doesn't match the new schema", () => {
-      const schemaPool = {};
-      const schema1 = Type.Object({ id: Type.Number() }, { $id: 'TestSchema' });
-      const schema2 = Type.Object({ id: Type.String() }, { $id: 'TestSchema' });
+    it('should return false for a non-identifiable object', () => {
+      const object = { a: 1, b: 2 };
 
-      referenceSchema(schemaPool, schema1);
-
-      expect(() => referenceSchema(schemaPool, schema2)).to.throw();
+      expect(isIdentifiableObject(object)).toBe(false);
     });
   });
 
-  describe('areEqualSchemas', () => {
-    it('returns true for equal schemas', () => {
-      const schema1 = Type.Object({ id: Type.Number() });
-      const schema2 = Type.Object({ id: Type.Number() });
+  describe('identifiable', () => {
+    it('should add an id to an object', () => {
+      const object = { a: 1, b: 2 };
+      const identifiableObject = identifiable(object, { $id: 'test' });
 
-      expect(areEqualSchemas(schema1, schema2)).toBe(true);
+      expect(identifiableObject).toEqual({ a: 1, b: 2, $id: 'test' });
+    });
+  });
+
+  describe('withoutId', () => {
+    it('should remove an id from an object', () => {
+      const object = { a: 1, b: 2, $id: 'test' };
+      const cleanObject = withoutId(object);
+
+      expect(cleanObject).toEqual({ a: 1, b: 2 });
+    });
+  });
+
+  describe('reference', () => {
+    it('should return a reference object for an identifiable object', () => {
+      const record = { a: 1, b: 2, $id: 'test' };
+
+      const ref = reference({}, 'schemas', record);
+
+      expect(ref).toEqual({ $ref: '#/components/schemas/test' });
     });
 
-    it('return true for equal schemas with differing property order', () => {
-      const schema1 = Type.Object({ id: Type.Number(), name: Type.String() });
-      const schema2 = Type.Object({ name: Type.String(), id: Type.Number() });
+    it('should return a reference object for a reference object', () => {
+      const record = { $ref: '#/components/schemas/test' };
 
-      expect(areEqualSchemas(schema1, schema2)).toBe(true);
+      const ref = reference({}, 'schemas', record);
 
-      expect(schema1.required).toEqual(['id', 'name']);
-      expect(schema2.required).toEqual(['name', 'id']);
+      expect(ref).toEqual({ $ref: '#/components/schemas/test' });
     });
 
-    it('returns false for different schemas', () => {
-      const schema1 = Type.Object({ id: Type.Number() });
-      const schema2 = Type.Object({ id: Type.String() });
+    it('should add a record to the components object', () => {
+      const record = { a: 1, b: 2, $id: 'test' };
+      const components: ComponentsObject = {};
 
-      expect(areEqualSchemas(schema1, schema2)).toBe(false);
+      reference(components, 'schemas', record);
+
+      expect(components).toEqual({ schemas: { test: { a: 1, b: 2 } } });
+    });
+
+    it('should use existing record for an identifiable object', () => {
+      const record: TSchema = Type.Object({
+        a: Type.Number(),
+        b: Type.Number(),
+      });
+
+      const components: ComponentsObject = {
+        schemas: { test: record },
+      };
+
+      reference(
+        components,
+        'schemas',
+        Type.Object(
+          {
+            a: Type.Number(),
+            b: Type.Number(),
+          },
+          { $id: 'test' },
+        ),
+      );
+
+      expect(components).toEqual({
+        schemas: { test: record },
+      });
+    });
+  });
+
+  describe('referenceMap', () => {
+    it('should return a map of references and add its values to the components object', () => {
+      const examples: ExamplesObject = {
+        first: { a: 1, b: 2, $id: 'FirstExample' },
+        second: { a: 3, b: 4, $id: 'SecondExample' },
+      };
+      const components: ComponentsObject = {};
+
+      const ref = referenceMap(components, 'examples', examples);
+
+      expect(ref).toEqual({
+        first: { $ref: '#/components/examples/FirstExample' },
+        second: { $ref: '#/components/examples/SecondExample' },
+      });
+
+      expect(components).toEqual({
+        examples: {
+          FirstExample: { a: 1, b: 2 },
+          SecondExample: { a: 3, b: 4 },
+        },
+      });
+    });
+
+    it('should ignore non-identifiable objects', () => {
+      const examples: ExamplesObject = {
+        first: { a: 1, b: 2 },
+        second: { a: 3, b: 4, $id: 'SecondExample' },
+      };
+      const components: ComponentsObject = {};
+
+      const ref = referenceMap(components, 'examples', examples);
+
+      expect(ref).toEqual({
+        first: { a: 1, b: 2 },
+        second: { $ref: '#/components/examples/SecondExample' },
+      });
+
+      expect(components).toEqual({
+        examples: {
+          SecondExample: { a: 3, b: 4 },
+        },
+      });
+    });
+  });
+
+  describe('referenceArray', () => {
+    it('should return an array of references and add its values to the components object', () => {
+      const parameters: ParameterObject[] = [
+        identifiable<ParameterObject>(
+          { name: 'first', in: 'path' },
+          { $id: 'FirstParameter' },
+        ),
+        identifiable<ParameterObject>(
+          { name: 'second', in: 'query' },
+          { $id: 'SecondParameter' },
+        ),
+      ];
+      const components: ComponentsObject = {};
+
+      const ref = referenceArray(components, 'parameters', parameters);
+
+      expect(ref).toEqual([
+        { $ref: '#/components/parameters/FirstParameter' },
+        { $ref: '#/components/parameters/SecondParameter' },
+      ]);
+
+      expect(components).toEqual({
+        parameters: {
+          FirstParameter: { name: 'first', in: 'path' },
+          SecondParameter: { name: 'second', in: 'query' },
+        },
+      });
+    });
+
+    it('should ignore non-identifiable objects', () => {
+      const parameters: ParameterObject[] = [
+        { name: 'first', in: 'path' },
+        identifiable<ParameterObject>(
+          { name: 'second', in: 'query' },
+          { $id: 'SecondParameter' },
+        ),
+      ];
+      const components: ComponentsObject = {};
+
+      const ref = referenceArray(components, 'parameters', parameters);
+
+      expect(ref).toEqual([
+        { name: 'first', in: 'path' },
+        { $ref: '#/components/parameters/SecondParameter' },
+      ]);
+
+      expect(components).toEqual({
+        parameters: {
+          SecondParameter: { name: 'second', in: 'query' },
+        },
+      });
     });
   });
 });

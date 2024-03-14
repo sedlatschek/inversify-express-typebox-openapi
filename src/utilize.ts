@@ -59,3 +59,15 @@ export const equalsRegardlessOfItemOrPropertyOrder = createCustomEqual({
 export const ucfirst = (str: string): string => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
+
+export const hasProperty = <T extends object, K extends keyof T>(
+  object: T,
+  key: K,
+): object is T & Record<K, NonNullable<T[K]>> => {
+  return (
+    typeof object === 'object' &&
+    key in object &&
+    object[key] !== undefined &&
+    object[key] !== null
+  );
+};

@@ -60,3 +60,5 @@ We use [vitest](https://vitest.dev/) for testing. To ensure support for decorato
 - [ ] ignore decorator for controller, methods and parameters
 - [ ] improve types of merge.ts (only allow property keys of the assumed property value that is needed for the function to work)
 - [ ] parameters decorators should reflect types
+- [ ] OA v3.0
+- [ ] remove reflect-metadata import from tests that do not rely on it

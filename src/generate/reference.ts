@@ -1,124 +1,94 @@
 import {
-  ContentObject,
-  ParameterObject,
+  ComponentsObject,
   ReferenceObject,
-  RequestBodyObject,
-  ResponsesObject,
-  SchemaObject,
-  isSchemaObject,
+  isReferenceObject,
 } from 'openapi3-ts/oas31';
-import {
-  SchemasObject,
-  isParameterObject,
-  isRequestBodyObject,
-  isResponseObject,
-} from '../type';
-import { TSchema } from '@sinclair/typebox';
 import { equalsRegardlessOfItemOrPropertyOrder } from '../utilize';
-import { OperationMetadata } from '../type';
 
-export const collectSchemasAndReplaceWithReferences = (
-  schemas: SchemasObject,
-  operationMetadatas: OperationMetadata[],
-): void => {
-  for (const operationMetadata of operationMetadatas) {
-    const parameterObjects = (
-      operationMetadata.operationObject?.parameters ?? []
-    ).filter(isParameterObject);
-    replaceParameterSchemasWithReferences(schemas, parameterObjects);
-    replaceBodySchemasWithReferences(
-      schemas,
-      operationMetadata.operationObject.requestBody,
-    );
-    replaceResponseSchemasWithReferences(
-      schemas,
-      operationMetadata.operationObject.responses,
-    );
-  }
+export type IdentifiableObject<T extends object> = T & {
+  $id: string;
 };
 
-export const replaceParameterSchemasWithReferences = (
-  schemas: SchemasObject,
-  parameterObjects: ParameterObject[],
-): void => {
-  for (const parameterObject of parameterObjects) {
-    if (parameterObject.schema && isSchemaObject(parameterObject.schema)) {
-      parameterObject.schema = referenceSchema(schemas, parameterObject.schema);
-    }
-  }
+export const isIdentifiableObject = <T extends object>(
+  object: T,
+): object is IdentifiableObject<T> => {
+  return (
+    typeof object === 'object' && '$id' in object && object.$id !== undefined
+  );
 };
 
-export const replaceBodySchemasWithReferences = (
-  schemas: SchemasObject,
-  requestBody: RequestBodyObject | ReferenceObject | undefined,
-): void => {
-  if (!isRequestBodyObject(requestBody)) {
-    return;
-  }
-
-  replaceContentObjectSchemaWithReferences(schemas, requestBody.content);
+export const identifiable = <T extends object>(
+  object: T,
+  additionalProperties: { $id: string },
+): IdentifiableObject<T> => {
+  return { ...object, ...additionalProperties };
 };
 
-export const replaceResponseSchemasWithReferences = (
-  schemas: SchemasObject,
-  responsesObject: ResponsesObject | undefined,
-): void => {
-  if (!responsesObject) {
-    return;
-  }
-  for (const response of Object.values(responsesObject).filter(
-    isResponseObject,
-  )) {
-    if (response.content) {
-      replaceContentObjectSchemaWithReferences(schemas, response.content);
-    }
-  }
+export const withoutId = <T extends object>(
+  object: { $id?: string } & T,
+): T => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { $id, ...cleanObject } = object;
+  return cleanObject as T;
 };
 
-export const replaceContentObjectSchemaWithReferences = (
-  schemas: SchemasObject,
-  contentObject: ContentObject,
-): void => {
-  const schema = contentObject['application/json']?.schema;
-
-  if (schema && isSchemaObject(schema)) {
-    contentObject['application/json'].schema = referenceSchema(schemas, schema);
+export const reference = <T extends object>(
+  components: ComponentsObject,
+  componentKey: keyof ComponentsObject,
+  record: T | ReferenceObject,
+): T | ReferenceObject => {
+  if (isReferenceObject(record)) {
+    return record;
   }
-};
-
-export const referenceSchema = (
-  schemas: SchemasObject,
-  schema: SchemaObject,
-): SchemaObject | ReferenceObject => {
-  const title = (schema as TSchema).$id ?? schema.title;
-  if (!title) {
-    return schema;
+  if (!isIdentifiableObject(record)) {
+    return record;
   }
 
-  const newSchema = {
-    ...schema,
-    title,
-  };
-  delete (newSchema as TSchema).$id;
+  if (!components[componentKey]) {
+    components[componentKey] = {};
+  }
 
-  const existingSchema = schemas[title];
+  const { $id, ...cleanRecord } = record;
+
+  const existingRecord = components[componentKey][$id];
   if (
-    existingSchema &&
-    isSchemaObject(existingSchema) &&
-    !areEqualSchemas(existingSchema, newSchema)
+    existingRecord &&
+    !isReferenceObject(existingRecord) &&
+    !equalsRegardlessOfItemOrPropertyOrder(existingRecord, cleanRecord)
   ) {
     throw new Error(
-      `Schema with title "${title}" already exists and does not match the new schema\nexistingSchema: ${JSON.stringify(existingSchema, null, 2)}\nschema: ${JSON.stringify(newSchema, null, 2)}`,
+      `Component with identifier "${$id}" already exists in ${componentKey} and does not match the new component.\nExisting: ${JSON.stringify(existingRecord, null, 2)}\nNew: ${JSON.stringify(cleanRecord, null, 2)}`,
     );
   }
 
-  schemas[title] = newSchema;
-  return { $ref: `#/components/schemas/${title}` };
+  components[componentKey][$id] = cleanRecord as T;
+
+  return { $ref: `#/components/${componentKey}/${$id}` };
 };
 
-export const areEqualSchemas = (
-  schema1: TSchema | SchemaObject,
-  schema2: TSchema | SchemaObject,
-): boolean => {
-  return equalsRegardlessOfItemOrPropertyOrder(schema1, schema2);
+export const referenceArray = <T extends object>(
+  components: ComponentsObject,
+  componentKey: keyof Pick<ComponentsObject, 'parameters'>, // TODO: automatically determine possible keys
+  records: (T | ReferenceObject)[],
+): (T | ReferenceObject)[] => {
+  const newRecords: (T | ReferenceObject)[] = [];
+  for (const record of records) {
+    newRecords.push(reference(components, componentKey, record));
+  }
+  return newRecords;
+};
+
+export const referenceMap = <T extends object>(
+  components: ComponentsObject,
+  componentKey: keyof Pick<
+    ComponentsObject,
+    'responses' | 'examples' | 'headers' | 'links' | 'callbacks'
+  >, // TODO: automatically determine possible keys
+  records: { [name: string]: T | ReferenceObject },
+): Record<string, T | ReferenceObject> => {
+  const newRecords = { ...records };
+  for (const [key, value] of Object.entries(newRecords)) {
+    newRecords[key] = reference(components, componentKey, value);
+  }
+  return newRecords;
 };
