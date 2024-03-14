@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { TSchema } from '@sinclair/typebox';
+import { Static, TSchema } from '@sinclair/typebox';
 import {
   HandlerDecorator,
   Middleware,
@@ -21,7 +21,7 @@ import {
   addOperationMetadata,
   addControllerMetadata,
 } from './reflect';
-import { OperationMethod } from './type';
+import { ExamplesObjectOf, OperationMethod } from './type';
 import {
   ParameterLocation,
   SecurityRequirementObject,
@@ -90,20 +90,40 @@ export type InversifyParameterDecorator = (
 const parameterDecoratorFactory = (
   inversifyParameterDecorator: InversifyParameterDecorator,
   type: ParameterLocation,
-): ((
+): (<
+  TTarget extends object,
+  TPropertyKey extends string | symbol | undefined,
+  TParameterIndex extends number,
+  TTSchema extends TSchema,
+>(
   name: string,
-  schema: TSchema,
+  schema: TTSchema,
   description?: string,
-) => ParameterDecorator) => {
-  return (
+  examples?: ExamplesObjectOf<Static<TTSchema>>,
+) => (
+  target: TTarget,
+  methodName: TPropertyKey,
+  parameterIndex: TParameterIndex,
+) => void) => {
+  return <
+    TTarget extends object,
+    TPropertyKey extends string | symbol | undefined,
+    TParameterIndex extends number,
+    TTSchema extends TSchema,
+  >(
     name: string,
-    schema: TSchema,
+    schema: TTSchema,
     description?: string,
-  ): ParameterDecorator => {
+    examples?: ExamplesObjectOf<Static<TTSchema>>,
+  ): ((
+    target: TTarget,
+    methodName: TPropertyKey,
+    parameterIndex: TParameterIndex,
+  ) => void) => {
     return (
-      target: object,
-      methodName: string | symbol | undefined,
-      parameterIndex: number,
+      target: TTarget,
+      methodName: TPropertyKey,
+      parameterIndex: TParameterIndex,
     ) => {
       if (!methodName) {
         throw new Error(
@@ -115,6 +135,7 @@ const parameterDecoratorFactory = (
         in: type,
         schema,
         description,
+        examples,
       });
       inversifyParameterDecorator(name)(target, methodName, parameterIndex);
     };
@@ -126,35 +147,46 @@ export const Query = parameterDecoratorFactory(queryParam, 'query');
 export const Cookie = parameterDecoratorFactory(queryParam, 'cookie');
 export const Header = parameterDecoratorFactory(queryParam, 'header');
 
-export function Body(
-  schema: TSchema,
+export const Body = <
+  TTarget extends object,
+  TPropertyKey extends string | symbol | undefined,
+  TParameterIndex extends number,
+  TSchemaType extends TSchema,
+>(
+  schema: TSchemaType,
   description?: string,
-): ParameterDecorator {
+  examples?: ExamplesObjectOf<Static<TSchemaType>>,
+): ((
+  target: TTarget,
+  propertyKey: TPropertyKey,
+  parameterIndex: TParameterIndex,
+) => void) => {
   return (
-    target: object,
-    propertyKey: string | symbol | undefined,
-    parameterIndex: number,
+    target: TTarget,
+    propertyKey: TPropertyKey,
+    parameterIndex: TParameterIndex,
   ) => {
     if (!propertyKey) {
       throw new Error('Body decorator can only be used on parameters');
     }
-    addBodyMetadata(target, propertyKey, schema, description);
+    addBodyMetadata(target, propertyKey, schema, description, examples);
     requestBody()(target, propertyKey, parameterIndex);
   };
-}
+};
 
 export function Response(
   statusCode: string | number,
   description: string,
   schema?: TSchema,
+  examples?: ExamplesObjectOf<Static<TSchema>>,
 ): HandlerDecorator {
   return (target: object, methodName: string) => {
     addResponsesMetadata(
       target,
       methodName,
       statusCode.toString(),
-      description,
-      schema,
+      { description },
+      { schema, examples },
     );
   };
 }
@@ -174,7 +206,6 @@ export const Deprecated = (): ParameterDecorator | HandlerDecorator => {
     const metadataProperties = { deprecated: true };
 
     if (typeof parameterIndex === 'number') {
-      // Parameter decorator
       addParametersMetadata(
         target,
         propertyKey,
@@ -182,7 +213,6 @@ export const Deprecated = (): ParameterDecorator | HandlerDecorator => {
         metadataProperties,
       );
     } else {
-      // Method decorator
       addOperationMetadata(target, propertyKey, {
         metadataProperties,
       });

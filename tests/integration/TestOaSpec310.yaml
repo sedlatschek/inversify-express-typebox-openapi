@@ -343,10 +343,14 @@ paths:
               schema:
                 $ref: "#/components/schemas/Post"
       requestBody:
+        description: A new post
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/Post"
+            examples:
+              postExample:
+                $ref: "#/components/examples/PostExample"
       description: Create a new post
       operationId: TestOaController310Post_createPost
       tags:
@@ -372,6 +376,9 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/Post"
+            examples:
+              postExample:
+                $ref: "#/components/examples/PostExample"
       parameters:
         - name: postId
           in: path
@@ -436,7 +443,6 @@ components:
         - email
         - createdAt
         - state
-      title: User
     UserState:
       anyOf:
         - const: active
@@ -445,7 +451,6 @@ components:
           type: string
         - const: pending
           type: string
-      title: UserState
     Post:
       type: object
       properties:
@@ -466,10 +471,16 @@ components:
         - title
         - content
         - createdAt
-      title: Post
   responses: {}
   parameters: {}
-  examples: {}
+  examples:
+    PostExample:
+      value:
+        id: 9238721
+        userId: 9311
+        title: Dear community
+        content: I am happy to announce that we have a new feature!
+        createdAt: 2024-03-08T14:12:31Z
   requestBodies: {}
   headers: {}
   securitySchemes:

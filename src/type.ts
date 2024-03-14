@@ -1,13 +1,12 @@
 import {
+  ExampleObject,
   OperationObject,
   ParameterObject,
   PathItemObject,
   ReferenceObject,
-  RequestBodyObject,
-  ResponseObject,
-  SchemaObject,
   isReferenceObject,
 } from 'openapi3-ts/oas31';
+import { IdentifiableObject } from './generate/reference';
 
 export type ControllerConfig = {
   path?: string;
@@ -37,30 +36,15 @@ export type OperationMethod = keyof Pick<
   'get' | 'put' | 'post' | 'delete' | 'options' | 'head' | 'patch' | 'trace'
 >;
 
-export type SchemasObject = {
-  [schema: string]: SchemaObject | ReferenceObject;
+export type ExampleObjectOf<T> = Omit<ExampleObject, 'value'> & {
+  value: T;
+};
+export type ExamplesObjectOf<T> = {
+  [name: string]: IdentifiableObject<ExampleObjectOf<T>>;
 };
 
 export const isParameterObject = (
   parameter: ParameterObject | ReferenceObject | undefined,
 ): parameter is ParameterObject => {
   return !!parameter && !isReferenceObject(parameter);
-};
-
-export const isRequestBodyObject = (
-  requestBody: RequestBodyObject | ReferenceObject | undefined,
-): requestBody is RequestBodyObject => {
-  return !!requestBody && !isReferenceObject(requestBody);
-};
-
-export const isResponseObject = (
-  response: ResponseObject | ReferenceObject | undefined,
-): response is ResponseObject => {
-  return !!response && !isReferenceObject(response);
-};
-
-export const isSchemaObject = (
-  schema: SchemaObject | ReferenceObject | undefined,
-): schema is SchemaObject => {
-  return !!schema && !isReferenceObject(schema);
 };

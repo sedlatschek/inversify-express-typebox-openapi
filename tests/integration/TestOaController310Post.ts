@@ -14,6 +14,8 @@ import {
   Security,
 } from '../../src';
 import { inject } from 'inversify';
+import { IdentifiableObject } from '../../src';
+import { ExampleObjectOf } from '../../src/type';
 
 export type Post = {
   id: number;
@@ -34,6 +36,17 @@ export const postSchema = Type.Object(
   { $id: 'Post' },
 );
 
+const postExample: IdentifiableObject<ExampleObjectOf<Post>> = {
+  $id: 'PostExample',
+  value: {
+    id: 9238721,
+    userId: 9311,
+    title: 'Dear community',
+    content: 'I am happy to announce that we have a new feature!',
+    createdAt: '2024-03-08T14:12:31Z',
+  },
+};
+
 export const posts: Post[] = [];
 
 @Controller('/api/posts')
@@ -49,7 +62,7 @@ export class TestOaController310Post {
   @Post('/', 'Create a new post')
   @Response(201, 'Post created', postSchema)
   public createPost(
-    @Body(postSchema) post: Post,
+    @Body(postSchema, 'A new post', { postExample }) post: Post,
     @response() res: express.Response,
   ): void {
     posts.push(post);
@@ -61,7 +74,8 @@ export class TestOaController310Post {
   @Response(404, 'Post not found')
   public updatePost(
     @Path('postId', Type.Number()) postId: number,
-    @Body(postSchema, 'The post dto') post: Post,
+    @Body(postSchema, 'The post dto', { postExample })
+    post: Post,
     @response() res: express.Response,
   ): void {
     const index = posts.findIndex((p) => p.id === postId);
@@ -78,7 +92,8 @@ export class TestOaController310Post {
   @Response(404, 'Post not found')
   @OperationId('deletePost')
   public del(
-    @Path('postId', Type.Number(), 'The post id') postId: number,
+    @Path('postId', Type.Number(), 'The post id')
+    postId: number,
     @response() res: express.Response,
   ): void {
     const index = posts.findIndex((p) => p.id === postId);

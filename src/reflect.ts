@@ -1,5 +1,6 @@
 import { OptionalKind, TSchema } from '@sinclair/typebox';
 import {
+  MediaTypeObject,
   OperationObject,
   ParameterLocation,
   ParameterObject,
@@ -8,11 +9,12 @@ import {
 import {
   ControllerConfig,
   ControllerMetadata,
+  ExamplesObjectOf,
   OperationConfig,
   OperationMetadata,
   isParameterObject,
 } from './type';
-import { updateDefinedProperties } from './utilize';
+import { hasValues, updateDefinedProperties } from './utilize';
 import { mergeIntoOperation } from './merge';
 
 export const CONTROLLER_METADATA_KEY =
@@ -245,11 +247,12 @@ export const addParametersMetadata = (
   operationMetadata.operationObject.parameters[arrayIndex] = parameter;
 };
 
-export const addBodyMetadata = (
+export const addBodyMetadata = <T>(
   target: object,
   methodName: string | symbol,
   schema: TSchema,
   description?: string,
+  examples?: ExamplesObjectOf<T>,
 ): void => {
   const metadata = getOrCreateOperationMetadata(target, methodName);
 
@@ -258,18 +261,24 @@ export const addBodyMetadata = (
     content: {
       'application/json': {
         schema,
+        examples,
+        // TODO: add example to content object
+        // TODO: add encoding to content object
       },
     },
     // TODO: add required to operation requestBody metadata
   };
 };
 
+export type ResponseMetadataProperties = Omit<ResponseObject, 'content'>;
+export type ResponseContentMetadataProperties = MediaTypeObject;
+
 export const addResponsesMetadata = (
   target: object,
   methodName: string | symbol,
   statusCode: string,
-  description: string,
-  schema?: TSchema,
+  properties: ResponseMetadataProperties,
+  content?: ResponseContentMetadataProperties,
 ): void => {
   const metadata = getOrCreateOperationMetadata(target, methodName);
 
@@ -278,19 +287,12 @@ export const addResponsesMetadata = (
   }
 
   const response: ResponseObject = {
-    description,
-    // TODO: add headers to operation response metadata
-    // TODO: add links to operation response metadata
+    ...properties,
   };
 
-  if (schema) {
+  if (content && hasValues(content)) {
     response.content = {
-      'application/json': {
-        schema,
-        // TODO: add examples to operation response metadata
-        // TODO: add example to operation response metadata
-        // TODO: add encoding to operation response metadata
-      },
+      'application/json': content,
     };
   }
 

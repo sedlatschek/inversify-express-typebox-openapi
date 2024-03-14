@@ -2,6 +2,7 @@ import { expect, describe, it } from 'vitest';
 import {
   equalsRegardlessOfItemOrPropertyOrder,
   hasProperty,
+  hasValues,
   ucfirst,
   updateDefinedProperties,
 } from '../../src/utilize';
@@ -44,6 +45,24 @@ describe('utilize', () => {
   describe('ucfirst', () => {
     it('should capitalize the first letter of a string', () => {
       expect(ucfirst('test')).toBe('Test');
+    });
+  });
+
+  describe('hasValues', () => {
+    it('should return true if an object has values', () => {
+      expect(hasValues({ a: 1 })).toBe(true);
+    });
+
+    it('should return false if an object has no values', () => {
+      expect(hasValues({})).toBe(false);
+    });
+
+    it('should return false if an object has only undefined values', () => {
+      expect(hasValues({ a: undefined })).toBe(false);
+    });
+
+    it('should return false if passed value is undefined', () => {
+      expect(hasValues(undefined as unknown as object)).toBe(false);
     });
   });
 

@@ -192,7 +192,7 @@ export class TestOaController310User extends BaseHttpController {
   }
 
   @Get('/:userId/posts', 'Get all posts of a user')
-  @Response(200, 'List of the users posts', Type.Array(postSchema))
+  @Response(200, 'List of the users posts', Type.Array(postSchema),)
   @Tags('Posts')
   public getUserPosts(
     @Path('userId', Type.Number()) userId: number,

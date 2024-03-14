@@ -60,6 +60,13 @@ export const ucfirst = (str: string): string => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
+export const hasValues = (obj: object): boolean => {
+  if (!obj) {
+    return false;
+  }
+  return Object.values(obj).some((value) => value !== undefined);
+};
+
 export const hasProperty = <T extends object, K extends keyof T>(
   object: T,
   key: K,

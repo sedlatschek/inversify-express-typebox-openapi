@@ -465,7 +465,9 @@ describe('reflect', () => {
       const TestController = class {};
       const testController = new TestController();
 
-      addResponsesMetadata(testController, 'test', '200', 'OK');
+      addResponsesMetadata(testController, 'test', '200', {
+        description: 'OK',
+      });
 
       const metadata = getOperationMetadata(testController, 'test');
 
@@ -485,7 +487,9 @@ describe('reflect', () => {
       const TestController = class {};
       const testController = new TestController();
 
-      addResponsesMetadata(testController, 'test', '200', 'OK');
+      addResponsesMetadata(testController, 'test', '200', {
+        description: 'OK',
+      });
 
       const metadata = getOperationMetadata(testController, 'test');
 
@@ -504,8 +508,8 @@ describe('reflect', () => {
         testController,
         'test',
         '200',
-        'OK',
-        Type.Object({}),
+        { description: 'OK' },
+        { schema: Type.Object({}) },
       );
 
       expect(metadata).toMatchObject({
