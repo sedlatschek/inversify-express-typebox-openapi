@@ -10,10 +10,13 @@ export type IdentifiableObject<T extends object> = T & {
 };
 
 export const isIdentifiableObject = <T extends object>(
-  object: T,
+  object: T | null | undefined,
 ): object is IdentifiableObject<T> => {
   return (
-    typeof object === 'object' && '$id' in object && object.$id !== undefined
+    typeof object === 'object' &&
+    object !== null &&
+    '$id' in object &&
+    object.$id !== undefined
   );
 };
 
@@ -32,38 +35,95 @@ export const withoutId = <T extends object>(
   return cleanObject as T;
 };
 
-export const reference = <T extends object>(
+export const reference = <T>(
   components: ComponentsObject,
-  componentKey: keyof ComponentsObject,
-  record: T | ReferenceObject,
+  componentsKey: keyof ComponentsObject,
+  record: T,
 ): T | ReferenceObject => {
-  if (isReferenceObject(record)) {
+  if (Array.isArray(record)) {
+    for (let i = 0; i < record.length; i++) {
+      record[i] = reference(components, componentsKey, record[i]);
+    }
+  }
+
+  if (
+    isReferenceObject(record) ||
+    typeof record !== 'object' ||
+    record === null
+  ) {
     return record;
   }
+
+  for (const key of Object.keys(record)) {
+    const property = key as keyof typeof record;
+    const value = record[property];
+    if (typeof value === 'object' && value !== null) {
+      record[property] = reference(
+        components,
+        getComponentsKey(key) ?? componentsKey,
+        value,
+      ) as (typeof record)[keyof typeof record];
+    }
+  }
+
   if (!isIdentifiableObject(record)) {
     return record;
   }
 
-  if (!components[componentKey]) {
-    components[componentKey] = {};
-  }
-
   const { $id, ...cleanRecord } = record;
 
-  const existingRecord = components[componentKey][$id];
+  return addComponent(components, componentsKey, $id, cleanRecord);
+};
+
+export const getComponentsKey = (
+  propertyKey: string,
+): keyof ComponentsObject | undefined => {
+  if (
+    [
+      'parameters',
+      'responses',
+      'examples',
+      'headers',
+      'links',
+      'callbacks',
+    ].includes(propertyKey)
+  ) {
+    return propertyKey as keyof ComponentsObject;
+  }
+  if (propertyKey === 'schema') {
+    return 'schemas';
+  }
+  if (propertyKey === 'requestBody') {
+    return 'requestBodies';
+  }
+
+  return undefined;
+};
+
+export const addComponent = (
+  components: ComponentsObject,
+  componentsKey: keyof ComponentsObject,
+  id: string,
+  target: object,
+): ReferenceObject => {
+  const existingRecord = components[componentsKey]?.[id];
   if (
     existingRecord &&
     !isReferenceObject(existingRecord) &&
-    !equalsRegardlessOfItemOrPropertyOrder(existingRecord, cleanRecord)
+    !equalsRegardlessOfItemOrPropertyOrder(existingRecord, target)
   ) {
     throw new Error(
-      `Component with identifier "${$id}" already exists in ${componentKey} and does not match the new component.\nExisting: ${JSON.stringify(existingRecord, null, 2)}\nNew: ${JSON.stringify(cleanRecord, null, 2)}`,
+      `Component with identifier "${id}" already exists in ${componentsKey} and does not match the new component.\nExisting: ${JSON.stringify(existingRecord, null, 2)}\nNew: ${JSON.stringify(target, null, 2)}`,
     );
   }
 
-  components[componentKey][$id] = cleanRecord as T;
+  if (!components[componentsKey]) {
+    components[componentsKey] = {};
+  }
 
-  return { $ref: `#/components/${componentKey}/${$id}` };
+  components[componentsKey][id] = target;
+
+  return { $ref: `#/components/${componentsKey}/${id}` };
 };
 
 export const referenceArray = <T extends object>(

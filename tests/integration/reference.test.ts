@@ -54,20 +54,27 @@ describe('reference', () => {
       >({ value: { id: 2, name: 'Test2' } }, { $id: 'UserExample2' }),
     };
 
+    const postContentObjectSchema = Type.Object(
+      {
+        title: Type.String(),
+        body: Type.String(),
+      },
+      { $id: 'PostContentSchema' },
+    );
     const postObjectSchema = Type.Object(
       {
         id: Type.Number(),
-        title: Type.String(),
+        content: postContentObjectSchema,
       },
       { $id: 'PostSchema' },
     );
     const postSchemaExamples = {
       PostExample1: identifiable(
-        { id: 1, title: 'Test' },
+        { id: 1, content: { title: 'Test', body: 'body' } },
         { $id: 'PostExample1' },
       ),
       PostExample2: identifiable(
-        { id: 2, title: 'Test2' },
+        { id: 2, content: { title: 'Test2', body: 'body2' } },
         { $id: 'PostExample2' },
       ),
     };
@@ -206,6 +213,7 @@ describe('reference', () => {
         NumberSchema: withoutId(numberSchema),
         StringSchema: withoutId(stringSchema),
         UserSchema: withoutId(userObjectSchema),
+        PostContentSchema: withoutId(postContentObjectSchema),
         PostSchema: withoutId(postObjectSchema),
       },
       responses: {

@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import { expect, describe, it } from 'vitest';
 import { identifiable, isIdentifiableObject } from '../../../src';
 import {
+  addComponent,
   reference,
   referenceArray,
   referenceMap,
@@ -12,7 +13,7 @@ import {
   ExamplesObject,
   ParameterObject,
 } from 'openapi3-ts/oas31';
-import { TSchema, Type } from '@sinclair/typebox';
+import { Kind, TSchema, Type } from '@sinclair/typebox';
 
 describe('generate', () => {
   describe('isIdentifiableObject', () => {
@@ -98,6 +99,71 @@ describe('generate', () => {
       expect(components).toEqual({
         schemas: { test: record },
       });
+    });
+
+    it('should reference nested schemas', () => {
+      const components: ComponentsObject = {};
+
+      const nestedRecord = Type.Object(
+        {
+          a: Type.Number(),
+          b: Type.Number(),
+        },
+        { $id: 'nested' },
+      );
+
+      const baseRecord = Type.Object(
+        {
+          a: Type.Number(),
+          b: nestedRecord,
+        },
+        { $id: 'base' },
+      );
+
+      reference(components, 'schemas', baseRecord);
+
+      expect(components).toEqual({
+        schemas: {
+          base: {
+            properties: {
+              a: Type.Number(),
+              b: { $ref: '#/components/schemas/nested' },
+            },
+            required: ['a', 'b'],
+            type: 'object',
+            [Kind]: 'Object',
+          },
+          nested: {
+            properties: {
+              a: Type.Number(),
+              b: Type.Number(),
+            },
+            required: ['a', 'b'],
+            type: 'object',
+            [Kind]: 'Object',
+          },
+        },
+      });
+    });
+  });
+
+  describe('addComponent', () => {
+    it('should add a record to the components object', () => {
+      const components: ComponentsObject = {};
+
+      addComponent(components, 'schemas', 'test', { a: 1, b: 2 });
+
+      expect(components).toEqual({ schemas: { test: { a: 1, b: 2 } } });
+    });
+
+    it('should throw an error if the record already exists', () => {
+      const components: ComponentsObject = {
+        schemas: { test: {} },
+      };
+
+      expect(() =>
+        addComponent(components, 'schemas', 'test', { a: 3, b: 4 }),
+      ).toThrowError();
     });
   });
 
