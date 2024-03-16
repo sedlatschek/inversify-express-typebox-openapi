@@ -60,9 +60,17 @@ export class TestOaController310Post {
   }
 
   @Post('/', 'Create a new post')
-  @Response(201, 'Post created', postSchema)
+  @Response(201, {
+    description: 'Post created',
+    content: { schema: postSchema },
+  })
   public createPost(
-    @Body(postSchema, 'A new post', { postExample }) post: Post,
+    @Body({
+      schema: postSchema,
+      description: 'A new post',
+      examples: { postExample },
+    })
+    post: Post,
     @response() res: express.Response,
   ): void {
     posts.push(post);
@@ -70,11 +78,18 @@ export class TestOaController310Post {
   }
 
   @Put('/:postId', 'Update a existing post')
-  @Response(200, 'Post updated', postSchema)
-  @Response(404, 'Post not found')
+  @Response(200, {
+    description: 'Post updated',
+    content: { schema: postSchema },
+  })
+  @Response(404, { description: 'Post not found' })
   public updatePost(
-    @Path('postId', Type.Number()) postId: number,
-    @Body(postSchema, 'The post dto', { postExample })
+    @Path('postId', { schema: Type.Number() }) postId: number,
+    @Body({
+      schema: postSchema,
+      description: 'The post dto',
+      examples: { postExample },
+    })
     post: Post,
     @response() res: express.Response,
   ): void {
@@ -88,11 +103,11 @@ export class TestOaController310Post {
   }
 
   @Delete('/:postId', 'Delete a post')
-  @Response(200, 'Post deleted')
-  @Response(404, 'Post not found')
+  @Response(200, { description: 'Post deleted' })
+  @Response(404, { description: 'Post not found' })
   @OperationId('deletePost')
   public del(
-    @Path('postId', Type.Number(), 'The post id')
+    @Path('postId', { schema: Type.Number(), description: 'The post id' })
     postId: number,
     @response() res: express.Response,
   ): void {

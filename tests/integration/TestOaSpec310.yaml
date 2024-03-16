@@ -47,33 +47,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $id: User
-                  type: object
-                  properties:
-                    id:
-                      type: number
-                    name:
-                      type: string
-                    email:
-                      type: string
-                    createdAt:
-                      format: date-time
-                      type: string
-                    state:
-                      $id: UserState
-                      anyOf:
-                        - const: active
-                          type: string
-                        - const: inactive
-                          type: string
-                        - const: pending
-                          type: string
-                  required:
-                    - id
-                    - name
-                    - email
-                    - createdAt
-                    - state
+                  $ref: "#/components/schemas/User"
       parameters:
         - name: Accept-Language
           in: header
@@ -129,33 +103,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $id: User
-                  type: object
-                  properties:
-                    id:
-                      type: number
-                    name:
-                      type: string
-                    email:
-                      type: string
-                    createdAt:
-                      format: date-time
-                      type: string
-                    state:
-                      $id: UserState
-                      anyOf:
-                        - const: active
-                          type: string
-                        - const: inactive
-                          type: string
-                        - const: pending
-                          type: string
-                  required:
-                    - id
-                    - name
-                    - email
-                    - createdAt
-                    - state
+                  $ref: "#/components/schemas/User"
       deprecated: true
       operationId: UserController_getAllActiveUsers
       tags:
@@ -290,26 +238,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $id: Post
-                  type: object
-                  properties:
-                    id:
-                      type: number
-                    userId:
-                      type: number
-                    title:
-                      type: string
-                    content:
-                      type: string
-                    createdAt:
-                      format: date-time
-                      type: string
-                  required:
-                    - id
-                    - userId
-                    - title
-                    - content
-                    - createdAt
+                  $ref: "#/components/schemas/Post"
       parameters:
         - name: Accept-Language
           in: header
@@ -414,31 +343,103 @@ paths:
         - bearerAuth:
             - user
             - poster
+  /api/images/:
+    post:
+      responses:
+        "201":
+          description: Image created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Image"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Image"
+            examples:
+              imageExample1:
+                $ref: "#/components/examples/ImageExample"
+      summary: Create a new image
+      description: Create a new image
+      operationId: TestOaController310Image_createImage
+      tags:
+        - Image
+  /api/images/{imageId}:
+    put:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Image"
+        "404":
+          description: Image not found
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Image"
+            examples:
+              imageExample1:
+                $ref: "#/components/examples/ImageExample"
+      parameters:
+        - name: imageId
+          in: path
+          schema:
+            type: number
+          required: true
+          description: The image's id
+      description: Update a existing image
+      operationId: TestOaController310Image_updateImage
+      tags:
+        - Image
+    delete:
+      responses:
+        "200":
+          description: Image deleted
+        "404":
+          description: Image not found
+      parameters:
+        - name: imageId
+          in: path
+          schema:
+            type: number
+          description: The image id
+          required: true
+      operationId: TestOaController310Image_deleteImage
+      description: Delete a image
+      tags:
+        - Image
   /api/postings/:
     post:
       responses:
         "201":
-          description: Post created
+          description: Posting created
           content:
             application/json:
               schema:
                 type: string
       requestBody:
-        description: A new post
         content:
           application/json:
             schema:
               type: string
-            examples:
-              example:
-                value: example
-      description: Create a new post
-      operationId: TestOaController310DeprecatedPost_createPost
+      description: Create a new posting
+      operationId: TestOaController310DeprecatedPosting_createPosting
       deprecated: true
       tags:
         - Posts
 components:
   schemas:
+    UserState:
+      anyOf:
+        - const: active
+          type: string
+        - const: inactive
+          type: string
+        - const: pending
+          type: string
     User:
       type: object
       properties:
@@ -452,28 +453,13 @@ components:
           format: date-time
           type: string
         state:
-          $id: UserState
-          anyOf:
-            - const: active
-              type: string
-            - const: inactive
-              type: string
-            - const: pending
-              type: string
+          $ref: "#/components/schemas/UserState"
       required:
         - id
         - name
         - email
         - createdAt
         - state
-    UserState:
-      anyOf:
-        - const: active
-          type: string
-        - const: inactive
-          type: string
-        - const: pending
-          type: string
     Post:
       type: object
       properties:
@@ -494,6 +480,19 @@ components:
         - title
         - content
         - createdAt
+    Image:
+      type: object
+      properties:
+        id:
+          type: number
+        imageId:
+          type: number
+        url:
+          type: string
+      required:
+        - id
+        - imageId
+        - url
   responses: {}
   parameters: {}
   examples:
@@ -504,6 +503,11 @@ components:
         title: Dear community
         content: I am happy to announce that we have a new feature!
         createdAt: 2024-03-08T14:12:31Z
+    ImageExample:
+      value:
+        id: 123
+        imageId: 546545
+        url: https://example.com/image.png
   requestBodies: {}
   headers: {}
   securitySchemes:

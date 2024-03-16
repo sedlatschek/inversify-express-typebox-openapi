@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { Static, TSchema } from '@sinclair/typebox';
+import { TSchema } from '@sinclair/typebox';
 import {
   HandlerDecorator,
   Middleware,
@@ -21,9 +21,16 @@ import {
   addOperationMetadata,
   addControllerMetadata,
 } from './reflect';
-import { ExamplesObjectOf, OperationMethod } from './type';
 import {
+  ExamplesObjectOf,
+  OperationMethod,
+  ParameterParameters,
+  ResponseParameters,
+} from './type';
+import {
+  ExternalDocumentationObject,
   ParameterLocation,
+  ParameterStyle,
   SecurityRequirementObject,
 } from 'openapi3-ts/oas31';
 import { ucfirst } from './utilize';
@@ -97,9 +104,7 @@ const parameterDecoratorFactory = (
   TTSchema extends TSchema,
 >(
   name: string,
-  schema: TTSchema,
-  description?: string,
-  examples?: ExamplesObjectOf<Static<TTSchema>>,
+  parameters: ParameterParameters<TTSchema>,
 ) => (
   target: TTarget,
   methodName: TPropertyKey,
@@ -112,9 +117,7 @@ const parameterDecoratorFactory = (
     TTSchema extends TSchema,
   >(
     name: string,
-    schema: TTSchema,
-    description?: string,
-    examples?: ExamplesObjectOf<Static<TTSchema>>,
+    parameters: ParameterParameters<TTSchema>,
   ): ((
     target: TTarget,
     methodName: TPropertyKey,
@@ -130,12 +133,9 @@ const parameterDecoratorFactory = (
           `${ucfirst(type)} decorator can only be used on parameters`,
         );
       }
-      addParametersMetadata(target, methodName, parameterIndex, {
+      addParametersMetadata(target, methodName, parameterIndex, parameters, {
         name,
         in: type,
-        schema,
-        description,
-        examples,
       });
       inversifyParameterDecorator(name)(target, methodName, parameterIndex);
     };
@@ -153,9 +153,7 @@ export const Body = <
   TParameterIndex extends number,
   TSchemaType extends TSchema,
 >(
-  schema: TSchemaType,
-  description?: string,
-  examples?: ExamplesObjectOf<Static<TSchemaType>>,
+  parameters: ParameterParameters<TSchemaType>,
 ): ((
   target: TTarget,
   propertyKey: TPropertyKey,
@@ -169,27 +167,60 @@ export const Body = <
     if (!propertyKey) {
       throw new Error('Body decorator can only be used on parameters');
     }
-    addBodyMetadata(target, propertyKey, schema, description, examples);
+    addBodyMetadata(target, propertyKey, parameters);
     requestBody()(target, propertyKey, parameterIndex);
   };
 };
 
-export function Response(
+export function Response<
+  TTarget extends object,
+  TPropertyKey extends string | symbol,
+  TSchemaType extends TSchema,
+>(
   statusCode: string | number,
-  description: string,
-  schema?: TSchema,
-  examples?: ExamplesObjectOf<Static<TSchema>>,
-): HandlerDecorator {
-  return (target: object, methodName: string) => {
+  parameters: ResponseParameters<TSchemaType>,
+): (target: TTarget, propertyKey: TPropertyKey) => void {
+  return (target: TTarget, propertyKey: TPropertyKey) => {
     addResponsesMetadata(
       target,
-      methodName,
+      propertyKey,
       statusCode.toString(),
-      { description },
-      { schema, examples },
+      parameters,
     );
   };
 }
+
+export const AllowEmptyValue = (): ParameterDecorator => {
+  return (
+    target: object,
+    propertyKey: string | symbol | undefined,
+    parameterIndex: number,
+  ) => {
+    if (!propertyKey) {
+      throw new Error(
+        'AllowEmptyValue decorator can only be used on parameters',
+      );
+    }
+    addParametersMetadata(target, propertyKey, parameterIndex, {
+      allowEmptyValue: true,
+    });
+  };
+};
+
+export const AllowReserved = (): ParameterDecorator => {
+  return (
+    target: object,
+    propertyKey: string | symbol | undefined,
+    parameterIndex: number,
+  ) => {
+    if (!propertyKey) {
+      throw new Error('AllowReserved decorator can only be used on parameters');
+    }
+    addParametersMetadata(target, propertyKey, parameterIndex, {
+      allowReserved: true,
+    });
+  };
+};
 
 export const Deprecated = (): ClassDecorator &
   MethodDecorator &
@@ -201,6 +232,107 @@ export const Deprecated = (): ClassDecorator &
     descriptorOrParameterIndex?: TypedPropertyDescriptor<any>,
   ): void => {
     const metadataProperties = { deprecated: true };
+    if (propertyKey === undefined) {
+      addControllerMetadata(target, { metadataProperties });
+    } else if (typeof descriptorOrParameterIndex === 'number') {
+      addParametersMetadata(
+        target,
+        propertyKey,
+        descriptorOrParameterIndex,
+        metadataProperties,
+      );
+    } else {
+      addOperationMetadata(target, propertyKey, {
+        metadataProperties,
+      });
+    }
+  };
+};
+
+export const Description = (
+  description: string,
+): ClassDecorator & MethodDecorator & ParameterDecorator => {
+  return (
+    target: object,
+    propertyKey?: string | symbol,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    descriptorOrParameterIndex?: TypedPropertyDescriptor<any>,
+  ): void => {
+    const metadataProperties = { description };
+    if (propertyKey === undefined) {
+      addControllerMetadata(target, { metadataProperties });
+    } else if (typeof descriptorOrParameterIndex === 'number') {
+      addParametersMetadata(
+        target,
+        propertyKey,
+        descriptorOrParameterIndex,
+        metadataProperties,
+      );
+    } else {
+      addOperationMetadata(target, propertyKey, {
+        metadataProperties,
+      });
+    }
+  };
+};
+
+export const Example = <T>(example: T): ParameterDecorator => {
+  return (
+    target: object,
+    propertyKey: string | symbol | undefined,
+    parameterIndex: number,
+  ) => {
+    if (!propertyKey) {
+      throw new Error('Example decorator can only be used on parameters');
+    }
+    addParametersMetadata(target, propertyKey, parameterIndex, {
+      example,
+    });
+  };
+};
+
+export const Examples = <T>(
+  examples: ExamplesObjectOf<T>,
+): ParameterDecorator => {
+  return (
+    target: object,
+    propertyKey: string | symbol | undefined,
+    parameterIndex: number,
+  ) => {
+    if (!propertyKey) {
+      throw new Error('Examples decorator can only be used on parameters');
+    }
+    addParametersMetadata(target, propertyKey, parameterIndex, {
+      examples,
+    });
+  };
+};
+
+export const Explode = (): ParameterDecorator => {
+  return (
+    target: object,
+    propertyKey: string | symbol | undefined,
+    parameterIndex: number,
+  ) => {
+    if (!propertyKey) {
+      throw new Error('Explode decorator can only be used on parameters');
+    }
+    addParametersMetadata(target, propertyKey, parameterIndex, {
+      explode: true,
+    });
+  };
+};
+
+export const ExternalDocs = (
+  externalDocs: ExternalDocumentationObject,
+): ClassDecorator & MethodDecorator & ParameterDecorator => {
+  return (
+    target: object,
+    propertyKey?: string | symbol,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    descriptorOrParameterIndex?: TypedPropertyDescriptor<any>,
+  ): void => {
+    const metadataProperties = { externalDocs };
     if (propertyKey === undefined) {
       addControllerMetadata(target, { metadataProperties });
     } else if (typeof descriptorOrParameterIndex === 'number') {
@@ -247,6 +379,28 @@ export const Security = (
         metadataProperties,
       });
     }
+  };
+};
+
+export const Style = (style: ParameterStyle): ParameterDecorator => {
+  return (
+    target: object,
+    propertyKey: string | symbol | undefined,
+    parameterIndex: number,
+  ) => {
+    if (!propertyKey) {
+      throw new Error('Style decorator can only be used on parameters');
+    }
+    addParametersMetadata(target, propertyKey, parameterIndex, { style });
+  };
+};
+
+export const Summary = (summary: string): MethodDecorator => {
+  return (target: object, propertyKey: string | symbol) => {
+    const metadataProperties = { summary };
+    addOperationMetadata(target, propertyKey, {
+      metadataProperties,
+    });
   };
 };
 

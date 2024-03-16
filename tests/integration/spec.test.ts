@@ -2,7 +2,8 @@ import 'reflect-metadata';
 import { describe, expect, it } from 'vitest';
 import { Container } from 'inversify';
 import { InversifyExpressServer } from 'inversify-express-utils';
-import './TestOaController310DeprecatedPost';
+import './TestOaController310Posting';
+import './TestOaController310Image';
 import './TestOaController310Other';
 import './TestOaController310User';
 import './TestOaController310Post';
@@ -39,5 +40,6 @@ describe('spec', async () => {
     expect(spec).to.equal(
       await readFile('tests/integration/TestOaSpec310.yaml', 'utf8'),
     );
+    expect(spec).to.not.include('$id');
   });
 });

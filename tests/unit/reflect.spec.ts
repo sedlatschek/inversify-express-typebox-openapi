@@ -337,10 +337,16 @@ describe('reflect', () => {
     it('should add new metadata', () => {
       const TestController = class {};
 
-      addParametersMetadata(new TestController(), 'test', 0, {
-        name: 'testMethod',
-        in: 'header',
-      });
+      addParametersMetadata(
+        new TestController(),
+        'test',
+        0,
+        {},
+        {
+          name: 'testMethod',
+          in: 'header',
+        },
+      );
 
       const expectation: ControllerMetadata = {
         name: 'TestController',
@@ -367,10 +373,16 @@ describe('reflect', () => {
       const TestController = class {};
       const testController = new TestController();
 
-      addParametersMetadata(testController, 'test', 0, {
-        name: 'method',
-        in: 'header',
-      });
+      addParametersMetadata(
+        testController,
+        'test',
+        0,
+        {},
+        {
+          name: 'method',
+          in: 'header',
+        },
+      );
 
       const metadata = getParameterMetadata(testController, 'test', 0);
 
@@ -397,7 +409,7 @@ describe('reflect', () => {
 
       const schema = Type.Object({ name: Type.String() });
 
-      addBodyMetadata(testController, 'test', schema);
+      addBodyMetadata(testController, 'test', { schema });
 
       const metadata = getOperationMetadata(testController, 'test');
 
@@ -422,7 +434,7 @@ describe('reflect', () => {
 
       const schema = Type.Object({ name: Type.String() });
 
-      addBodyMetadata(testController, 'test', schema);
+      addBodyMetadata(testController, 'test', { schema });
 
       const metadata = getOperationMetadata(testController, 'test');
 
@@ -442,7 +454,7 @@ describe('reflect', () => {
 
       const newSchema = Type.Object({ id: Type.Number(), name: Type.String() });
 
-      addBodyMetadata(testController, 'test', newSchema);
+      addBodyMetadata(testController, 'test', { schema: newSchema });
 
       expect(metadata).toMatchObject({
         operationObject: {
@@ -504,13 +516,12 @@ describe('reflect', () => {
         parameterIndices: [],
       });
 
-      addResponsesMetadata(
-        testController,
-        'test',
-        '200',
-        { description: 'OK' },
-        { schema: Type.Object({}) },
-      );
+      addResponsesMetadata(testController, 'test', '200', {
+        description: 'OK',
+        content: {
+          schema: Type.Object({}),
+        },
+      });
 
       expect(metadata).toMatchObject({
         operationObject: {

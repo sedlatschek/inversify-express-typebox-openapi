@@ -1,8 +1,13 @@
 import {
+  BaseParameterObject,
+  EncodingObject,
   ExampleObject,
+  ISpecificationExtension,
   OperationObject,
   PathItemObject,
+  ResponseObject,
 } from 'openapi3-ts/oas31';
+import { Static, TSchema } from '@sinclair/typebox';
 import { IdentifiableObject } from './generate/reference';
 
 export type ControllerConfig = {
@@ -40,3 +45,27 @@ export type ExampleObjectOf<T> = Omit<ExampleObject, 'value'> & {
 export type ExamplesObjectOf<T> = {
   [name: string]: IdentifiableObject<ExampleObjectOf<T>> | ExampleObjectOf<T>;
 };
+
+export type BodyParameters<T extends TSchema> = {
+  schema: T;
+  example?: Static<T>;
+  examples?: ExamplesObjectOf<Static<T>>;
+} & Omit<BaseParameterObject, 'schema' | 'example' | 'examples' | 'content'>;
+
+export type ParameterParameters<T extends TSchema> = BodyParameters<T>;
+
+export type ResponseParameters<T extends TSchema> = {
+  content?: MediaTypeObjectOf<T>;
+} & Partial<Omit<ResponseObject, 'content'>>;
+
+export interface ContentObjectOf<T extends TSchema> {
+  [mediaType: string]: MediaTypeObjectOf<T>;
+}
+
+export interface MediaTypeObjectOf<T extends TSchema>
+  extends ISpecificationExtension {
+  schema?: T;
+  examples?: ExamplesObjectOf<Static<T>>;
+  example?: Static<T>;
+  encoding?: EncodingObject;
+}

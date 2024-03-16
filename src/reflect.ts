@@ -1,6 +1,5 @@
 import { OptionalKind, TSchema } from '@sinclair/typebox';
 import {
-  MediaTypeObject,
   OperationObject,
   ParameterLocation,
   ParameterObject,
@@ -8,11 +7,12 @@ import {
   isReferenceObject,
 } from 'openapi3-ts/oas31';
 import {
+  ParameterParameters,
   ControllerConfig,
   ControllerMetadata,
-  ExamplesObjectOf,
   OperationConfig,
   OperationMetadata,
+  ResponseParameters,
 } from './type';
 import { hasValues, updateDefinedProperties } from './utilize';
 import { mergeIntoOperation } from './merge';
@@ -187,22 +187,12 @@ export const getParameterMetadata = (
   return undefined;
 };
 
-export type ParameterMetadataProperties = Omit<
-  ParameterObject,
-  'name' | 'in'
-> & {
-  name?: string;
-  in?: ParameterLocation;
-};
-
-/**
- * Existing metadata will be updated with the new props.
- */
-export const addParametersMetadata = (
+export const addParametersMetadata = <T extends TSchema>(
   target: object,
   methodName: string | symbol,
   parameterIndex: number,
-  properties: ParameterMetadataProperties,
+  parameters: Partial<ParameterParameters<T>>,
+  metadata?: { name: string; in: ParameterLocation },
 ): void => {
   const operationMetadata = getOrCreateOperationMetadata(target, methodName);
 
@@ -213,23 +203,16 @@ export const addParametersMetadata = (
   let parameter = getParameterMetadata(target, methodName, parameterIndex);
   if (!parameter) {
     parameter = {
-      name: properties.name ?? 'unknown name', // TODO: refactor this ugly peace of code so we don't need to set a default value
-      in: properties.in ?? 'query', // TODO: refactor this ugly peace of code so we don't need to set a default value
-      // TODO: add allowEmptyValue to operation parameter metadata
-      // TODO: add style to operation parameter metadata
-      // TODO: add explode to operation parameter metadata
-      // TODO: add allowReserved to operation parameter metadata
-      // TODO: add examples to operation parameter metadata
-      // TODO: add example to operation parameter metadata
-      // TODO: add content to operation parameter metadata
+      name: metadata?.name ?? 'unknown name', // TODO: refactor this ugly peace of code so we don't need to set a default value
+      in: metadata?.in ?? 'query', // TODO: refactor this ugly peace of code so we don't need to set a default value
     };
     operationMetadata.operationObject.parameters.push(parameter);
     operationMetadata.parameterIndices.push(parameterIndex);
   }
 
-  const calculatedProps = properties.schema
+  const calculatedProps = parameters.schema
     ? {
-        required: !(OptionalKind in properties.schema),
+        required: !(OptionalKind in parameters.schema),
       }
     : {};
 
@@ -244,44 +227,40 @@ export const addParametersMetadata = (
     );
   }
 
-  updateDefinedProperties(parameter, { ...properties, ...calculatedProps });
+  updateDefinedProperties(parameter, { ...parameters, ...calculatedProps });
   operationMetadata.operationObject.parameters[arrayIndex] = parameter;
 };
 
-export const addBodyMetadata = <T>(
+export const addBodyMetadata = <T extends TSchema>(
   target: object,
   methodName: string | symbol,
-  schema: TSchema,
-  description?: string,
-  examples?: ExamplesObjectOf<T>,
+  parameters: ParameterParameters<T>,
 ): void => {
   const metadata = getOrCreateOperationMetadata(target, methodName);
 
+  const { schema, example, examples, ...properties } = parameters;
+
   metadata.operationObject.requestBody = {
-    description,
+    ...properties,
     content: {
       'application/json': {
         schema,
+        example,
         examples,
-        // TODO: add example to content object
-        // TODO: add encoding to content object
       },
     },
-    // TODO: add required to operation requestBody metadata
   };
 };
 
-export type ResponseMetadataProperties = Omit<ResponseObject, 'content'>;
-export type ResponseContentMetadataProperties = MediaTypeObject;
-
-export const addResponsesMetadata = (
+export const addResponsesMetadata = <T extends TSchema>(
   target: object,
   methodName: string | symbol,
   statusCode: string,
-  properties: ResponseMetadataProperties,
-  content?: ResponseContentMetadataProperties,
+  parameters: ResponseParameters<T>,
 ): void => {
   const metadata = getOrCreateOperationMetadata(target, methodName);
+
+  const { content, ...properties } = parameters;
 
   if (!metadata.operationObject.responses) {
     metadata.operationObject.responses = {};
