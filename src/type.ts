@@ -56,7 +56,7 @@ export type ParameterParameters<T extends TSchema> = BodyParameters<T>;
 
 export type ResponseParameters<T extends TSchema> = {
   content?: MediaTypeObjectOf<T>;
-} & Partial<Omit<ResponseObject, 'content'>>;
+} & Omit<ResponseObject, 'content'>;
 
 export interface ContentObjectOf<T extends TSchema> {
   [mediaType: string]: MediaTypeObjectOf<T>;

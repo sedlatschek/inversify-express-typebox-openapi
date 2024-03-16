@@ -262,6 +262,25 @@ paths:
         - bearerAuth:
             - user
             - admin
+  /api/postings/:
+    post:
+      responses:
+        "201":
+          description: Posting created
+          content:
+            application/json:
+              schema:
+                type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+      description: Create a new posting
+      operationId: TestOaController310DeprecatedPosting_createPosting
+      deprecated: true
+      tags:
+        - Posts
   /api/posts/:
     post:
       responses:
@@ -411,25 +430,6 @@ paths:
       description: Delete a image
       tags:
         - Image
-  /api/postings/:
-    post:
-      responses:
-        "201":
-          description: Posting created
-          content:
-            application/json:
-              schema:
-                type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: string
-      description: Create a new posting
-      operationId: TestOaController310DeprecatedPosting_createPosting
-      deprecated: true
-      tags:
-        - Posts
 components:
   schemas:
     UserState:
