@@ -5,6 +5,10 @@ const config = {
   semi: true,
   singleQuote: true,
   endOfLine: 'lf',
+  plugins: ['@trivago/prettier-plugin-sort-imports'],
+  importOrder: ['reflect-metadata', '<THIRD_PARTY_MODULES>', '^[./]'],
+  importOrderParserPlugins: ['typescript', 'decorators-legacy'],
+  importOrderSortSpecifiers: true,
 };
 
 module.exports = config;

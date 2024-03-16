@@ -1,5 +1,6 @@
 import 'reflect-metadata';
-import { expect, describe, it } from 'vitest';
+import { Type } from '@sinclair/typebox';
+import { describe, expect, it } from 'vitest';
 import {
   CONTROLLER_METADATA_KEY,
   addBodyMetadata,
@@ -14,7 +15,6 @@ import {
   getOrCreateOperationMetadata,
   getParameterMetadata,
 } from '../../src/reflect';
-import { Type } from '@sinclair/typebox';
 import { ControllerMetadata, OperationMetadata } from '../../src/type';
 
 describe('reflect', () => {

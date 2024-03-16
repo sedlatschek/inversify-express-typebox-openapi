@@ -1,4 +1,5 @@
 import { Static, Type } from '@sinclair/typebox';
+import express from 'express';
 import {
   httpDelete,
   httpPost,
@@ -7,7 +8,6 @@ import {
   requestParam,
   response,
 } from 'inversify-express-utils';
-import express from 'express';
 
 export const otherSchema = Type.Object(
   {

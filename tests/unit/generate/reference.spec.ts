@@ -1,5 +1,11 @@
 import 'reflect-metadata';
-import { expect, describe, it } from 'vitest';
+import { Kind, TSchema, Type } from '@sinclair/typebox';
+import {
+  ComponentsObject,
+  ExamplesObject,
+  ParameterObject,
+} from 'openapi3-ts/oas31';
+import { describe, expect, it } from 'vitest';
 import { identifiable, isIdentifiableObject } from '../../../src';
 import {
   addComponent,
@@ -8,12 +14,6 @@ import {
   referenceMap,
   withoutId,
 } from '../../../src/generate/reference';
-import {
-  ComponentsObject,
-  ExamplesObject,
-  ParameterObject,
-} from 'openapi3-ts/oas31';
-import { Kind, TSchema, Type } from '@sinclair/typebox';
 
 describe('generate', () => {
   describe('isIdentifiableObject', () => {

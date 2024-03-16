@@ -1,8 +1,9 @@
 import { Container } from 'inversify';
 import { OpenApiBuilder } from 'openapi3-ts/oas31';
-import { parseContainer } from './parse';
-import { injectControllersIntoBuilder } from './generate/generate';
 import { stringify } from 'yaml';
+import { injectControllersIntoBuilder } from './generate/generate';
+import { parseContainer } from './parse';
+
 export * from './decorate';
 
 export {

@@ -1,24 +1,24 @@
-import { BaseHttpController, response } from 'inversify-express-utils';
 import { Static, Type } from '@sinclair/typebox';
+import { Response as ExpressResponse } from 'express';
+import { BaseHttpController, response } from 'inversify-express-utils';
 import {
-  Delete,
-  Get,
   Body,
   Controller,
+  Cookie,
+  Delete,
+  Deprecated,
+  Get,
+  Header,
+  OperationId,
   Patch,
   Path,
   Post,
   Put,
   Query,
-  Deprecated,
   Response,
-  Header,
-  Cookie,
-  Tags,
-  OperationId,
   Security,
+  Tags,
 } from '../../src';
-import { Response as ExpressResponse } from 'express';
 import { Post as PostType, postSchema, posts } from './TestOaController310Post';
 
 export enum UserState {

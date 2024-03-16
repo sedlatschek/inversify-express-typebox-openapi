@@ -1,7 +1,7 @@
 import { Static, Type } from '@sinclair/typebox';
-import { response } from 'inversify-express-utils';
 import express from 'express';
-import { Body, Controller, Post, Response, Tags, Deprecated } from '../../src';
+import { response } from 'inversify-express-utils';
+import { Body, Controller, Deprecated, Post, Response, Tags } from '../../src';
 
 const postings: string[] = [];
 

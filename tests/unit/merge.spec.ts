@@ -1,3 +1,4 @@
+import { OperationObject } from 'openapi3-ts/dist/oas31';
 import { describe, expect, it } from 'vitest';
 import {
   concatArrays,
@@ -5,7 +6,6 @@ import {
   mergeAtomicProperties,
   mergeMaps,
 } from '../../src/merge';
-import { OperationObject } from 'openapi3-ts/dist/oas31';
 
 describe('merge', () => {
   describe('mergeAtomicProperties', () => {

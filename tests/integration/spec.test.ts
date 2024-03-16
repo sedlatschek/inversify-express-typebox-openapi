@@ -1,14 +1,14 @@
 import 'reflect-metadata';
-import { describe, expect, it } from 'vitest';
+import { readFile } from 'fs/promises';
 import { Container } from 'inversify';
 import { InversifyExpressServer } from 'inversify-express-utils';
-import './TestOaController310Posting';
+import { describe, expect, it } from 'vitest';
+import { generateSpec, generateSpecAsYaml } from '../../src';
 import './TestOaController310Image';
 import './TestOaController310Other';
-import './TestOaController310User';
 import './TestOaController310Post';
-import { readFile } from 'fs/promises';
-import { generateSpec, generateSpecAsYaml } from '../../src';
+import './TestOaController310Posting';
+import './TestOaController310User';
 
 const container = new Container();
 container.bind('SomeService').toConstantValue('SomeValue');

@@ -1,19 +1,19 @@
 import { Type } from '@sinclair/typebox';
-import { response } from 'inversify-express-utils';
 import express from 'express';
+import { inject } from 'inversify';
+import { response } from 'inversify-express-utils';
 import {
-  Delete,
   Body,
   Controller,
+  Delete,
+  OperationId,
   Path,
   Post,
   Put,
   Response,
-  OperationId,
-  Tags,
   Security,
+  Tags,
 } from '../../src';
-import { inject } from 'inversify';
 import { IdentifiableObject } from '../../src';
 import { ExampleObjectOf } from '../../src/type';
 

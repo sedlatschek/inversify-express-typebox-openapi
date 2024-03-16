@@ -15,11 +15,17 @@ import {
   requestParam,
 } from 'inversify-express-utils';
 import {
+  ExternalDocumentationObject,
+  ParameterLocation,
+  ParameterStyle,
+  SecurityRequirementObject,
+} from 'openapi3-ts/oas31';
+import {
   addBodyMetadata,
+  addControllerMetadata,
+  addOperationMetadata,
   addParametersMetadata,
   addResponsesMetadata,
-  addOperationMetadata,
-  addControllerMetadata,
 } from './reflect';
 import {
   ExamplesObjectOf,
@@ -27,12 +33,6 @@ import {
   ParameterParameters,
   ResponseParameters,
 } from './type';
-import {
-  ExternalDocumentationObject,
-  ParameterLocation,
-  ParameterStyle,
-  SecurityRequirementObject,
-} from 'openapi3-ts/oas31';
 import { ucfirst } from './utilize';
 
 export const Controller = (

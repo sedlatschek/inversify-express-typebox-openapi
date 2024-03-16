@@ -1,4 +1,5 @@
-import 'reflect-metadata'; // TODO: find out why this is required here
+import 'reflect-metadata';
+import { Static, Type } from '@sinclair/typebox';
 import {
   CallbackObject,
   ComponentsObject,
@@ -10,9 +11,8 @@ import {
   ResponseObject,
 } from 'openapi3-ts/oas31';
 import { describe, expect, it } from 'vitest';
-import { Static, Type } from '@sinclair/typebox';
-import { createReferences } from '../../src/generate/create-references';
 import { identifiable } from '../../src';
+import { createReferences } from '../../src/generate/create-references';
 import { withoutId } from '../../src/generate/reference';
 import { ExampleObjectOf } from '../../src/type';
 

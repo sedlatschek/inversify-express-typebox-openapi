@@ -6,16 +6,16 @@ import {
   ResponseObject,
   isReferenceObject,
 } from 'openapi3-ts/oas31';
+import { mergeIntoOperation } from './merge';
 import {
-  ParameterParameters,
   ControllerConfig,
   ControllerMetadata,
   OperationConfig,
   OperationMetadata,
+  ParameterParameters,
   ResponseParameters,
 } from './type';
 import { hasValues, updateDefinedProperties } from './utilize';
-import { mergeIntoOperation } from './merge';
 
 export const CONTROLLER_METADATA_KEY =
   'inversify-express-typebox-openapi:controller';

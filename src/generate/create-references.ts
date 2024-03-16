@@ -17,8 +17,8 @@ import {
   SchemaObject,
   isReferenceObject,
 } from 'openapi3-ts/oas31';
-import { reference, referenceArray, referenceMap } from './reference';
 import { hasProperty } from '../utilize';
+import { reference, referenceArray, referenceMap } from './reference';
 
 export const createReferences = (
   components: ComponentsObject,

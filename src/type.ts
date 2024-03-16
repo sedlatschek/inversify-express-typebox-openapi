@@ -1,3 +1,4 @@
+import { Static, TSchema } from '@sinclair/typebox';
 import {
   BaseParameterObject,
   EncodingObject,
@@ -7,7 +8,6 @@ import {
   PathItemObject,
   ResponseObject,
 } from 'openapi3-ts/oas31';
-import { Static, TSchema } from '@sinclair/typebox';
 import { IdentifiableObject } from './generate/reference';
 
 export type ControllerConfig = {
