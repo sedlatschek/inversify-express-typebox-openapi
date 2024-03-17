@@ -29,8 +29,8 @@ ToDo
 This package supports references. It will add any object that has an `$id` property to the `components` map of the OpenApi specification. There is a helper function for defining identifiable/referenceable objects called `identifiable`. The value of `$id` will be used as the key within the components map.
 
 ```ts
-import { type ExampleObject } from 'openapi3-ts/oas31';
 import { identifiable } from 'inversify-express-typebox-openapi';
+import { type ExampleObject } from 'openapi3-ts/oas31';
 
 const postExample = identifiable<ExampleObject>(
   {
@@ -78,6 +78,10 @@ const example = withoutId({
 
 #### AllowEmtpyValue
 
+| Controller | Method | Parameter |
+| :--------: | :----: | :-------: |
+|     ❌     |   ❌   |    ✅     |
+
 Sets the ability to pass empty-valued parameters. This is valid only for query parameters and allows sending a parameter with an empty value.
 
 ```ts
@@ -89,10 +93,6 @@ class ExampleController {
   }
 }
 ```
-
-| Controller | Method | Parameter |
-| :--------: | :----: | :-------: |
-|     ❌     |   ❌   |    ✅     |
 
 This can also be done through the `Query` decorator:
 
@@ -108,6 +108,10 @@ class ExampleController {
 
 #### AllowReserved
 
+| Controller | Method | Parameter |
+| :--------: | :----: | :-------: |
+|     ❌     |   ❌   |    ✅     |
+
 Determines whether the parameter value SHOULD allow reserved characters, as defined by [RFC3986] `:/?#[]@!$&'()*+,;=` to be included without percent-encoding.
 
 ```ts
@@ -119,10 +123,6 @@ class ExampleController {
   }
 }
 ```
-
-| Controller | Method | Parameter |
-| :--------: | :----: | :-------: |
-|     ❌     |   ❌   |    ✅     |
 
 This can also be done through the `Query` decorator:
 
@@ -138,6 +138,10 @@ class ExampleController {
 
 #### Deprecated
 
+| Controller | Method | Parameter |
+| :--------: | :----: | :-------: |
+|     ✅     |   ✅   |    ✅     |
+
 Flag a parameter, a method or a controller as deprecated.
 
 ```ts
@@ -145,13 +149,13 @@ Flag a parameter, a method or a controller as deprecated.
 class ExampleController {}
 ```
 
-| Controller | Method | Parameter |
-| :--------: | :----: | :-------: |
-|     ✅     |   ✅   |    ✅     |
-
 When used on a controller, it is applied to each of its methods.
 
 #### Description
+
+| Controller | Method | Parameter |
+| :--------: | :----: | :-------: |
+|     ✅     |   ✅   |    ✅     |
 
 Specify a description for methods and parameters.
 
@@ -163,10 +167,6 @@ class ExampleController {
   }
 }
 ```
-
-| Controller | Method | Parameter |
-| :--------: | :----: | :-------: |
-|     ✅     |   ✅   |    ✅     |
 
 When used on a controller, it is applied to each of its methods.
 
@@ -185,6 +185,10 @@ class ExampleController {
 
 #### Example
 
+| Controller | Method | Parameter |
+| :--------: | :----: | :-------: |
+|     ❌     |   ❌   |    ✅     |
+
 Specify an example for a parameter value.
 
 ```ts
@@ -196,10 +200,6 @@ class ExampleController {
   }
 }
 ```
-
-| Controller | Method | Parameter |
-| :--------: | :----: | :-------: |
-|     ❌     |   ❌   |    ✅     |
 
 This can also be done through any of the parameter decorators:
 
@@ -214,6 +214,10 @@ class ExampleController {
 ```
 
 #### Examples
+
+| Controller | Method | Parameter |
+| :--------: | :----: | :-------: |
+|     ❌     |   ❌   |    ✅     |
 
 Specify a map of examples for a parameter value:
 
@@ -235,10 +239,6 @@ class ExampleController {
   }
 }
 ```
-
-| Controller | Method | Parameter |
-| :--------: | :----: | :-------: |
-|     ❌     |   ❌   |    ✅     |
 
 This can also be done through any of the parameter decorators:
 
@@ -264,6 +264,10 @@ class ExampleController {
 
 #### Explode
 
+| Controller | Method | Parameter |
+| :--------: | :----: | :-------: |
+|     ❌     |   ❌   |    ✅     |
+
 Specify that property values of the type `array` or `object` generate separate parameters for each value of the array, or key-value-pair of the map.
 
 ```ts
@@ -275,10 +279,6 @@ class ExampleController {
   }
 }
 ```
-
-| Controller | Method | Parameter |
-| :--------: | :----: | :-------: |
-|     ❌     |   ❌   |    ✅     |
 
 This can also be done through any of the parameter decorators:
 
@@ -294,6 +294,10 @@ class ExampleController {
 
 #### ExternalDocs
 
+| Controller | Method | Parameter |
+| :--------: | :----: | :-------: |
+|     ✅     |   ✅   |    ✅     |
+
 Specify external documentation.
 
 ```ts
@@ -308,11 +312,44 @@ class ExampleController {
 }
 ```
 
+#### OperationId
+
 | Controller | Method | Parameter |
 | :--------: | :----: | :-------: |
-|     ✅     |   ✅   |    ✅     |
+|     ✅     |   ✅   |    ❌     |
+
+Specify a custom operation id for a method. By default, the operation id is the method name.
+
+```ts
+class ExampleController {
+  @OperationId('customOperationId')
+  @Get('/users')
+  public getUsers() {
+    // ....
+  }
+}
+```
+
+This example will result in the operation id `ExampleController_customOperationId`.
+
+When used on a controller, the prefix (by default the controller name) is replaced with the custom operation id. The following example will result in the operation id `customControllerName_customOperationId`:
+
+```ts
+@OperationId('customControllerName')
+class ExampleController {
+  @OperationId('customOperationId')
+  @Get('/users')
+  public getUsers() {
+    // ....
+  }
+}
+```
 
 #### Security
+
+| Controller | Method | Parameter |
+| :--------: | :----: | :-------: |
+|     ✅     |   ✅   |    ❌     |
 
 Specify the security requirements for a method.
 
@@ -321,14 +358,14 @@ Specify the security requirements for a method.
 class ExampleController {}
 ```
 
-| Controller | Method | Parameter |
-| :--------: | :----: | :-------: |
-|     ✅     |   ✅   |    ❌     |
-
 When used on a controller, it is applied to each of its methods.
 Multiple `@Security` decorators onto one controller/method extend the requirements.
 
 #### Style
+
+| Controller | Method | Parameter |
+| :--------: | :----: | :-------: |
+|     ❌     |   ❌   |    ✅     |
 
 Describes how the parameter value will be serialized depending on the type of the parameter value.
 
@@ -341,10 +378,6 @@ class ExampleController {
   }
 }
 ```
-
-| Controller | Method | Parameter |
-| :--------: | :----: | :-------: |
-|     ❌     |   ❌   |    ✅     |
 
 This can also be done through any of the parameter decorators:
 
@@ -360,6 +393,10 @@ class ExampleController {
 
 #### Summary
 
+| Controller | Method | Parameter |
+| :--------: | :----: | :-------: |
+|     ❌     |   ✅   |    ❌     |
+
 Specify a summary for an operation.
 
 ```ts
@@ -370,10 +407,6 @@ class ExampleController {
   }
 }
 ```
-
-| Controller | Method | Parameter |
-| :--------: | :----: | :-------: |
-|     ❌     |   ✅   |    ❌     |
 
 ## Development
 
