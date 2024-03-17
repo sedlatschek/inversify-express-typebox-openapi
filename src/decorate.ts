@@ -355,7 +355,6 @@ export const OperationId = (
 ): ClassDecorator & MethodDecorator => {
   return (target: object, propertyKey?: string | symbol | undefined) => {
     const metadataProperties = { operationId };
-
     if (propertyKey === undefined) {
       addControllerMetadata(target, { metadataProperties });
     } else {
