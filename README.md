@@ -354,6 +354,26 @@ class ExampleController {
 }
 ```
 
+#### Header
+
+| Controller | Method | Parameter |
+| :--------: | :----: | :-------: |
+|     ❌     |   ❌   |    ✅     |
+
+Specify a header parameter.
+
+```ts
+// ...
+class ExampleController {
+  // ...
+  public get(
+    @Header('Authorization', { schema: Type.String() }) authToken: string,
+  ) {
+    // ....
+  }
+}
+```
+
 #### OperationId
 
 | Controller | Method | Parameter |

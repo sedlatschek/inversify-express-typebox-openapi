@@ -1,14 +1,14 @@
 import { Type } from '@sinclair/typebox';
 import { basename } from 'path';
-import { Controller, Cookie, Get } from '../../../src';
+import { Controller, Get, Header } from '../../../src';
 import { ucfirst } from '../../../src/utilize';
 import { DecoratorSpecification, DecoratorTest } from './decorate.test';
 
 const controller: DecoratorSpecification = {
   controller: () => {
     @Controller('/')
-    // @ts-expect-error: Cookie can not be used on controllers
-    @Cookie({ schema: Type.String() })
+    // @ts-expect-error: Header can not be used on controllers
+    @Header({ schema: Type.String() })
     class TestController {
       @Get('/')
       public get(): void {}
@@ -26,8 +26,8 @@ const method: DecoratorSpecification = {
     @Controller('/')
     class TestController {
       @Get('/')
-      // @ts-expect-error: Cookie can not be used on methods
-      @Cookie({ schema: Type.String() })
+      // @ts-expect-error: Header can not be used on methods
+      @Header({ schema: Type.String() })
       public get(): void {}
     }
 
@@ -44,7 +44,7 @@ const parameter: DecoratorSpecification = {
     class TestController {
       @Get('/')
       public get(
-        @Cookie('Cookie', { schema: Type.String() }) _cookie: string,
+        @Header('Header', { schema: Type.String() }) _header: string,
       ): void {}
     }
     return () => new TestController();
@@ -60,8 +60,8 @@ paths:
     get:
       responses: {}
       parameters:
-        - name: Cookie
-          in: cookie
+        - name: Header
+          in: header
           schema:
             type: string
           required: true
