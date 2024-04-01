@@ -84,7 +84,25 @@ describe('decorate', async () => {
           const server = new InversifyExpressServer(container);
           server.build();
 
-          expect(generateSpecAsYaml(container)).toBe(test.expectation.yaml);
+          expect(generateSpecAsYaml(container)).toBe(`openapi: 3.1.0
+info:
+  title: app
+  version: version
+paths:
+  ${test.expectation.yaml?.trim()}
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers: []
+`);
         });
       }
     }

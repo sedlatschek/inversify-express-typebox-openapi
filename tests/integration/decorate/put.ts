@@ -27,27 +27,11 @@ const method: DecoratorSpecification = {
   },
   expectation: {
     possible: true,
-    yaml: `openapi: 3.1.0
-info:
-  title: app
-  version: version
-paths:
+    yaml: `
   /test:
     put:
       responses: {}
       operationId: TestController_update
-components:
-  schemas: {}
-  responses: {}
-  parameters: {}
-  examples: {}
-  requestBodies: {}
-  headers: {}
-  securitySchemes: {}
-  links: {}
-  callbacks: {}
-tags: []
-servers: []
 `,
   },
 };

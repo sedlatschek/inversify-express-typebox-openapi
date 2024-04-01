@@ -18,11 +18,7 @@ const controller: DecoratorSpecification = {
   },
   expectation: {
     possible: true,
-    yaml: `openapi: 3.1.0
-info:
-  title: app
-  version: version
-paths:
+    yaml: `
   /:
     get:
       responses: {}
@@ -32,18 +28,6 @@ paths:
       responses: {}
       operationId: TestController_post
       deprecated: true
-components:
-  schemas: {}
-  responses: {}
-  parameters: {}
-  examples: {}
-  requestBodies: {}
-  headers: {}
-  securitySchemes: {}
-  links: {}
-  callbacks: {}
-tags: []
-servers: []
 `,
   },
 };
@@ -61,28 +45,12 @@ const method: DecoratorSpecification = {
   },
   expectation: {
     possible: true,
-    yaml: `openapi: 3.1.0
-info:
-  title: app
-  version: version
-paths:
+    yaml: `
   /:
     get:
       responses: {}
       deprecated: true
       operationId: TestController_get
-components:
-  schemas: {}
-  responses: {}
-  parameters: {}
-  examples: {}
-  requestBodies: {}
-  headers: {}
-  securitySchemes: {}
-  links: {}
-  callbacks: {}
-tags: []
-servers: []
 `,
   },
 };
@@ -100,11 +68,7 @@ const parameter: DecoratorSpecification = {
   },
   expectation: {
     possible: true,
-    yaml: `openapi: 3.1.0
-info:
-  title: app
-  version: version
-paths:
+    yaml: `
   /:
     get:
       responses: {}
@@ -116,18 +80,6 @@ paths:
           required: false
           deprecated: true
       operationId: TestController_get
-components:
-  schemas: {}
-  responses: {}
-  parameters: {}
-  examples: {}
-  requestBodies: {}
-  headers: {}
-  securitySchemes: {}
-  links: {}
-  callbacks: {}
-tags: []
-servers: []
 `,
   },
 };

@@ -49,11 +49,7 @@ const parameter: DecoratorSpecification = {
   },
   expectation: {
     possible: true,
-    yaml: `openapi: 3.1.0
-info:
-  title: app
-  version: version
-paths:
+    yaml: `
   /:
     get:
       responses: {}
@@ -64,20 +60,7 @@ paths:
           schema:
             type: string
           required: true
-      operationId: TestController_get
-components:
-  schemas: {}
-  responses: {}
-  parameters: {}
-  examples: {}
-  requestBodies: {}
-  headers: {}
-  securitySchemes: {}
-  links: {}
-  callbacks: {}
-tags: []
-servers: []
-`,
+      operationId: TestController_get`,
   },
 };
 

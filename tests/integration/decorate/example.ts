@@ -54,11 +54,7 @@ const parameter: DecoratorSpecification = {
   },
   expectation: {
     possible: true,
-    yaml: `openapi: 3.1.0
-info:
-  title: app
-  version: version
-paths:
+    yaml: `
   /users:
     post:
       responses: {}
@@ -82,18 +78,6 @@ paths:
             example:
               name: example
       operationId: TestController_createUser
-components:
-  schemas: {}
-  responses: {}
-  parameters: {}
-  examples: {}
-  requestBodies: {}
-  headers: {}
-  securitySchemes: {}
-  links: {}
-  callbacks: {}
-tags: []
-servers: []
 `,
   },
 };
