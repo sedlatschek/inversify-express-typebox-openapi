@@ -94,7 +94,7 @@ class ExampleController {
 }
 ```
 
-This can also be done through the `Query` decorator:
+This can also be achieved through the `Query` decorator:
 
 ```ts
 class ExampleController {
@@ -124,7 +124,7 @@ class ExampleController {
 }
 ```
 
-This can also be done through the `Query` decorator:
+This can also be achieved through the `Query` decorator:
 
 ```ts
 class ExampleController {
@@ -230,7 +230,7 @@ class ExampleController {
 
 When used on a controller, it is applied to each of its methods.
 
-This can also be done through any of the parameter decorators:
+This can also be achieved through any of the parameter decorators:
 
 ```ts
 class ExampleController {
@@ -261,7 +261,7 @@ class ExampleController {
 }
 ```
 
-This can also be done through any of the parameter decorators:
+This can also be achieved through any of the parameter decorators:
 
 ```ts
 class ExampleController {
@@ -300,7 +300,7 @@ class ExampleController {
 }
 ```
 
-This can also be done through any of the parameter decorators:
+This can also be achieved through any of the parameter decorators:
 
 ```ts
 class ExampleController {
@@ -340,7 +340,7 @@ class ExampleController {
 }
 ```
 
-This can also be done through any of the parameter decorators:
+This can also be achieved through any of the parameter decorators:
 
 ```ts
 class ExampleController {
@@ -608,7 +608,7 @@ class ExampleController {
 }
 ```
 
-This can also be done through any of the parameter decorators:
+This can also be achieved through any of the parameter decorators:
 
 ```ts
 class ExampleController {

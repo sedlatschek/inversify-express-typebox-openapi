@@ -8,6 +8,7 @@ import { basename } from 'path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { generateSpecAsYaml } from '../../../src';
 import { ucfirst } from '../../../src/utilize';
+import allowEmptyValueTest from './allow-empty-value';
 import bodyTest from './body';
 import cookieTest from './cookie';
 import deleteTest from './delete';
@@ -45,6 +46,7 @@ describe('decorate', async () => {
   });
 
   const decoratorTests: DecoratorTest[] = [
+    allowEmptyValueTest,
     bodyTest,
     cookieTest,
     deleteTest,
