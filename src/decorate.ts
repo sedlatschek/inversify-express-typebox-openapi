@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 import { TSchema } from '@sinclair/typebox';
+import assert from 'assert';
 import {
   HandlerDecorator,
   Middleware,
@@ -128,11 +129,10 @@ const parameterDecoratorFactory = (
       methodName: TPropertyKey,
       parameterIndex: TParameterIndex,
     ) => {
-      if (!methodName) {
-        throw new Error(
-          `${ucfirst(type)} decorator can only be used on parameters`,
-        );
-      }
+      assert(
+        !!methodName,
+        `${ucfirst(type)} decorator can only be used on parameters`,
+      );
       addParametersMetadata(target, methodName, parameterIndex, parameters, {
         name,
         in: type,
@@ -164,9 +164,7 @@ export const Body = <
     propertyKey: TPropertyKey,
     parameterIndex: TParameterIndex,
   ) => {
-    if (!propertyKey) {
-      throw new Error('Body decorator can only be used on parameters');
-    }
+    assert(!!propertyKey, 'Body decorator can only be used on parameters');
     addBodyMetadata(target, propertyKey, parameterIndex, parameters);
     requestBody()(target, propertyKey, parameterIndex);
   };
@@ -196,11 +194,10 @@ export const AllowEmptyValue = (): ParameterDecorator => {
     propertyKey: string | symbol | undefined,
     parameterIndex: number,
   ) => {
-    if (!propertyKey) {
-      throw new Error(
-        'AllowEmptyValue decorator can only be used on parameters',
-      );
-    }
+    assert(
+      !!propertyKey,
+      'AllowEmptyValue decorator can only be used on parameters',
+    );
     addParametersMetadata(target, propertyKey, parameterIndex, {
       allowEmptyValue: true,
     });
@@ -213,9 +210,10 @@ export const AllowReserved = (): ParameterDecorator => {
     propertyKey: string | symbol | undefined,
     parameterIndex: number,
   ) => {
-    if (!propertyKey) {
-      throw new Error('AllowReserved decorator can only be used on parameters');
-    }
+    assert(
+      !!propertyKey,
+      'AllowReserved decorator can only be used on parameters',
+    );
     addParametersMetadata(target, propertyKey, parameterIndex, {
       allowReserved: true,
     });
@@ -282,9 +280,7 @@ export const Example = <T>(example: T): ParameterDecorator => {
     propertyKey: string | symbol | undefined,
     parameterIndex: number,
   ) => {
-    if (!propertyKey) {
-      throw new Error('Example decorator can only be used on parameters');
-    }
+    assert(!!propertyKey, 'Example decorator can only be used on parameters');
     addParametersMetadata(target, propertyKey, parameterIndex, {
       example,
     });
@@ -299,9 +295,7 @@ export const Examples = <T>(
     propertyKey: string | symbol | undefined,
     parameterIndex: number,
   ) => {
-    if (!propertyKey) {
-      throw new Error('Examples decorator can only be used on parameters');
-    }
+    assert(!!propertyKey, 'Examples decorator can only be used on parameters');
     addParametersMetadata(target, propertyKey, parameterIndex, {
       examples,
     });
@@ -314,9 +308,7 @@ export const Explode = (): ParameterDecorator => {
     propertyKey: string | symbol | undefined,
     parameterIndex: number,
   ) => {
-    if (!propertyKey) {
-      throw new Error('Explode decorator can only be used on parameters');
-    }
+    assert(!!propertyKey, 'Explode decorator can only be used on parameters');
     addParametersMetadata(target, propertyKey, parameterIndex, {
       explode: true,
     });
@@ -387,9 +379,7 @@ export const Style = (style: ParameterStyle): ParameterDecorator => {
     propertyKey: string | symbol | undefined,
     parameterIndex: number,
   ) => {
-    if (!propertyKey) {
-      throw new Error('Style decorator can only be used on parameters');
-    }
+    assert(!!propertyKey, 'Style decorator can only be used on parameters');
     addParametersMetadata(target, propertyKey, parameterIndex, { style });
   };
 };
