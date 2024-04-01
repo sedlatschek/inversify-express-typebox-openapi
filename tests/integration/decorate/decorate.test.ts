@@ -8,11 +8,12 @@ import { basename } from 'path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { generateSpecAsYaml } from '../../../src';
 import { ucfirst } from '../../../src/utilize';
-import allowEmptyValueTest from './allow-empty-value';
+import allowEmptyValueTest from './allowEmptyValue';
 import allowReservedTest from './allowReserved';
 import bodyTest from './body';
 import cookieTest from './cookie';
 import deleteTest from './delete';
+import deprecatedTest from './deprecated';
 import getTest from './get';
 import headTest from './head';
 import headerTest from './header';
@@ -52,6 +53,7 @@ describe('decorate', async () => {
     bodyTest,
     cookieTest,
     deleteTest,
+    deprecatedTest,
     getTest,
     headTest,
     headerTest,

@@ -231,7 +231,7 @@ export const Deprecated = (): ClassDecorator &
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     descriptorOrParameterIndex?: TypedPropertyDescriptor<any>,
   ): void => {
-    const metadataProperties = { deprecated: true };
+    const metadataProperties = { deprecated: true, required: false };
     if (propertyKey === undefined) {
       addControllerMetadata(target, { metadataProperties });
     } else if (typeof descriptorOrParameterIndex === 'number') {

@@ -202,14 +202,32 @@ class ExampleController {
 | :--------: | :----: | :-------: |
 |     ✅     |   ✅   |    ✅     |
 
-Flag a parameter, a method or a controller as deprecated.
+Flag a parameter, a method or all methods of a controller as deprecated. Deprecated parameters will have `required` set to `false`.
 
 ```ts
+// ...
 @Deprecated()
-class ExampleController {}
-```
+class ExampleController {
+  // ...
+}
 
-When used on a controller, it is applied to each of its methods.
+// ...
+class ExampleController {
+  // ...
+  @Deprecated()
+  public getUser() {
+    // ...
+  }
+}
+
+// ...
+class ExampleController {
+  // ...
+  public getUser(@Deprecated() @Path('userId', { schema: Type.String() })) {
+
+  }
+}
+```
 
 #### Description
 
