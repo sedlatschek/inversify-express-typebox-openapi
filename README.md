@@ -160,6 +160,24 @@ class ExampleController {
 }
 ```
 
+#### Cookie
+
+| Controller | Method | Parameter |
+| :--------: | :----: | :-------: |
+|     ❌     |   ❌   |    ✅     |
+
+Specify a cookie parameter.
+
+```ts
+// ...
+class ExampleController {
+  // ...
+  public get(@Cookie('Cookie', { schema: Type.String() }) cookie: string) {
+    // ....
+  }
+}
+```
+
 #### Deprecated
 
 | Controller | Method | Parameter |
