@@ -349,7 +349,9 @@ class ExampleController {
 Specify that property values of the type `array` or `object` generate separate parameters for each value of the array, or key-value-pair of the map.
 
 ```ts
+// ...
 class ExampleController {
+  // ...
   public getUsers(
     @Explode() @Query('id', Type.Array(Type.String()) ids: string[],
   ) {
@@ -361,7 +363,9 @@ class ExampleController {
 This can also be achieved through any of the parameter decorators:
 
 ```ts
+// ...
 class ExampleController {
+  // ...
   public getUsers(
     @Query('id', Type.Array(Type.String(), { explode: true }) ids: string[],
   ) {

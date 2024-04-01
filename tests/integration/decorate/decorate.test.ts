@@ -17,6 +17,7 @@ import deprecatedTest from './deprecated';
 import descriptionTest from './description';
 import exampleTest from './example';
 import examplesTest from './examples';
+import explodeTest from './explode';
 import getTest from './get';
 import headTest from './head';
 import headerTest from './header';
@@ -60,6 +61,7 @@ describe('decorate', async () => {
     descriptionTest,
     exampleTest,
     examplesTest,
+    explodeTest,
     getTest,
     headTest,
     headerTest,
