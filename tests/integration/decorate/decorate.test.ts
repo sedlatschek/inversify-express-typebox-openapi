@@ -18,6 +18,7 @@ import pathTest from './path';
 import postTest from './post';
 import putTest from './put';
 import queryTest from './query';
+import responseTest from './response';
 
 export type DecoratorSpecification = {
   controller: () => void;
@@ -54,6 +55,7 @@ describe('decorate', async () => {
     postTest,
     putTest,
     queryTest,
+    responseTest,
   ];
 
   for (const decoratorTest of decoratorTests) {

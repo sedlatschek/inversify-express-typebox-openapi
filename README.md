@@ -535,11 +535,11 @@ class ExampleController {
 
 #### Query
 
-Specify a query parameter.
-
 | Controller | Method | Parameter |
 | :--------: | :----: | :-------: |
 |     ❌     |   ❌   |    ✅     |
+
+Specify a query parameter.
 
 ```ts
 // ...
@@ -550,6 +550,29 @@ class ExampleController {
   }
 }
 ```
+
+#### Response
+
+| Controller | Method | Parameter |
+| :--------: | :----: | :-------: |
+|     ❌     |   ✅   |    ❌     |
+
+Specify a possible response for a method.
+
+```ts
+class ExampleController {
+  // ...
+  @Response(200, {
+    description: 'IDs of users',
+    content: { schema: Type.Array(Type.Number()) },
+  })
+  public getUserIds() {
+    // ...
+  }
+}
+```
+
+Use `default` instead of an HTTP status code for a default error response.
 
 #### Security
 
