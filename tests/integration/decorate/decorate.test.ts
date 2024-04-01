@@ -11,6 +11,7 @@ import cookieTest from './cookie';
 import getTest from './get';
 import headerTest from './header';
 import operationIdTest from './operationId';
+import patchTest from './patch';
 import pathTest from './path';
 import postTest from './post';
 import queryTest from './query';
@@ -43,6 +44,7 @@ describe('decorate', async () => {
     getTest,
     headerTest,
     operationIdTest,
+    patchTest,
     pathTest,
     postTest,
     queryTest,

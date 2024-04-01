@@ -425,6 +425,24 @@ class ExampleController {
 }
 ```
 
+#### Patch
+
+| Controller | Method | Parameter |
+| :--------: | :----: | :-------: |
+|     ❌     |   ✅   |    ❌     |
+
+Specify a patch method.
+
+```ts
+// ...
+class ExampleController {
+  @Patch('/users/{userId}')
+  public updateUser() {
+    // ....
+  }
+}
+```
+
 #### Path
 
 | Controller | Method | Parameter |
