@@ -22,7 +22,7 @@ export const mergeIntoOperation = (
 export const mergeAtomicProperties = (
   a: OperationObject,
   b: Partial<OperationObject>,
-  ...properties: (keyof OperationObject)[]
+  ...properties: (keyof OperationObject)[] // TODO: Restrict to properties that are actually atomic
 ): void => {
   for (const property of properties) {
     if (!a[property] && b[property]) {
@@ -34,7 +34,7 @@ export const mergeAtomicProperties = (
 export const concatPrimitiveArrays = (
   a: OperationObject,
   b: Partial<OperationObject>,
-  ...properties: (keyof OperationObject)[]
+  ...properties: (keyof OperationObject)[] // TODO: Restrict to properties that are actually an array of primitives
 ): void => {
   for (const property of properties) {
     if (b[property]) {
@@ -48,7 +48,7 @@ export const concatPrimitiveArrays = (
 export const concatArrays = (
   a: OperationObject,
   b: Partial<OperationObject>,
-  ...properties: (keyof OperationObject)[]
+  ...properties: (keyof OperationObject)[] // TODO: Restrict to properties that are actually an array of objects
 ): void => {
   for (const property of properties) {
     if (b[property]) {
@@ -60,7 +60,7 @@ export const concatArrays = (
 export const mergeMaps = <OperationObject>(
   a: OperationObject,
   b: Partial<OperationObject>,
-  ...properties: (keyof OperationObject)[]
+  ...properties: (keyof OperationObject)[] // TODO: Restrict to properties that are actually a map
 ): void => {
   for (const property of properties) {
     if (b[property]) {

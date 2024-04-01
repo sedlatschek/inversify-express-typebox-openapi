@@ -868,7 +868,6 @@ Feel free to contribute your code.
 - [ ] De we need to provide clearMetadata for testing?
 - [ ] Make a package out of it
 - [ ] Check for the lowest compatible version of each peerDependency
-- [ ] Improve types of merge.ts (only allow property keys of the assumed property value that is needed for the function to work)
 - [ ] Changelog / PR CI system
 - [ ] Add jsdoc to decorators from oas v3.1 spec
 - [ ] Add type tests for decorators (und such things as examples, example, schema)
