@@ -427,11 +427,11 @@ class ExampleController {
 
 #### Path
 
-Specify a path parameter.
-
 | Controller | Method | Parameter |
 | :--------: | :----: | :-------: |
 |     ❌     |   ❌   |    ✅     |
+
+Specify a path parameter.
 
 ```ts
 // ...
@@ -439,6 +439,24 @@ class ExampleController {
   @Get('/users/{userId}')
   public getUser(@Path('userId', schema: Type.String()) userId: string) {
     // ...
+  }
+}
+```
+
+#### Post
+
+| Controller | Method | Parameter |
+| :--------: | :----: | :-------: |
+|     ❌     |   ✅   |    ❌     |
+
+Specify a post method.
+
+```ts
+// ...
+class ExampleController {
+  @Post('/users')
+  public createUser() {
+    // ....
   }
 }
 ```

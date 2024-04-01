@@ -12,6 +12,7 @@ import getTest from './get';
 import headerTest from './header';
 import operationIdTest from './operationId';
 import pathTest from './path';
+import postTest from './post';
 import queryTest from './query';
 
 export type DecoratorSpecification = {
@@ -43,6 +44,7 @@ describe('decorate', async () => {
     headerTest,
     operationIdTest,
     pathTest,
+    postTest,
     queryTest,
   ];
 
