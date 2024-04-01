@@ -59,7 +59,7 @@ const parameter: DecoratorSpecification = {
     @Controller('/')
     class TestController {
       @Post('/')
-      // @ts-expect-error: Post can not be used on methods
+      // @ts-expect-error: Post can not be used on parameters
       public post(@Post() _test: string): void {}
     }
     return () => new TestController();

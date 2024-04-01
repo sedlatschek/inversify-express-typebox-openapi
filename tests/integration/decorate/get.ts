@@ -59,7 +59,7 @@ const parameter: DecoratorSpecification = {
     @Controller('/')
     class TestController {
       @Get('/')
-      // @ts-expect-error: Get can not be used on methods
+      // @ts-expect-error: Get can not be used on parameters
       public get(@Get() _test: string): void {}
     }
     return () => new TestController();
