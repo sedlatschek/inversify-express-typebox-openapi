@@ -8,6 +8,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { generateSpecAsYaml } from '../../../src';
 import bodyTest from './body';
 import cookieTest from './cookie';
+import deleteTest from './delete';
 import getTest from './get';
 import headTest from './head';
 import headerTest from './header';
@@ -43,6 +44,7 @@ describe('decorate', async () => {
   const decoratorTests: DecoratorTest[] = [
     bodyTest,
     cookieTest,
+    deleteTest,
     getTest,
     headTest,
     headerTest,

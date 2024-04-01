@@ -178,6 +178,24 @@ class ExampleController {
 }
 ```
 
+#### Delete
+
+| Controller | Method | Parameter |
+| :--------: | :----: | :-------: |
+|     ❌     |   ✅   |    ❌     |
+
+Specify a delete method.
+
+```ts
+// ...
+class ExampleController {
+  @Delete('/users/{userId}')
+  public deleteUser(/* ... */) {
+    // ....
+  }
+}
+```
+
 #### Deprecated
 
 | Controller | Method | Parameter |
