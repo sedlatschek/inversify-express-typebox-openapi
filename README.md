@@ -112,7 +112,7 @@ class ExampleController {
 | :--------: | :----: | :-------: |
 |     ❌     |   ❌   |    ✅     |
 
-Determines whether the parameter value SHOULD allow reserved characters, as defined by [RFC3986] `:/?#[]@!$&'()*+,;=` to be included without percent-encoding.
+Specify whether the parameter value SHOULD allow reserved characters, as defined by [RFC3986] `:/?#[]@!$&'()*+,;=` to be included without percent-encoding.
 
 ```ts
 class ExampleController {
@@ -666,6 +666,7 @@ ToDo
 - [ ] add type tests for decorators (und such things as examples, example, schema)
 - [ ] move schema to be its own parameter for parameter decorators
 - [ ] DRY up decorator code
+- [ ] AllowReserved can only be applied to Query parameters, yet we allow it to be used on any parameter. This allows for invalid oas31 specification if used incorrectly.
 
 ### Roadmap
 
