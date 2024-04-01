@@ -479,6 +479,24 @@ class ExampleController {
 }
 ```
 
+#### Put
+
+| Controller | Method | Parameter |
+| :--------: | :----: | :-------: |
+|     ❌     |   ✅   |    ❌     |
+
+Specify a put method.
+
+```ts
+// ...
+class ExampleController {
+  @Put('/users/{userId}')
+  public replaceUser() {
+    // ....
+  }
+}
+```
+
 #### Query
 
 Specify a query parameter.

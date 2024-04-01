@@ -14,6 +14,7 @@ import operationIdTest from './operationId';
 import patchTest from './patch';
 import pathTest from './path';
 import postTest from './post';
+import putTest from './put';
 import queryTest from './query';
 
 export type DecoratorSpecification = {
@@ -47,6 +48,7 @@ describe('decorate', async () => {
     patchTest,
     pathTest,
     postTest,
+    putTest,
     queryTest,
   ];
 
