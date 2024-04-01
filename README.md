@@ -698,6 +698,27 @@ class ExampleController {
 }
 ```
 
+#### Tags
+
+| Controller | Method | Parameter |
+| :--------: | :----: | :-------: |
+|     ✅     |   ✅   |    ❌     |
+
+Specify tags for a method.
+
+```ts
+// ...
+class ExampleController {
+  // ....
+  @Tags('V1', 'User')
+  public getUser() {
+    // ....
+  }
+}
+```
+
+When used on a controller, it is applied to each of its methods.
+
 ## Development
 
 ### Testing

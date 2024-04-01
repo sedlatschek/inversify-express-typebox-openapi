@@ -367,7 +367,7 @@ export const OperationId = (
 
 export const Security = (
   securityObject: SecurityRequirementObject,
-): ((target: object, propertyKey?: string | symbol | undefined) => void) => {
+): ClassDecorator & MethodDecorator => {
   return (target: object, propertyKey?: string | symbol | undefined): void => {
     const metadataProperties = { security: [securityObject] };
 
@@ -403,9 +403,7 @@ export const Summary = (summary: string): MethodDecorator => {
   };
 };
 
-export const Tags = (
-  ...tags: string[]
-): ((target: object, propertyKey?: string | symbol | undefined) => void) => {
+export const Tags = (...tags: string[]): ClassDecorator & MethodDecorator => {
   return (target: object, propertyKey?: string | symbol | undefined): void => {
     const metadataProperties = { tags };
 
