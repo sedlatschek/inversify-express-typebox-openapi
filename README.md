@@ -248,7 +248,7 @@ class ExampleController {
 
 When used on a controller, it is applied to each of its methods.
 
-This can also be achieved through any of the parameter decorators:
+Parameter descriptions can also be achieved through any of the parameter decorators:
 
 ```ts
 class ExampleController {
