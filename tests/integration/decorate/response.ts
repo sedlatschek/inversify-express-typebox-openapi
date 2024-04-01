@@ -1,7 +1,5 @@
 import { Type } from '@sinclair/typebox';
-import { basename } from 'path';
 import { Controller, Get, Response } from '../../../src';
-import { ucfirst } from '../../../src/utilize';
 import { DecoratorSpecification, DecoratorTest } from './decorate.test';
 
 const controller: DecoratorSpecification = {
@@ -101,7 +99,7 @@ const parameter: DecoratorSpecification = {
 };
 
 const test: DecoratorTest = {
-  name: ucfirst(basename(__filename).replace(/\.ts$/, '')),
+  filename: __filename,
   tests: {
     controller,
     method,

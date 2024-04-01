@@ -4,8 +4,10 @@ import {
   InversifyExpressServer,
   cleanUpMetadata,
 } from 'inversify-express-utils';
+import { basename } from 'path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { generateSpecAsYaml } from '../../../src';
+import { ucfirst } from '../../../src/utilize';
 import bodyTest from './body';
 import cookieTest from './cookie';
 import deleteTest from './delete';
@@ -29,7 +31,7 @@ export type DecoratorSpecification = {
 };
 
 export type DecoratorTest = {
-  name: string;
+  filename: string;
   tests: {
     controller: DecoratorSpecification;
     method: DecoratorSpecification;
@@ -61,7 +63,7 @@ describe('decorate', async () => {
   for (const decoratorTest of decoratorTests) {
     for (const [decoratorType, test] of Object.entries(decoratorTest.tests)) {
       if (test.expectation.possible) {
-        it(`should be possible to specify ${decoratorTest.name} on ${decoratorType}`, () => {
+        it(`should be possible to specify ${ucfirst(basename(decoratorTest.filename).replace(/\.ts$/, ''))} on ${decoratorType}`, () => {
           expect(test.expectation.yaml).toBeDefined();
 
           test.controller();
