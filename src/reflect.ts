@@ -409,7 +409,5 @@ export const addResponsesMetadata = <T extends TSchema>(
     };
   }
 
-  // TODO: add default response to operation responses metadata
-
   metadata.operationObject.responses[statusCode] = response;
 };
