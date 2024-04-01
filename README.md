@@ -136,6 +136,30 @@ class ExampleController {
 }
 ```
 
+#### Body
+
+| Controller | Method | Parameter |
+| :--------: | :----: | :-------: |
+|     ❌     |   ❌   |    ✅     |
+
+Specify a body parameter.
+
+```ts
+const userSchema = Type.Object({
+  id: Type.Number(),
+  name: Type.String(),
+});
+type User = Static<typeof userSchema>;
+
+// ...
+class ExampleController {
+  // ...
+  public createUser(@Body({ schema: userSchema }) userDto: User) {
+    // ....
+  }
+}
+```
+
 #### Deprecated
 
 | Controller | Method | Parameter |

@@ -1,5 +1,4 @@
 import 'reflect-metadata';
-import { globSync } from 'glob';
 import { Container } from 'inversify';
 import {
   InversifyExpressServer,
@@ -7,40 +6,48 @@ import {
 } from 'inversify-express-utils';
 import { afterEach, describe, expect, it } from 'vitest';
 import { generateSpecAsYaml } from '../../../src';
-import { ucfirst } from '../../../src/utilize';
+import bodyTest from './body';
+import operationIdTest from './operationId';
 
-const titleRegex = /[/\\](\w+)\.(class|method|parameter)\.ts$/;
+export type DecoratorSpecification = {
+  controller: () => void;
+  expectation: {
+    possible: boolean;
+    yaml?: string;
+  };
+};
+
+export type DecoratorTest = {
+  name: string;
+  tests: {
+    controller: DecoratorSpecification;
+    method: DecoratorSpecification;
+    parameter: DecoratorSpecification;
+  };
+};
 
 describe('decorate', async () => {
   afterEach(() => {
     cleanUpMetadata();
   });
 
-  for (const file of globSync([
-    `${__dirname}/*.class.ts`,
-    `${__dirname}/*.method.ts`,
-    `${__dirname}/*.parameter.ts`,
-  ])) {
-    const decoratorName = file.match(titleRegex)?.[1];
-    if (!decoratorName) {
-      throw new Error('Decorator title is missing');
+  const decoratorTests: DecoratorTest[] = [bodyTest, operationIdTest];
+
+  for (const decoratorTest of decoratorTests) {
+    for (const [decoratorType, test] of Object.entries(decoratorTest.tests)) {
+      if (test.expectation.possible) {
+        it(`should be possible to specify ${decoratorTest.name} on ${decoratorType}`, () => {
+          expect(test.expectation.yaml).toBeDefined();
+
+          test.controller();
+
+          const container = new Container();
+          const server = new InversifyExpressServer(container);
+          server.build();
+
+          expect(generateSpecAsYaml(container)).toBe(test.expectation.yaml);
+        });
+      }
     }
-
-    const decoratorType = file.match(titleRegex)?.[2];
-    if (!decoratorType) {
-      throw new Error('Decorator type is missing');
-    }
-
-    it(`should specify ${ucfirst(decoratorName)} on ${decoratorType}`, async () => {
-      const test = await import(file);
-      expect(test.expectedYaml).toBeDefined();
-      expect(test.TestController).toBeDefined();
-
-      const container = new Container();
-      const server = new InversifyExpressServer(container);
-      server.build();
-
-      expect(generateSpecAsYaml(container)).toBe(test.expectedYaml);
-    });
   }
 });
