@@ -861,28 +861,16 @@ We use [vitest](https://vitest.dev/) for testing. To ensure support for decorato
 
 ### Contribute
 
-ToDo
+Feel free to contribute your code.
 
 ## ToDo
 
 - [ ] De we need to provide clearMetadata for testing?
 - [ ] Make a package out of it
 - [ ] Check for the lowest compatible version of each peerDependency
-- [ ] What to do with inversify's all method? (and also check for other inversify decorators that are currently not supported)
 - [ ] Improve types of merge.ts (only allow property keys of the assumed property value that is needed for the function to work)
-- [ ] Parameters decorators should reflect types
-- [ ] Check response type if it is something other than void
-- [ ] OA v3.0
 - [ ] Remove reflect-metadata import from tests that do not rely on it
 - [ ] Changelog / PR CI system
 - [ ] Add jsdoc to decorators from oas v3.1 spec
-- [ ] webhooks callback via decorator?
 - [ ] Add type tests for decorators (und such things as examples, example, schema)
 - [ ] Move schema to be its own parameter for parameter decorators
-- [ ] DRY up decorator code
-- [ ] AllowReserved can only be applied to Query parameters, yet we allow it to be used on any parameter. This allows for invalid oas31 specification if used incorrectly.
-
-### Roadmap
-
-- [ ] Controller wide parameters: eg. cookie, header
-- [ ] Controller wide responses: eg. 500
