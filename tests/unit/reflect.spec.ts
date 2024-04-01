@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 import { Type } from '@sinclair/typebox';
+import { ParameterObject } from 'openapi3-ts/oas31';
 import { describe, expect, it } from 'vitest';
 import {
   CONTROLLER_METADATA_KEY,
@@ -8,12 +9,15 @@ import {
   addOperationMetadata,
   addParametersMetadata,
   addResponsesMetadata,
+  convertParameterMetadataToBodyMetadata,
+  createBodyMetadata,
   getControllerMetadata,
   getIndexByParameterIndex,
   getOperationMetadata,
   getOrCreateControllerMetadata,
   getOrCreateOperationMetadata,
   getParameterMetadata,
+  getTypeOfParameterIndex,
 } from '../../src/reflect';
 import { ControllerMetadata, OperationMetadata } from '../../src/type';
 
@@ -110,7 +114,7 @@ describe('reflect', () => {
           deprecated: true,
         },
       });
-      const retrievedUpdagtedMetadata = getControllerMetadata(TestController);
+      const retrievedUpdatedMetadata = getControllerMetadata(TestController);
       const expectedUpdatedMetadata: ControllerMetadata = {
         name: 'TestController',
         baseOperationObject: {
@@ -121,7 +125,7 @@ describe('reflect', () => {
       };
 
       expect(returnedUpdatedMetadata).toEqual(expectedUpdatedMetadata);
-      expect(retrievedUpdagtedMetadata).toEqual(expectedUpdatedMetadata);
+      expect(retrievedUpdatedMetadata).toEqual(expectedUpdatedMetadata);
     });
   });
 
@@ -264,6 +268,53 @@ describe('reflect', () => {
     });
   });
 
+  describe('getTypeOfParameterIndex', () => {
+    it('should return undefined if no metadata is found', () => {
+      expect(getTypeOfParameterIndex({}, 'test', 0)).toBeUndefined();
+    });
+
+    it('should return type for all parameters ', () => {
+      const parameters: ParameterObject[] = [
+        { name: 'test', in: 'query' },
+        { name: 'test2', in: 'path' },
+        { name: 'test3', in: 'header' },
+        { name: 'test4', in: 'cookie' },
+      ];
+
+      const TestController = class {};
+      const operationMetadata: OperationMetadata = {
+        name: 'test',
+        config: {},
+        operationObject: {
+          parameters,
+          responses: {},
+        },
+        parameterIndices: [0, 1, 2, 3],
+        bodyParameterIndex: 4,
+      };
+      const controllerMetadata: ControllerMetadata = {
+        name: 'TestController',
+        baseOperationObject: {},
+        operationMetadatas: [operationMetadata],
+      };
+
+      Reflect.defineMetadata(
+        CONTROLLER_METADATA_KEY,
+        controllerMetadata,
+        TestController,
+      );
+
+      for (let i = 0; i < parameters.length; i++) {
+        expect(
+          getTypeOfParameterIndex(new TestController(), 'test', i),
+        ).toEqual(parameters[i].in);
+      }
+      expect(getTypeOfParameterIndex(new TestController(), 'test', 4)).toEqual(
+        'body',
+      );
+    });
+  });
+
   describe('getIndexByParameterIndex', () => {
     it('should return undefined if no metadata is found', () => {
       expect(getIndexByParameterIndex({}, 'test', 0)).toBeUndefined();
@@ -295,6 +346,9 @@ describe('reflect', () => {
         TestController,
       );
 
+      expect(getIndexByParameterIndex(new TestController(), 'test', 3)).toEqual(
+        0,
+      );
       expect(getIndexByParameterIndex(new TestController(), 'test', 4)).toEqual(
         1,
       );
@@ -402,6 +456,52 @@ describe('reflect', () => {
     });
   });
 
+  describe('convertParameterMetadataToBodyMetadata', () => {
+    it('should convert parameter metadata to body metadata', () => {
+      const TestController = class {};
+      const testController = new TestController();
+
+      const schema = Type.Object({ name: Type.String() });
+
+      addParametersMetadata(
+        testController,
+        'test',
+        0,
+        {
+          schema,
+          example: { name: 'test' },
+        },
+        {
+          name: 'method',
+          in: 'query',
+        },
+      );
+
+      convertParameterMetadataToBodyMetadata(testController, 'test', 0);
+
+      const metadata = getOperationMetadata(testController, 'test');
+
+      expect(metadata).toStrictEqual({
+        bodyParameterIndex: 0,
+        config: {},
+        name: 'test',
+        operationObject: {
+          parameters: [],
+          requestBody: {
+            content: {
+              'application/json': {
+                schema,
+                example: { name: 'test' },
+              },
+            },
+          },
+          responses: {},
+        },
+        parameterIndices: [],
+      });
+    });
+  });
+
   describe('addBodyMetadata', () => {
     it('should add new metadata', () => {
       const TestController = class {};
@@ -409,7 +509,7 @@ describe('reflect', () => {
 
       const schema = Type.Object({ name: Type.String() });
 
-      addBodyMetadata(testController, 'test', { schema });
+      addBodyMetadata(testController, 'test', 0, { schema });
 
       const metadata = getOperationMetadata(testController, 'test');
 
@@ -434,7 +534,7 @@ describe('reflect', () => {
 
       const schema = Type.Object({ name: Type.String() });
 
-      addBodyMetadata(testController, 'test', { schema });
+      addBodyMetadata(testController, 'test', 0, { schema });
 
       const metadata = getOperationMetadata(testController, 'test');
 
@@ -454,7 +554,7 @@ describe('reflect', () => {
 
       const newSchema = Type.Object({ id: Type.Number(), name: Type.String() });
 
-      addBodyMetadata(testController, 'test', { schema: newSchema });
+      addBodyMetadata(testController, 'test', 0, { schema: newSchema });
 
       expect(metadata).toMatchObject({
         operationObject: {

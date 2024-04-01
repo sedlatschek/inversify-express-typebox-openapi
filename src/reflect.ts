@@ -8,6 +8,7 @@ import {
 } from 'openapi3-ts/oas31';
 import { mergeIntoOperation } from './merge';
 import {
+  BodyParameters,
   ControllerConfig,
   ControllerMetadata,
   OperationConfig,
@@ -150,6 +151,28 @@ export const addOperationMetadata = (
   return operationMetadata;
 };
 
+export const getTypeOfParameterIndex = (
+  target: object,
+  methodName: string | symbol,
+  parameterIndex: number,
+): ParameterLocation | 'body' | undefined => {
+  const operationMetadata = getOperationMetadata(target, methodName);
+
+  if (operationMetadata?.bodyParameterIndex === parameterIndex) {
+    return 'body';
+  }
+
+  const index = getIndexByParameterIndex(target, methodName, parameterIndex);
+  if (index !== undefined) {
+    const parameter = operationMetadata?.operationObject.parameters?.[index];
+    if (parameter && !isReferenceObject(parameter)) {
+      return parameter.in;
+    }
+  }
+
+  return undefined;
+};
+
 export const getIndexByParameterIndex = (
   target: object,
   methodName: string | symbol,
@@ -194,6 +217,12 @@ export const addParametersMetadata = <T extends TSchema>(
   parameters: Partial<ParameterParameters<T>>,
   metadata?: { name: string; in: ParameterLocation },
 ): void => {
+  // reroute if we already know its a body parameter
+  if (getTypeOfParameterIndex(target, methodName, parameterIndex) === 'body') {
+    addBodyMetadata(target, methodName, parameterIndex, parameters);
+    return;
+  }
+
   const operationMetadata = getOrCreateOperationMetadata(target, methodName);
 
   if (!operationMetadata.operationObject.parameters) {
@@ -235,10 +264,85 @@ export const addParametersMetadata = <T extends TSchema>(
   operationMetadata.operationObject.parameters[arrayIndex] = parameter;
 };
 
+export const convertParameterMetadataToBodyMetadata = (
+  target: object,
+  methodName: string | symbol,
+  parameterIndex: number,
+): void => {
+  const operationMetadata = getOperationMetadata(target, methodName);
+
+  if (!operationMetadata) {
+    throw new Error('Could not find operation metadata');
+  }
+
+  if (operationMetadata.bodyParameterIndex === parameterIndex) {
+    throw new Error('Parameter is already a body parameter');
+  }
+
+  const parameter = getParameterMetadata(target, methodName, parameterIndex);
+
+  if (!parameter) {
+    throw new Error(
+      `Could not find parameter at index ${parameterIndex} in operation metadata`,
+    );
+  }
+
+  const arrayIndex = getIndexByParameterIndex(
+    target,
+    methodName,
+    parameterIndex,
+  );
+  if (arrayIndex === undefined) {
+    throw new Error(
+      `Could not find array index of parameter index ${parameterIndex} in operation metadata`,
+    );
+  }
+  operationMetadata.operationObject.parameters?.splice(arrayIndex, 1);
+  operationMetadata.parameterIndices.splice(arrayIndex, 1);
+
+  operationMetadata.bodyParameterIndex = parameterIndex;
+
+  const { schema, example, examples } = parameter;
+
+  operationMetadata.operationObject.requestBody = {
+    content: {
+      'application/json': {
+        ...(schema !== undefined && { schema }),
+        ...(example !== undefined && { example }),
+        ...(examples !== undefined && { examples }),
+      },
+    },
+  };
+};
+
 export const addBodyMetadata = <T extends TSchema>(
   target: object,
   methodName: string | symbol,
-  parameters: ParameterParameters<T>,
+  parameterIndex: number,
+  parameters: BodyParameters<T>,
+): void => {
+  const metadata = getOrCreateOperationMetadata(target, methodName);
+
+  // Since we can not tell from decorators such as Example whether the parameter
+  // is a body or any other parameter, the example may ends up in the parameters
+  // array. Therefore we need to check if the parameter is already defined in
+  // the parameters array and move it to the requestBody object.
+  if (metadata.parameterIndices.includes(parameterIndex)) {
+    convertParameterMetadataToBodyMetadata(target, methodName, parameterIndex);
+  }
+
+  if (metadata.operationObject.requestBody) {
+    updateBodyMetadata(target, methodName, parameters);
+  } else {
+    createBodyMetadata(target, methodName, parameterIndex, parameters);
+  }
+};
+
+export const createBodyMetadata = <T extends TSchema>(
+  target: object,
+  methodName: string | symbol,
+  parameterIndex: number,
+  parameters: BodyParameters<T>,
 ): void => {
   const metadata = getOrCreateOperationMetadata(target, methodName);
 
@@ -248,12 +352,37 @@ export const addBodyMetadata = <T extends TSchema>(
     ...properties,
     content: {
       'application/json': {
-        schema,
-        example,
-        examples,
+        ...(schema !== undefined && { schema }),
+        ...(example !== undefined && { example }),
+        ...(examples !== undefined && { examples }),
       },
     },
   };
+  metadata.bodyParameterIndex = parameterIndex;
+};
+
+export const updateBodyMetadata = <T extends TSchema>(
+  target: object,
+  methodName: string | symbol,
+  parameters: BodyParameters<T>,
+): void => {
+  const metadata = getOrCreateOperationMetadata(target, methodName);
+
+  if (!metadata.operationObject.requestBody) {
+    throw new Error('Could not find request body in operation metadata');
+  }
+
+  if (isReferenceObject(metadata.operationObject.requestBody)) {
+    throw new Error('Request body is a reference object');
+  }
+
+  const { schema, example, examples, ...properties } = parameters;
+
+  updateDefinedProperties(metadata.operationObject.requestBody, properties);
+  updateDefinedProperties(
+    metadata.operationObject.requestBody.content['application/json'],
+    { schema, example, examples },
+  );
 };
 
 export const addResponsesMetadata = <T extends TSchema>(

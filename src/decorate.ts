@@ -167,7 +167,7 @@ export const Body = <
     if (!propertyKey) {
       throw new Error('Body decorator can only be used on parameters');
     }
-    addBodyMetadata(target, propertyKey, parameters);
+    addBodyMetadata(target, propertyKey, parameterIndex, parameters);
     requestBody()(target, propertyKey, parameterIndex);
   };
 };

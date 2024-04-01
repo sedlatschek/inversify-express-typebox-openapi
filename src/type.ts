@@ -29,6 +29,7 @@ export type OperationConfig = {
 export type OperationMetadata = {
   name: string;
   parameterIndices: number[];
+  bodyParameterIndex?: number;
   config: OperationConfig;
   operationObject: OperationObject;
 };
@@ -47,12 +48,16 @@ export type ExamplesObjectOf<T> = {
 };
 
 export type BodyParameters<T extends TSchema> = {
-  schema: T;
+  schema?: T;
   example?: Static<T>;
   examples?: ExamplesObjectOf<Static<T>>;
-} & Omit<BaseParameterObject, 'schema' | 'example' | 'examples' | 'content'>;
+};
 
-export type ParameterParameters<T extends TSchema> = BodyParameters<T>;
+export type ParameterParameters<T extends TSchema> = Omit<
+  BaseParameterObject,
+  'schema' | 'example' | 'examples'
+> &
+  BodyParameters<T>;
 
 export type ResponseParameters<T extends TSchema> = {
   content?: MediaTypeObjectOf<T>;
