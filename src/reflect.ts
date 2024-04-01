@@ -227,7 +227,11 @@ export const addParametersMetadata = <T extends TSchema>(
     );
   }
 
-  updateDefinedProperties(parameter, { ...parameters, ...calculatedProps });
+  updateDefinedProperties(parameter, {
+    ...metadata,
+    ...parameters,
+    ...calculatedProps,
+  });
   operationMetadata.operationObject.parameters[arrayIndex] = parameter;
 };
 
