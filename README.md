@@ -387,6 +387,24 @@ class ExampleController {
 }
 ```
 
+#### Query
+
+Specify a query parameter.
+
+| Controller | Method | Parameter |
+| :--------: | :----: | :-------: |
+|     ❌     |   ❌   |    ✅     |
+
+```ts
+// ...
+class ExampleController {
+  // ...
+  public getUsers(@Query('query', schema: Type.String()) query: string) {
+    // ...
+  }
+}
+```
+
 #### Security
 
 | Controller | Method | Parameter |

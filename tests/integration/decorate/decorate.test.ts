@@ -9,6 +9,7 @@ import { generateSpecAsYaml } from '../../../src';
 import bodyTest from './body';
 import operationIdTest from './operationId';
 import pathTest from './path';
+import queryTest from './query';
 
 export type DecoratorSpecification = {
   controller: () => void;
@@ -32,7 +33,12 @@ describe('decorate', async () => {
     cleanUpMetadata();
   });
 
-  const decoratorTests: DecoratorTest[] = [bodyTest, operationIdTest, pathTest];
+  const decoratorTests: DecoratorTest[] = [
+    bodyTest,
+    operationIdTest,
+    pathTest,
+    queryTest,
+  ];
 
   for (const decoratorTest of decoratorTests) {
     for (const [decoratorType, test] of Object.entries(decoratorTest.tests)) {

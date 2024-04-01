@@ -1,14 +1,14 @@
 import { Type } from '@sinclair/typebox';
 import { basename } from 'path';
-import { Controller, Get, Path } from '../../../src';
+import { Controller, Get, Query } from '../../../src';
 import { ucfirst } from '../../../src/utilize';
 import { DecoratorSpecification, DecoratorTest } from './decorate.test';
 
 const controller: DecoratorSpecification = {
   controller: () => {
     @Controller('/')
-    // @ts-expect-error: Path can not be used on controllers
-    @Path({ schema: Type.String() })
+    // @ts-expect-error: Query can not be used on controllers
+    @Query({ schema: Type.String() })
     class TestController {
       @Get('/')
       public get(): void {}
@@ -26,8 +26,8 @@ const method: DecoratorSpecification = {
     @Controller('/')
     class TestController {
       @Get('/')
-      // @ts-expect-error: Path can not be used on methods
-      @Path({ schema: Type.String() })
+      // @ts-expect-error: Query can not be used on methods
+      @Query({ schema: Type.String() })
       public get(): void {}
     }
 
@@ -42,8 +42,10 @@ const parameter: DecoratorSpecification = {
   controller: () => {
     @Controller('/')
     class TestController {
-      @Get('/{id}')
-      public get(@Path('id', { schema: Type.String() }) _id: string): void {}
+      @Get('/')
+      public get(
+        @Query('query', { schema: Type.String() }) _query: string,
+      ): void {}
     }
     return () => new TestController();
   },
@@ -54,12 +56,12 @@ info:
   title: app
   version: version
 paths:
-  /{id}:
+  /:
     get:
       responses: {}
       parameters:
-        - name: id
-          in: path
+        - name: query
+          in: query
           schema:
             type: string
           required: true
