@@ -18,6 +18,7 @@ import descriptionTest from './description';
 import exampleTest from './example';
 import examplesTest from './examples';
 import explodeTest from './explode';
+import externalDocsTest from './externalDocs';
 import getTest from './get';
 import headTest from './head';
 import headerTest from './header';
@@ -62,6 +63,7 @@ describe('decorate', async () => {
     exampleTest,
     examplesTest,
     explodeTest,
+    externalDocsTest,
     getTest,
     headTest,
     headerTest,

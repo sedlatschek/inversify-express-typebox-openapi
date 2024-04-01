@@ -383,12 +383,41 @@ class ExampleController {
 Specify external documentation.
 
 ```ts
+// ...
+@ExternalDocs({
+  description: 'Official documentation',
+  url: 'https://example.org',
+})
 class ExampleController {
+  // ...
+  public getUsers() {
+    // ....
+  }
+}
+
+// ...
+class ExampleController {
+  // ...
   @ExternalDocs({
     description: 'Official documentation',
     url: 'https://example.org',
   })
   public getUsers() {
+    // ....
+  }
+}
+
+// ...
+class ExampleController {
+  // ...
+  public getUser(
+    @ExternalDocs({
+      description: 'Official documentation',
+      url: 'https://example.org',
+    })
+    @Path('id', { schema: Type.String() }))
+    id: string
+  {
     // ....
   }
 }
