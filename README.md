@@ -20,7 +20,141 @@ npm install inversify-express-typebox-openapi
 
 ### Example
 
-ToDo
+```ts
+export enum UserState {
+  Active = 'active',
+  Inactive = 'inactive',
+  Pending = 'pending',
+}
+
+export const userStateSchema = Type.Enum(UserState, { $id: 'UserState' });
+
+export const userSchema = Type.Object(
+  {
+    id: Type.Number(),
+    name: Type.String(),
+    email: Type.String({}),
+    createdAt: Type.String({ format: 'date-time' }),
+    state: userStateSchema,
+  },
+  { $id: 'User' },
+);
+
+export type User = Static<typeof userSchema>;
+
+@Controller('/users')
+@Tags('User')
+@Security({ bearerAuth: ['read:user'] })
+export class TestOaController310User extends BaseHttpController {
+  @Get('me')
+  @Response(200, {
+    description: 'The user from the session',
+    content: { schema: userSchema },
+  })
+  @Response(401, { description: 'Unauthorized' })
+  @Security({ bearerAuth: ['read:session'] })
+  public getUserFromSession(
+    @response() res: ExpressResponse,
+    @Cookie('sessionId', { schema: Type.String() }) sessionId: string,
+  ): void {
+    // ...
+  }
+
+  @Get('/')
+  @Response(200, {
+    description: 'List of all users',
+    content: { schema: Type.Array(userSchema) },
+  })
+  @OperationId('getAllUsers')
+  public get(
+    @Query('state', { schema: Type.Optional(userStateSchema) })
+    userState?: UserState,
+    @Header('Accept-Language', {
+      schema: Type.Optional(Type.String()),
+      description: 'Falls back to english if not provided',
+    })
+    _acceptLanguage?: string,
+  ): User[] {
+    // ...
+  }
+
+  @Deprecated()
+  @Get('/active')
+  @Response(200, {
+    description: 'List of all active users',
+    content: { schema: Type.Array(userSchema) },
+  })
+  public getAllActiveUsers(): User[] {
+    // ...
+  }
+
+  @Get('/:userId')
+  @Response(200, {
+    description: 'The requested user',
+    content: { schema: userSchema },
+  })
+  @Response(404, { description: 'User not found' })
+  public getUserById(
+    @Path('userId', { schema: Type.Number() }) userId: number,
+    @response() res: ExpressResponse,
+    @Header('Accept-Language', { schema: Type.Optional(Type.String()) })
+    _acceptLanguage?: string,
+  ): void {
+    // ...
+  }
+
+  @Post('/')
+  @Response(201, {
+    description: 'The created user',
+    content: { schema: userSchema },
+  })
+  @Security({ bearerAuth: ['write:user'] })
+  public createUser(
+    @Body({ schema: userSchema }) user: User,
+    @response() res: ExpressResponse,
+  ): void {
+    // ...
+  }
+
+  @Put('/:userId')
+  @Response(200, { description: 'The updated user' })
+  @Response(404, { description: 'User not found' })
+  @Security({ bearerAuth: ['write:user'] })
+  public updateUser(
+    @Path('userId', { schema: Type.Number() }) userId: number,
+    @Body({ schema: userSchema }) user: User,
+    @response() res: ExpressResponse,
+  ): void {
+    // ...
+  }
+
+  @Patch('/:userId/state')
+  @Response(200, {
+    description: 'The updated user',
+    content: { schema: userSchema },
+  })
+  @Response(404, { description: 'User not found' })
+  @Security({ bearerAuth: ['write:user'] })
+  public patchUserState(
+    @Path('userId', { schema: Type.Number() }) userId: number,
+    @Body({ schema: userStateSchema }) userState: UserState,
+    @response() res: ExpressResponse,
+  ): void {
+    // ...
+  }
+
+  @Delete('/:userId')
+  @Response(204, { description: 'User deleted' })
+  @Response(404, { description: 'User not found' })
+  @Security({ bearerAuth: ['delete:user'] })
+  public deleteUser(
+    @Path('userId', { schema: Type.Number() }) userId: number,
+    @response() res: ExpressResponse,
+  ): void {
+    // ...
+  }
+}
+```
 
 ### References
 
@@ -731,26 +865,24 @@ ToDo
 
 ## ToDo
 
-- [ ] provide clearMetadata for testing
-- [ ] Readme (docs)
-- [ ] make a package out of it
-- [ ] check for the lowest compatible version of each peerDependency
-- [ ] inversify all? (and also check for other inversify decorators that are currently not supported)
-- [ ] ignore decorator for controller, methods and parameters
-- [ ] improve types of merge.ts (only allow property keys of the assumed property value that is needed for the function to work)
-- [ ] parameters decorators should reflect types
-- [ ] check response type if it is something other than void
+- [ ] De we need to provide clearMetadata for testing?
+- [ ] Make a package out of it
+- [ ] Check for the lowest compatible version of each peerDependency
+- [ ] What to do with inversify's all method? (and also check for other inversify decorators that are currently not supported)
+- [ ] Improve types of merge.ts (only allow property keys of the assumed property value that is needed for the function to work)
+- [ ] Parameters decorators should reflect types
+- [ ] Check response type if it is something other than void
 - [ ] OA v3.0
-- [ ] remove reflect-metadata import from tests that do not rely on it
-- [ ] Changelog
-- [ ] add jsdoc to decorators from oas v3.1 spec
+- [ ] Remove reflect-metadata import from tests that do not rely on it
+- [ ] Changelog / PR CI system
+- [ ] Add jsdoc to decorators from oas v3.1 spec
 - [ ] webhooks callback via decorator?
-- [ ] add type tests for decorators (und such things as examples, example, schema)
-- [ ] move schema to be its own parameter for parameter decorators
+- [ ] Add type tests for decorators (und such things as examples, example, schema)
+- [ ] Move schema to be its own parameter for parameter decorators
 - [ ] DRY up decorator code
 - [ ] AllowReserved can only be applied to Query parameters, yet we allow it to be used on any parameter. This allows for invalid oas31 specification if used incorrectly.
 
 ### Roadmap
 
-- [ ] controller wide parameters: eg. cookie, header
-- [ ] controller wide responses: eg. 500
+- [ ] Controller wide parameters: eg. cookie, header
+- [ ] Controller wide responses: eg. 500
