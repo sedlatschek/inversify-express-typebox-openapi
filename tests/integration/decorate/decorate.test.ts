@@ -15,6 +15,7 @@ import cookieTest from './cookie';
 import deleteTest from './delete';
 import deprecatedTest from './deprecated';
 import descriptionTest from './description';
+import exampleTest from './example';
 import getTest from './get';
 import headTest from './head';
 import headerTest from './header';
@@ -56,6 +57,7 @@ describe('decorate', async () => {
     deleteTest,
     deprecatedTest,
     descriptionTest,
+    exampleTest,
     getTest,
     headTest,
     headerTest,
