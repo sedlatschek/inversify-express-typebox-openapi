@@ -18,8 +18,9 @@ import {
 } from './type';
 import { hasValues, updateDefinedProperties } from './utilize';
 
-export const CONTROLLER_METADATA_KEY =
-  'inversify-express-typebox-openapi:controller';
+export const CONTROLLER_METADATA_KEY = Symbol(
+  'inversify-express-typebox-openapi:controller',
+);
 
 export const getControllerMetadata = (
   // eslint-disable-next-line @typescript-eslint/ban-types
