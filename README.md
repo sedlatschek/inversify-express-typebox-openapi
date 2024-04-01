@@ -369,6 +369,24 @@ class ExampleController {
 }
 ```
 
+#### Path
+
+Specify a path parameter.
+
+| Controller | Method | Parameter |
+| :--------: | :----: | :-------: |
+|     ❌     |   ❌   |    ✅     |
+
+```ts
+// ...
+class ExampleController {
+  @Get('/users/{userId}')
+  public getUser(@Path('userId', schema: Type.String()) userId: string) {
+    // ...
+  }
+}
+```
+
 #### Security
 
 | Controller | Method | Parameter |

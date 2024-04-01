@@ -8,6 +8,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { generateSpecAsYaml } from '../../../src';
 import bodyTest from './body';
 import operationIdTest from './operationId';
+import pathTest from './path';
 
 export type DecoratorSpecification = {
   controller: () => void;
@@ -31,7 +32,7 @@ describe('decorate', async () => {
     cleanUpMetadata();
   });
 
-  const decoratorTests: DecoratorTest[] = [bodyTest, operationIdTest];
+  const decoratorTests: DecoratorTest[] = [bodyTest, operationIdTest, pathTest];
 
   for (const decoratorTest of decoratorTests) {
     for (const [decoratorType, test] of Object.entries(decoratorTest.tests)) {
