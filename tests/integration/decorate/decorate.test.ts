@@ -9,6 +9,7 @@ import { generateSpecAsYaml } from '../../../src';
 import bodyTest from './body';
 import cookieTest from './cookie';
 import getTest from './get';
+import headTest from './head';
 import headerTest from './header';
 import operationIdTest from './operationId';
 import patchTest from './patch';
@@ -43,6 +44,7 @@ describe('decorate', async () => {
     bodyTest,
     cookieTest,
     getTest,
+    headTest,
     headerTest,
     operationIdTest,
     patchTest,

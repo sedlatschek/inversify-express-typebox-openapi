@@ -372,6 +372,24 @@ class ExampleController {
 }
 ```
 
+#### Head
+
+| Controller | Method | Parameter |
+| :--------: | :----: | :-------: |
+|     ❌     |   ✅   |    ❌     |
+
+Specify a head method.
+
+```ts
+// ...
+class ExampleController {
+  @Head('/file/xyz.zip')
+  public download() {
+    // ....
+  }
+}
+```
+
 #### Header
 
 | Controller | Method | Parameter |
