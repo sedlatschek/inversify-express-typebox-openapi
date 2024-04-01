@@ -354,6 +354,24 @@ class ExampleController {
 }
 ```
 
+#### Get
+
+| Controller | Method | Parameter |
+| :--------: | :----: | :-------: |
+|     ❌     |   ✅   |    ❌     |
+
+Specify a get method.
+
+```ts
+// ...
+class ExampleController {
+  @Get('/users')
+  public getUsers() {
+    // ....
+  }
+}
+```
+
 #### Header
 
 | Controller | Method | Parameter |
