@@ -654,7 +654,9 @@ Multiple `@Security` decorators onto one controller/method extend the requiremen
 Describes how the parameter value will be serialized depending on the type of the parameter value.
 
 ```ts
+// ...
 class ExampleController {
+  // ...
   public getUser(
     @Style('simple') @Path('userId', Type.String()) status: string,
   ) {
@@ -666,7 +668,9 @@ class ExampleController {
 This can also be achieved through any of the parameter decorators:
 
 ```ts
+// ...
 class ExampleController {
+  // ...
   public getUser(
     @Path('userId', Type.String(), { style: 'simple' }) status: string,
   ) {
