@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import { readFile } from 'fs/promises';
 import { Container } from 'inversify';
 import { InversifyExpressServer } from 'inversify-express-utils';

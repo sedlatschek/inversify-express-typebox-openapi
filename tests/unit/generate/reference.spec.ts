@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import { Kind, TSchema, Type } from '@sinclair/typebox';
 import {
   ComponentsObject,

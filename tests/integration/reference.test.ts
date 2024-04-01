@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import { Static, Type } from '@sinclair/typebox';
 import {
   CallbackObject,
