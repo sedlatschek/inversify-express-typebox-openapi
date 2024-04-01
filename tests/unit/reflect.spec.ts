@@ -10,7 +10,6 @@ import {
   addParametersMetadata,
   addResponsesMetadata,
   convertParameterMetadataToBodyMetadata,
-  createBodyMetadata,
   getControllerMetadata,
   getIndexByParameterIndex,
   getOperationMetadata,
