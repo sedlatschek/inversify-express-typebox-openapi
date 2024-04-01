@@ -634,11 +634,15 @@ Use `default` instead of an HTTP status code for a default error response.
 Specify the security requirements for a method.
 
 ```ts
+// ...
 @Security({ securityScheme: ['scopeA', 'scopeB'] })
-class ExampleController {}
+class ExampleController {
+  // ...
+}
 ```
 
 When used on a controller, it is applied to each of its methods.
+
 Multiple `@Security` decorators onto one controller/method extend the requirements.
 
 #### Style
