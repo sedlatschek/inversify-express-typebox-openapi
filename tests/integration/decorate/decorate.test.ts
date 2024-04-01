@@ -31,6 +31,7 @@ import queryTest from './query';
 import responseTest from './response';
 import securityTest from './security';
 import styleTest from './style';
+import summaryTest from './summary';
 
 export type DecoratorSpecification = {
   controller: () => void;
@@ -78,6 +79,7 @@ describe('decorate', async () => {
     responseTest,
     securityTest,
     styleTest,
+    summaryTest,
   ];
 
   for (const decoratorTest of decoratorTests) {

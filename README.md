@@ -688,7 +688,9 @@ class ExampleController {
 Specify a summary for an operation.
 
 ```ts
+// ...
 class ExampleController {
+  // ....
   @Summary('Retrieves all the users form the database')
   public getUser() {
     // ....
