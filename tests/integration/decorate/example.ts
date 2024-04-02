@@ -41,12 +41,12 @@ const parameter: DecoratorSpecification = {
       @Post('/users')
       public createUser(
         @Example({ name: 'example' })
-        @Body({ schema: Type.Object({ name: Type.String() }) })
+        @Body(Type.Object({ name: Type.String() }))
         _userDto: {
           name: string;
         },
         @Example('PUSH')
-        @Query('mode', { schema: Type.Optional(Type.String()) })
+        @Query('mode', Type.Optional(Type.String()))
         _mode?: string,
       ): void {}
     }

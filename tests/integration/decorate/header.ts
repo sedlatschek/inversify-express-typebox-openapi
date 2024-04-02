@@ -41,9 +41,7 @@ const parameter: DecoratorSpecification = {
     @Controller('/')
     class TestController {
       @Get('/')
-      public get(
-        @Header('Header', { schema: Type.String() }) _header: string,
-      ): void {}
+      public get(@Header('Header', Type.String()) _header: string): void {}
     }
     return () => new TestController();
   },

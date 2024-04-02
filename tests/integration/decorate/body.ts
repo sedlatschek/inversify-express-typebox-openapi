@@ -43,9 +43,7 @@ const parameter: DecoratorSpecification = {
     @Controller('/')
     class TestController {
       @Get('/')
-      public get(
-        @Body({ schema: bodySchema }) _body: Static<typeof bodySchema>,
-      ): void {}
+      public get(@Body(bodySchema) _body: Static<typeof bodySchema>): void {}
     }
     return () => new TestController();
   },

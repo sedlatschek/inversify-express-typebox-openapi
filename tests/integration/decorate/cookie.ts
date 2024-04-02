@@ -41,9 +41,7 @@ const parameter: DecoratorSpecification = {
     @Controller('/')
     class TestController {
       @Get('/')
-      public get(
-        @Cookie('Cookie', { schema: Type.String() }) _cookie: string,
-      ): void {}
+      public get(@Cookie('Cookie', Type.String()) _cookie: string): void {}
     }
     return () => new TestController();
   },

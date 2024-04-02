@@ -41,7 +41,7 @@ const parameter: DecoratorSpecification = {
     @Controller('/')
     class TestController {
       @Get('/{id}')
-      public get(@Path('id', { schema: Type.String() }) _id: string): void {}
+      public get(@Path('id', Type.String()) _id: string): void {}
     }
     return () => new TestController();
   },

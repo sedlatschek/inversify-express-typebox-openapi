@@ -40,7 +40,7 @@ const parameter: DecoratorSpecification = {
     class TestController {
       @Get('/')
       public get(
-        @Query('ids', { schema: Type.Array(Type.String()) })
+        @Query('ids', Type.Array(Type.String()))
         @Explode()
         _q: string,
       ): void {}

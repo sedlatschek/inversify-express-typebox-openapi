@@ -18,7 +18,7 @@ export class TestOaController310DeprecatedPosting {
     content: { schema: Type.String() },
   })
   public createPosting(
-    @Body({ schema: postingSchema })
+    @Body(postingSchema)
     postingDto: Posting,
     @response() res: express.Response,
   ): void {

@@ -60,9 +60,7 @@ const parameter: DecoratorSpecification = {
     @Controller('/')
     class TestController {
       @Get('/')
-      public get(
-        @Deprecated() @Query('q', { schema: Type.String() }) _q: string,
-      ): void {}
+      public get(@Deprecated() @Query('q', Type.String()) _q: string): void {}
     }
     return () => new TestController();
   },

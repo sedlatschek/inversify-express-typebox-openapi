@@ -77,7 +77,7 @@ const parameter: DecoratorSpecification = {
           url: 'https://example.org/docs.md',
           description: 'External Docs',
         })
-        @Query('q', { schema: Type.String() })
+        @Query('q', Type.String())
         _q: string,
       ): void {}
     }

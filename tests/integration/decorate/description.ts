@@ -61,7 +61,7 @@ const parameter: DecoratorSpecification = {
     class TestController {
       @Get('/')
       public get(
-        @Description('test') @Query('q', { schema: Type.String() }) _q: string,
+        @Description('test') @Query('q', Type.String()) _q: string,
       ): void {}
     }
     return () => new TestController();

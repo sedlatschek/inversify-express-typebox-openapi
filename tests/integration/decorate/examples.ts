@@ -44,7 +44,7 @@ const parameter: DecoratorSpecification = {
           admin: { value: { name: 'admin' } },
           guest: { value: { name: 'guest' } },
         })
-        @Body({ schema: Type.Object({ name: Type.String() }) })
+        @Body(Type.Object({ name: Type.String() }))
         _userDto: {
           name: string;
         },
@@ -52,7 +52,7 @@ const parameter: DecoratorSpecification = {
           push: { value: 'PUSH' },
           wait: { value: 'WAIT' },
         })
-        @Query('mode', { schema: Type.Optional(Type.String()) })
+        @Query('mode', Type.Optional(Type.String()))
         _mode?: string,
       ): void {}
     }

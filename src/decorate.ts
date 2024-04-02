@@ -105,7 +105,8 @@ const parameterDecoratorFactory = (
   TTSchema extends TSchema,
 >(
   name: string,
-  parameters: ParameterParameters<TTSchema>,
+  schema: TTSchema,
+  parameters?: ParameterParameters<TTSchema>,
 ) => (
   target: TTarget,
   methodName: TPropertyKey,
@@ -118,7 +119,8 @@ const parameterDecoratorFactory = (
     TTSchema extends TSchema,
   >(
     name: string,
-    parameters: ParameterParameters<TTSchema>,
+    schema: TTSchema,
+    parameters?: ParameterParameters<TTSchema>,
   ): ((
     target: TTarget,
     methodName: TPropertyKey,
@@ -133,10 +135,16 @@ const parameterDecoratorFactory = (
         !!methodName,
         `${ucfirst(type)} decorator can only be used on parameters`,
       );
-      addParametersMetadata(target, methodName, parameterIndex, parameters, {
-        name,
-        in: type,
-      });
+      addParametersMetadata(
+        target,
+        methodName,
+        parameterIndex,
+        { schema, ...parameters },
+        {
+          name,
+          in: type,
+        },
+      );
       inversifyParameterDecorator(name)(target, methodName, parameterIndex);
     };
   };
@@ -151,9 +159,10 @@ export const Body = <
   TTarget extends object,
   TPropertyKey extends string | symbol | undefined,
   TParameterIndex extends number,
-  TSchemaType extends TSchema,
+  TTSchema extends TSchema,
 >(
-  parameters: ParameterParameters<TSchemaType>,
+  schema: TTSchema,
+  parameters?: ParameterParameters<TTSchema>,
 ): ((
   target: TTarget,
   propertyKey: TPropertyKey,
@@ -165,7 +174,10 @@ export const Body = <
     parameterIndex: TParameterIndex,
   ) => {
     assert(!!propertyKey, 'Body decorator can only be used on parameters');
-    addBodyMetadata(target, propertyKey, parameterIndex, parameters);
+    addBodyMetadata(target, propertyKey, parameterIndex, {
+      schema,
+      ...parameters,
+    });
     requestBody()(target, propertyKey, parameterIndex);
   };
 };

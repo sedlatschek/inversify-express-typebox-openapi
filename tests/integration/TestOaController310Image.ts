@@ -56,7 +56,7 @@ export class TestOaController310Image {
     content: { schema: imageSchema },
   })
   public createImage(
-    @Body({ schema: imageSchema, examples: { imageExample1 } }) image: Image,
+    @Body(imageSchema, { examples: { imageExample1 } }) image: Image,
     @response() res: express.Response,
   ): void {
     images.push(image);
@@ -64,13 +64,16 @@ export class TestOaController310Image {
   }
 
   @Put('/:imageId', 'Update a existing image')
-  @Response(200, { content: { schema: imageSchema } })
+  @Response(200, {
+    description: 'Image updated',
+    content: { schema: imageSchema },
+  })
   @Response(404, { description: 'Image not found' })
   public updateImage(
     @Description("The image's id")
-    @Path('imageId', { schema: Type.Number() })
+    @Path('imageId', Type.Number())
     imageId: number,
-    @Body({ schema: imageSchema, examples: { imageExample1 } })
+    @Body(imageSchema, { examples: { imageExample1 } })
     image: Image,
     @response() res: express.Response,
   ): void {
@@ -89,7 +92,7 @@ export class TestOaController310Image {
   @Response(404, { description: 'Image not found' })
   @OperationId('deleteImage')
   public del(
-    @Path('imageId', { schema: Type.Number(), description: 'The image id' })
+    @Path('imageId', Type.Number(), { description: 'The image id' })
     imageId: number,
     @response() res: express.Response,
   ): void {

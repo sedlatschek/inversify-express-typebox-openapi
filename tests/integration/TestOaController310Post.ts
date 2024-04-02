@@ -65,8 +65,7 @@ export class TestOaController310Post {
     content: { schema: postSchema },
   })
   public createPost(
-    @Body({
-      schema: postSchema,
+    @Body(postSchema, {
       description: 'A new post',
       examples: { postExample },
     })
@@ -84,9 +83,8 @@ export class TestOaController310Post {
   })
   @Response(404, { description: 'Post not found' })
   public updatePost(
-    @Path('postId', { schema: Type.Number() }) postId: number,
-    @Body({
-      schema: postSchema,
+    @Path('postId', Type.Number()) postId: number,
+    @Body(postSchema, {
       description: 'The post dto',
       examples: { postExample },
     })
@@ -107,7 +105,7 @@ export class TestOaController310Post {
   @Response(404, { description: 'Post not found' })
   @OperationId('deletePost')
   public del(
-    @Path('postId', { schema: Type.Number(), description: 'The post id' })
+    @Path('postId', Type.Number(), { description: 'The post id' })
     postId: number,
     @response() res: express.Response,
   ): void {

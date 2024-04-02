@@ -75,7 +75,7 @@ export class TestOaController310User extends BaseHttpController {
   @Security({ basicAuth: ['user'] })
   public getUserFromSession(
     @response() res: ExpressResponse,
-    @Cookie('sessionId', { schema: Type.String() }) sessionId: string,
+    @Cookie('sessionId', Type.String()) sessionId: string,
   ): void {
     if (sessionId) {
       res.send(users[0]);
@@ -91,10 +91,9 @@ export class TestOaController310User extends BaseHttpController {
   })
   @OperationId('getAllUsers')
   public get(
-    @Query('state', { schema: Type.Optional(userStateSchema) })
+    @Query('state', Type.Optional(userStateSchema))
     userState?: UserState,
-    @Header('Accept-Language', {
-      schema: Type.Optional(Type.String()),
+    @Header('Accept-Language', Type.Optional(Type.String()), {
       description: 'Falls back to english if not provided',
     })
     _acceptLanguage?: string,
@@ -122,9 +121,9 @@ export class TestOaController310User extends BaseHttpController {
   })
   @Response(404, { description: 'User not found' })
   public getUserById(
-    @Path('userId', { schema: Type.Number() }) userId: number,
+    @Path('userId', Type.Number()) userId: number,
     @response() res: ExpressResponse,
-    @Header('Accept-Language', { schema: Type.Optional(Type.String()) })
+    @Header('Accept-Language', Type.Optional(Type.String()))
     _acceptLanguage?: string,
   ): void {
     const user = users.find((user) => user.id === userId);
@@ -143,7 +142,7 @@ export class TestOaController310User extends BaseHttpController {
     content: { schema: userSchema },
   })
   public createUser(
-    @Body({ schema: userSchema }) user: User,
+    @Body(userSchema) user: User,
     @response() res: ExpressResponse,
   ): void {
     users.push(user);
@@ -154,8 +153,8 @@ export class TestOaController310User extends BaseHttpController {
   @Response(200, { description: 'The updated user' })
   @Response(404, { description: 'User not found' })
   public updateUser(
-    @Path('userId', { schema: Type.Number() }) userId: number,
-    @Body({ schema: userSchema }) user: User,
+    @Path('userId', Type.Number()) userId: number,
+    @Body(userSchema) user: User,
     @response() res: ExpressResponse,
   ): void {
     const index = users.findIndex((user) => user.id === userId);
@@ -176,8 +175,8 @@ export class TestOaController310User extends BaseHttpController {
   })
   @Response(404, { description: 'User not found' })
   public patchUserState(
-    @Path('userId', { schema: Type.Number() }) userId: number,
-    @Body({ schema: userStateSchema }) userState: UserState,
+    @Path('userId', Type.Number()) userId: number,
+    @Body(userStateSchema) userState: UserState,
     @response() res: ExpressResponse,
   ): void {
     const user = users.find((user) => user.id === userId);
@@ -195,7 +194,7 @@ export class TestOaController310User extends BaseHttpController {
   @Response(204, { description: 'User deleted' })
   @Response(404, { description: 'User not found' })
   public deleteUser(
-    @Path('userId', { schema: Type.Number() }) userId: number,
+    @Path('userId', Type.Number()) userId: number,
     @response() res: ExpressResponse,
   ): void {
     const index = users.findIndex((user) => user.id === userId);
@@ -216,8 +215,8 @@ export class TestOaController310User extends BaseHttpController {
   })
   @Tags('Posts')
   public getUserPosts(
-    @Path('userId', { schema: Type.Number() }) userId: number,
-    @Header('Accept-Language', { schema: Type.Optional(Type.String()) })
+    @Path('userId', Type.Number()) userId: number,
+    @Header('Accept-Language', Type.Optional(Type.String()))
     _acceptLanguage?: string,
   ): PostType[] {
     return posts.filter((post) => post.userId === userId);

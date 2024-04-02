@@ -215,7 +215,7 @@ export const addParametersMetadata = <T extends TSchema>(
   target: object,
   methodName: string | symbol,
   parameterIndex: number,
-  parameters: Partial<ParameterParameters<T>>,
+  parameters: Partial<ParameterParameters<T> & { schema: T }>,
   metadata?: { name: string; in: ParameterLocation },
 ): void => {
   // reroute if we already know its a body parameter

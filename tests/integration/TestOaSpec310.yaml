@@ -388,6 +388,7 @@ paths:
     put:
       responses:
         "200":
+          description: Image updated
           content:
             application/json:
               schema:

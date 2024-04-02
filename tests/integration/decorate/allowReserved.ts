@@ -41,7 +41,7 @@ const parameter: DecoratorSpecification = {
       @Get('/')
       public get(
         @AllowReserved()
-        @Query('tuple', { schema: Type.String() })
+        @Query('tuple', Type.String())
         _q: string,
       ): void {}
     }

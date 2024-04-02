@@ -56,8 +56,10 @@ export type BodyParameters<T extends TSchema> = {
 export type ParameterParameters<T extends TSchema> = Omit<
   BaseParameterObject,
   'schema' | 'example' | 'examples'
-> &
-  BodyParameters<T>;
+> & {
+  example?: Static<T>;
+  examples?: ExamplesObjectOf<Static<T>>;
+};
 
 export type ResponseParameters<T extends TSchema> = {
   content?: MediaTypeObjectOf<T>;

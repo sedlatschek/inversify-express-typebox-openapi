@@ -55,7 +55,7 @@ export class UserController {
   @Security({ bearerAuth: ['read:session'] })
   public getUserFromSession(
     @response() res: ExpressResponse,
-    @Cookie('sessionId', { schema: Type.String() }) sessionId: string,
+    @Cookie('sessionId', Type.String()) sessionId: string,
   ): void {
     // ...
   }
@@ -67,10 +67,9 @@ export class UserController {
   })
   @OperationId('getAllUsers')
   public get(
-    @Query('state', { schema: Type.Optional(userStateSchema) })
+    @Query('state', Type.Optional(userStateSchema))
     userState?: UserState,
-    @Header('Accept-Language', {
-      schema: Type.Optional(Type.String()),
+    @Header('Accept-Language', Type.Optional(Type.String()), {
       description: 'Falls back to english if not provided',
     })
     _acceptLanguage?: string,
@@ -95,9 +94,9 @@ export class UserController {
   })
   @Response(404, { description: 'User not found' })
   public getUserById(
-    @Path('userId', { schema: Type.Number() }) userId: number,
+    @Path('userId', Type.Number()) userId: number,
     @response() res: ExpressResponse,
-    @Header('Accept-Language', { schema: Type.Optional(Type.String()) })
+    @Header('Accept-Language', Type.Optional(Type.String()))
     _acceptLanguage?: string,
   ): void {
     // ...
@@ -110,7 +109,7 @@ export class UserController {
   })
   @Security({ bearerAuth: ['write:user'] })
   public createUser(
-    @Body({ schema: userSchema }) user: User,
+    @Body(userSchema) user: User,
     @response() res: ExpressResponse,
   ): void {
     // ...
@@ -121,8 +120,8 @@ export class UserController {
   @Response(404, { description: 'User not found' })
   @Security({ bearerAuth: ['write:user'] })
   public updateUser(
-    @Path('userId', { schema: Type.Number() }) userId: number,
-    @Body({ schema: userSchema }) user: User,
+    @Path('userId', Type.Number()) userId: number,
+    @Body(userSchema) user: User,
     @response() res: ExpressResponse,
   ): void {
     // ...
@@ -136,8 +135,8 @@ export class UserController {
   @Response(404, { description: 'User not found' })
   @Security({ bearerAuth: ['write:user'] })
   public patchUserState(
-    @Path('userId', { schema: Type.Number() }) userId: number,
-    @Body({ schema: userStateSchema }) userState: UserState,
+    @Path('userId', Type.Number()) userId: number,
+    @Body(userStateSchema) userState: UserState,
     @response() res: ExpressResponse,
   ): void {
     // ...
@@ -148,7 +147,7 @@ export class UserController {
   @Response(404, { description: 'User not found' })
   @Security({ bearerAuth: ['delete:user'] })
   public deleteUser(
-    @Path('userId', { schema: Type.Number() }) userId: number,
+    @Path('userId', Type.Number()) userId: number,
     @response() res: ExpressResponse,
   ): void {
     // ...
@@ -676,7 +675,7 @@ Specify a path parameter.
 // ...
 class ExampleController {
   @Get('/users/{userId}')
-  public getUser(@Path('userId', schema: Type.String()) userId: string) {
+  public getUser(@Path('userId', Type.String()) userId: string) {
     // ...
   }
 }
@@ -852,14 +851,3 @@ class ExampleController {
 ```
 
 When used on a controller, it is applied to each of its methods.
-
-## ToDo
-
-- [ ] De we need to provide clearMetadata for testing?
-- [ ] Make a package out of it
-- [ ] Check for the lowest compatible version of each peerDependency
-- [ ] Changelog / PR CI system
-- [ ] Add jsdoc to decorators from oas v3.1 spec
-- [ ] Add type tests for decorators (und such things as examples, example, schema)
-- [ ] Move schema to be its own parameter for parameter decorators
-- [ ] use https://www.npmjs.com/package/http-status-codes for responses, since its also a dependency of inversify-express-utils

@@ -41,7 +41,7 @@ const parameter: DecoratorSpecification = {
       @Get('/')
       public get(
         @Style('simple')
-        @Query('q', { schema: Type.String() })
+        @Query('q', Type.String())
         _q: string,
       ): void {}
     }
