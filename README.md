@@ -45,7 +45,7 @@ export type User = Static<typeof userSchema>;
 @Controller('/users')
 @Tags('User')
 @Security({ bearerAuth: ['read:user'] })
-export class TestOaController310User extends BaseHttpController {
+export class UserController {
   @Get('me')
   @Response(200, {
     description: 'The user from the session',
@@ -853,16 +853,6 @@ class ExampleController {
 
 When used on a controller, it is applied to each of its methods.
 
-## Development
-
-### Testing
-
-We use [vitest](https://vitest.dev/) for testing. To ensure support for decorators and reflection, we run it with [swc](https://swc.rs).
-
-### Contribute
-
-Feel free to contribute your code.
-
 ## ToDo
 
 - [ ] De we need to provide clearMetadata for testing?
@@ -872,3 +862,4 @@ Feel free to contribute your code.
 - [ ] Add jsdoc to decorators from oas v3.1 spec
 - [ ] Add type tests for decorators (und such things as examples, example, schema)
 - [ ] Move schema to be its own parameter for parameter decorators
+- [ ] use https://www.npmjs.com/package/http-status-codes for responses, since its also a dependency of inversify-express-utils
