@@ -8,6 +8,7 @@ import {
   requestParam,
   response,
 } from 'inversify-express-utils';
+import { injectResponse } from '../../src';
 
 export const otherSchema = Type.Object(
   {
@@ -25,7 +26,7 @@ export class TestOaController310Other {
   @httpPost('/')
   public createOther(
     @requestBody() other: Other,
-    @response() res: express.Response,
+    @injectResponse() res: express.Response,
   ): void {
     others.push(other);
     res.status(201).send(other);
@@ -35,7 +36,7 @@ export class TestOaController310Other {
   public updateOther(
     @requestParam('otherId') otherId: number,
     @requestBody() other: Other,
-    @response() res: express.Response,
+    @injectResponse() res: express.Response,
   ): void {
     const index = others.findIndex((other) => other.id === otherId);
     if (index) {
@@ -49,7 +50,7 @@ export class TestOaController310Other {
   @httpDelete('/:otherId')
   public del(
     @requestParam('otherId') otherId: number,
-    @response() res: express.Response,
+    @injectResponse() res: express.Response,
   ): void {
     const index = others.findIndex((other) => other.id === otherId);
     if (index) {

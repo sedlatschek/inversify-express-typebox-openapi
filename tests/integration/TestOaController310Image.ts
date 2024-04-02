@@ -1,7 +1,6 @@
 import { Static, Type } from '@sinclair/typebox';
 import express from 'express';
 import { inject } from 'inversify';
-import { response } from 'inversify-express-utils';
 import {
   Body,
   Controller,
@@ -14,6 +13,7 @@ import {
   Response,
   Summary,
   Tags,
+  injectResponse,
 } from '../../src';
 import { IdentifiableObject } from '../../src';
 import { ExampleObjectOf } from '../../src/type';
@@ -57,7 +57,7 @@ export class TestOaController310Image {
   })
   public createImage(
     @Body(imageSchema, { examples: { imageExample1 } }) image: Image,
-    @response() res: express.Response,
+    @injectResponse() res: express.Response,
   ): void {
     images.push(image);
     res.status(201).send(image);
@@ -75,7 +75,7 @@ export class TestOaController310Image {
     imageId: number,
     @Body(imageSchema, { examples: { imageExample1 } })
     image: Image,
-    @response() res: express.Response,
+    @injectResponse() res: express.Response,
   ): void {
     const index = images.findIndex((p) => p.id === imageId);
     if (index) {
@@ -94,7 +94,7 @@ export class TestOaController310Image {
   public del(
     @Path('imageId', Type.Number(), { description: 'The image id' })
     imageId: number,
-    @response() res: express.Response,
+    @injectResponse() res: express.Response,
   ): void {
     const index = images.findIndex((p) => p.id === imageId);
     if (index) {

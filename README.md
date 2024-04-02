@@ -54,7 +54,7 @@ export class UserController {
   @Response(401, { description: 'Unauthorized' })
   @Security({ bearerAuth: ['read:session'] })
   public getUserFromSession(
-    @response() res: ExpressResponse,
+    @injectResponse() res: ExpressResponse,
     @Cookie('sessionId', Type.String()) sessionId: string,
   ): void {
     // ...
@@ -95,7 +95,7 @@ export class UserController {
   @Response(404, { description: 'User not found' })
   public getUserById(
     @Path('userId', Type.Number()) userId: number,
-    @response() res: ExpressResponse,
+    @injectResponse() res: ExpressResponse,
     @Header('Accept-Language', Type.Optional(Type.String()))
     _acceptLanguage?: string,
   ): void {
@@ -110,7 +110,7 @@ export class UserController {
   @Security({ bearerAuth: ['write:user'] })
   public createUser(
     @Body(userSchema) user: User,
-    @response() res: ExpressResponse,
+    @injectResponse() res: ExpressResponse,
   ): void {
     // ...
   }
@@ -122,7 +122,7 @@ export class UserController {
   public updateUser(
     @Path('userId', Type.Number()) userId: number,
     @Body(userSchema) user: User,
-    @response() res: ExpressResponse,
+    @injectResponse() res: ExpressResponse,
   ): void {
     // ...
   }
@@ -137,7 +137,7 @@ export class UserController {
   public patchUserState(
     @Path('userId', Type.Number()) userId: number,
     @Body(userStateSchema) userState: UserState,
-    @response() res: ExpressResponse,
+    @injectResponse() res: ExpressResponse,
   ): void {
     // ...
   }
@@ -148,7 +148,7 @@ export class UserController {
   @Security({ bearerAuth: ['delete:user'] })
   public deleteUser(
     @Path('userId', Type.Number()) userId: number,
-    @response() res: ExpressResponse,
+    @injectResponse() res: ExpressResponse,
   ): void {
     // ...
   }
@@ -208,6 +208,18 @@ const example = withoutId({
 ```
 
 ### Decorators
+
+### injectRequest
+
+Is an alias for [inversify-express-utils](https://www.npmjs.com/package/inversify-express-utils) `request` decorator. May be extended with functionality at a later stage of development.
+
+### injectResponse
+
+Is an alias for [inversify-express-utils](https://www.npmjs.com/package/inversify-express-utils) `response` decorator. May be extended with functionality at a later stage of development.
+
+### injectNext
+
+Is an alias for [inversify-express-utils](https://www.npmjs.com/package/inversify-express-utils) `next` decorator. May be extended with functionality at a later stage of development.
 
 #### AllowEmtpyValue
 

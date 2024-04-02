@@ -18,6 +18,7 @@ import {
   Response,
   Security,
   Tags,
+  injectResponse,
 } from '../../src';
 import { Post as PostType, postSchema, posts } from './TestOaController310Post';
 
@@ -74,7 +75,7 @@ export class TestOaController310User extends BaseHttpController {
   @Security({ bearerAuth: ['user'] })
   @Security({ basicAuth: ['user'] })
   public getUserFromSession(
-    @response() res: ExpressResponse,
+    @injectResponse() res: ExpressResponse,
     @Cookie('sessionId', Type.String()) sessionId: string,
   ): void {
     if (sessionId) {
@@ -122,7 +123,7 @@ export class TestOaController310User extends BaseHttpController {
   @Response(404, { description: 'User not found' })
   public getUserById(
     @Path('userId', Type.Number()) userId: number,
-    @response() res: ExpressResponse,
+    @injectResponse() res: ExpressResponse,
     @Header('Accept-Language', Type.Optional(Type.String()))
     _acceptLanguage?: string,
   ): void {
@@ -143,7 +144,7 @@ export class TestOaController310User extends BaseHttpController {
   })
   public createUser(
     @Body(userSchema) user: User,
-    @response() res: ExpressResponse,
+    @injectResponse() res: ExpressResponse,
   ): void {
     users.push(user);
     res.status(201).send(user);
@@ -155,7 +156,7 @@ export class TestOaController310User extends BaseHttpController {
   public updateUser(
     @Path('userId', Type.Number()) userId: number,
     @Body(userSchema) user: User,
-    @response() res: ExpressResponse,
+    @injectResponse() res: ExpressResponse,
   ): void {
     const index = users.findIndex((user) => user.id === userId);
 
@@ -177,7 +178,7 @@ export class TestOaController310User extends BaseHttpController {
   public patchUserState(
     @Path('userId', Type.Number()) userId: number,
     @Body(userStateSchema) userState: UserState,
-    @response() res: ExpressResponse,
+    @injectResponse() res: ExpressResponse,
   ): void {
     const user = users.find((user) => user.id === userId);
 
@@ -195,7 +196,7 @@ export class TestOaController310User extends BaseHttpController {
   @Response(404, { description: 'User not found' })
   public deleteUser(
     @Path('userId', Type.Number()) userId: number,
-    @response() res: ExpressResponse,
+    @injectResponse() res: ExpressResponse,
   ): void {
     const index = users.findIndex((user) => user.id === userId);
 

@@ -36,6 +36,12 @@ import {
 } from './type';
 import { ucfirst } from './utilize';
 
+export {
+  next as injectNext,
+  request as injectRequest,
+  response as injectResponse,
+} from 'inversify-express-utils';
+
 export const Controller = (
   path: string,
   ...middleware: Array<Middleware>

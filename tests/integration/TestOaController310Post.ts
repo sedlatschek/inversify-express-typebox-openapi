@@ -13,6 +13,7 @@ import {
   Response,
   Security,
   Tags,
+  injectResponse,
 } from '../../src';
 import { IdentifiableObject } from '../../src';
 import { ExampleObjectOf } from '../../src/type';
@@ -70,7 +71,7 @@ export class TestOaController310Post {
       examples: { postExample },
     })
     post: Post,
-    @response() res: express.Response,
+    @injectResponse() res: express.Response,
   ): void {
     posts.push(post);
     res.status(201).send(post);
@@ -89,7 +90,7 @@ export class TestOaController310Post {
       examples: { postExample },
     })
     post: Post,
-    @response() res: express.Response,
+    @injectResponse() res: express.Response,
   ): void {
     const index = posts.findIndex((p) => p.id === postId);
     if (index) {
@@ -107,7 +108,7 @@ export class TestOaController310Post {
   public del(
     @Path('postId', Type.Number(), { description: 'The post id' })
     postId: number,
-    @response() res: express.Response,
+    @injectResponse() res: express.Response,
   ): void {
     const index = posts.findIndex((p) => p.id === postId);
     if (index) {

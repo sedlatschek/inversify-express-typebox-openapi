@@ -1,7 +1,15 @@
 import { Static, Type } from '@sinclair/typebox';
 import express from 'express';
 import { response } from 'inversify-express-utils';
-import { Body, Controller, Deprecated, Post, Response, Tags } from '../../src';
+import {
+  Body,
+  Controller,
+  Deprecated,
+  Post,
+  Response,
+  Tags,
+  injectResponse,
+} from '../../src';
 
 const postings: string[] = [];
 
@@ -20,7 +28,7 @@ export class TestOaController310DeprecatedPosting {
   public createPosting(
     @Body(postingSchema)
     postingDto: Posting,
-    @response() res: express.Response,
+    @injectResponse() res: express.Response,
   ): void {
     postings.push(postingDto);
     res.status(201).send(postingDto);
