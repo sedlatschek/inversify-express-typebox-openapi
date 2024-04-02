@@ -299,7 +299,7 @@ type User = Static<typeof userSchema>;
 // ...
 class ExampleController {
   // ...
-  public createUser(@Body({ schema: userSchema }) userDto: User) {
+  public createUser(@Body(userSchema) userDto: User) {
     // ....
   }
 }
@@ -317,7 +317,7 @@ Specify a cookie parameter.
 // ...
 class ExampleController {
   // ...
-  public get(@Cookie('Cookie', { schema: Type.String() }) cookie: string) {
+  public get(@Cookie('Cookie', Type.String()) cookie: string) {
     // ....
   }
 }
@@ -368,7 +368,7 @@ class ExampleController {
 // ...
 class ExampleController {
   // ...
-  public getUser(@Deprecated() @Path('userId', { schema: Type.String() })) {
+  public getUser(@Deprecated() @Path('userId', Type.String())) {
 
   }
 }
@@ -560,7 +560,7 @@ class ExampleController {
       description: 'Official documentation',
       url: 'https://example.org',
     })
-    @Path('id', { schema: Type.String() }))
+    @Path('id', Type.String()))
     id: string
   {
     // ....
@@ -616,9 +616,7 @@ Specify a header parameter.
 // ...
 class ExampleController {
   // ...
-  public get(
-    @Header('Authorization', { schema: Type.String() }) authToken: string,
-  ) {
+  public get(@Header('Authorization', Type.String()) authToken: string) {
     // ....
   }
 }
@@ -741,7 +739,7 @@ Specify a query parameter.
 // ...
 class ExampleController {
   // ...
-  public getUsers(@Query('query', schema: Type.String()) query: string) {
+  public getUsers(@Query('query', Type.String()) query: string) {
     // ...
   }
 }
