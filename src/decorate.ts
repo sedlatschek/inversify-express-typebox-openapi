@@ -5,6 +5,7 @@ import {
   HandlerDecorator,
   Middleware,
   controller,
+  cookies,
   httpDelete,
   httpGet,
   httpHead,
@@ -13,6 +14,7 @@ import {
   httpPut,
   queryParam,
   requestBody,
+  requestHeaders,
   requestParam,
 } from 'inversify-express-utils';
 import {
@@ -158,8 +160,8 @@ const parameterDecoratorFactory = (
 
 export const Path = parameterDecoratorFactory(requestParam, 'path');
 export const Query = parameterDecoratorFactory(queryParam, 'query');
-export const Cookie = parameterDecoratorFactory(queryParam, 'cookie');
-export const Header = parameterDecoratorFactory(queryParam, 'header');
+export const Cookie = parameterDecoratorFactory(cookies, 'cookie');
+export const Header = parameterDecoratorFactory(requestHeaders, 'header');
 
 export const Body = <
   TTarget extends object,
