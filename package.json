@@ -1,6 +1,6 @@
 {
   "name": "inversify-express-typebox-openapi",
-  "version": "0.0.5",
+  "version": "0.1.0",
   "description": "Generate OpenAPI specification from inversify-express-utils controllers",
   "scripts": {
     "test": "vitest",
