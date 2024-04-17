@@ -1,6 +1,5 @@
 import { Static, Type } from '@sinclair/typebox';
 import express from 'express';
-import { response } from 'inversify-express-utils';
 import {
   Body,
   Controller,

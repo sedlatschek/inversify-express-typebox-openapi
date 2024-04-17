@@ -6,7 +6,6 @@ import {
   httpPut,
   requestBody,
   requestParam,
-  response,
 } from 'inversify-express-utils';
 import { injectResponse } from '../../src';
 
